@@ -1,8 +1,10 @@
-import { Entity, Column } from 'typeorm';
-import Base from './base.entity';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('files')
-export default class File extends Base {
+export class File {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  id: number;
+
   @Column('varchar', { length: 255, unique: true })
   filename: string;
 

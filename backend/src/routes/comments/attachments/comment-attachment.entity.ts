@@ -1,9 +1,9 @@
 import { Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import Comment from './comment.entity';
-import File from './file.entity';
+import { File } from '../../files/file.entity';
+import { Comment } from '../comment.entity';
 
 @Entity('comment_attachments')
-export default class CommentAttachment {
+export class CommentAttachment {
   @PrimaryColumn('int')
   comment_id: number;
 
