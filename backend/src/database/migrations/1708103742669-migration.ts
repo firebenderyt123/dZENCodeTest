@@ -2,16 +2,21 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class Migration1708103742669 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
+    // USERS
     await queryRunner.query(`
         CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
             username VARCHAR(50) NOT NULL,
             email VARCHAR(100) NOT NULL,
             password_hash VARCHAR(255) NOT NULL,
-            site_url VARCHAR(255)
+            site_url VARCHAR(255),
+            UNIQUE (id),
+            UNIQUE (email),
+            UNIQUE (username)
         )
     `);
 
+    // COMMENTS
     await queryRunner.query(`
         CREATE TABLE IF NOT EXISTS comments (
             id SERIAL PRIMARY KEY,
@@ -20,17 +25,46 @@ export class Migration1708103742669 implements MigrationInterface {
             text TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id),
-            FOREIGN KEY (parent_comment_id) REFERENCES comments(id)
+            FOREIGN KEY (parent_comment_id) REFERENCES comments(id),
+            UNIQUE (id)
         )
+    `);
+
+    // FILES
+    await queryRunner.query(`
+        CREATE TABLE IF NOT EXISTS files (
+            id SERIAL PRIMARY KEY,
+            filename VARCHAR(255) NOT NULL,
+            uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE (id),
+            UNIQUE (filename)
+        );
+    `);
+
+    // COMMENT_ATTACHMENTS
+    await queryRunner.query(`
+        CREATE TABLE IF NOT EXISTS comment_attachments (
+            comment_id INT NOT NULL,
+            file_id INT NOT NULL,
+            PRIMARY KEY (comment_id, file_id),
+            FOREIGN KEY (comment_id) REFERENCES comments(id),
+            FOREIGN KEY (file_id) REFERENCES files(id)
+        );
     `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-            DROP TABLE IF EXISTS comments
-        `);
+        DROP TABLE IF EXISTS comment_attachments
+    `);
     await queryRunner.query(`
-            DROP TABLE IF EXISTS users
-        `);
+        DROP TABLE IF EXISTS comments
+    `);
+    await queryRunner.query(`
+        DROP TABLE IF EXISTS files
+    `);
+    await queryRunner.query(`
+        DROP TABLE IF EXISTS users
+    `);
   }
 }

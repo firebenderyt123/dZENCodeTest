@@ -1,20 +1,18 @@
-import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, OneToOne, ManyToOne } from 'typeorm';
 import Base from './base.entity';
 import User from './user.entity';
 
-@Entity()
+@Entity('comments')
 export default class Comment extends Base {
-  @OneToOne(() => User)
-  @JoinColumn()
+  @ManyToOne(() => User)
   user: User;
 
   @OneToOne(() => Comment, { nullable: true })
-  @JoinColumn()
   parent: Comment;
 
-  @Column()
+  @Column('text')
   text: string;
 
-  @Column({ type: 'bigint' })
-  created_at: number;
+  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
 }
