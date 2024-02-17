@@ -16,14 +16,11 @@ export class UsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createUser(
+  async create(
     @Body() userData: CreateUserDto,
     @Res() reply: FastifyReply,
-  ) {
-    const user = await this.usersService.createUser(userData);
-
-    if (!user) return reply.code(400).send({ message: 'User already exists!' });
-
+  ): Promise<void> {
+    const user = await this.usersService.create(userData);
     reply.send(user);
   }
 }

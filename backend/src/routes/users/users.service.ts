@@ -1,7 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { createHash } from 'crypto';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 
@@ -12,14 +11,11 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async createUser(userData: CreateUserDto) {
+  async create(userData: CreateUserDto): Promise<User> {
     const user = new User();
     user.username = userData.username;
     user.email = userData.email;
     user.site_url = userData.site_url;
-    user.password_hash = createHash('md5')
-      .update(userData.password)
-      .digest('hex');
 
     try {
       return await this.usersRepository.save(user);

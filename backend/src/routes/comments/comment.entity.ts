@@ -1,9 +1,10 @@
 import {
   Entity,
   Column,
-  OneToOne,
   ManyToOne,
   PrimaryGeneratedColumn,
+  JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { User } from '../users/user.entity';
 
@@ -13,10 +14,18 @@ export class Comment {
   id: number;
 
   @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @OneToOne(() => Comment, { nullable: true })
+  @ManyToOne(() => Comment, (comment) => comment.replies, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'parent_comment_id' })
   parent: Comment;
+
+  @OneToMany(() => Comment, (comment) => comment.parent, { cascade: true })
+  replies: Comment[];
 
   @Column('text')
   text: string;
