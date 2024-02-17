@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { FindOptionsOrder } from 'typeorm';
 
 @Controller()
 export class CommentsController {
@@ -40,8 +39,20 @@ export class CommentsController {
     @Query('order') order: 'ASC' | 'DESC' | 'asc' | 'desc' = 'DESC',
     @Res() reply: FastifyReply,
   ): Promise<void> {
+    if (isNaN(page)) {
+      throw new BadRequestException('Page must be a number');
+    }
+
+    if (isNaN(limit)) {
+      throw new BadRequestException('Limit must be a number');
+    }
+
     if (!['username', 'email', 'created_at'].includes(orderBy)) {
       throw new BadRequestException('Invalid orderBy parameter');
+    }
+
+    if (!['ASC', 'DESC', 'asc', 'desc'].includes(order)) {
+      throw new BadRequestException('Invalid order parameter');
     }
 
     const obj = {
