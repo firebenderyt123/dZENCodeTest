@@ -11,11 +11,11 @@ import {
 export class CreateCommentDto {
   @IsDefined({ message: 'User id is required' })
   @IsNumber({}, { message: 'User id should be a number' })
-  user_id: number;
+  userId: number;
 
   @IsNumber({}, { message: 'Parent comment id should be a number' })
   @IsOptional()
-  parent_comment_id?: number;
+  parentId?: number;
 
   @IsDefined({ message: 'Text is required' })
   @MinLength(20, { message: 'Text should be at least 20 characters long' })

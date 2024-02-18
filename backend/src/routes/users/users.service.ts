@@ -15,7 +15,7 @@ export class UsersService {
     const user = new User();
     user.username = userData.username;
     user.email = userData.email;
-    user.site_url = userData.site_url;
+    user.siteUrl = userData.siteUrl;
 
     try {
       return await this.usersRepository.save(user);

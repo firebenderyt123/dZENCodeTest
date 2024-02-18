@@ -43,10 +43,12 @@ export class Migration1708103742669 implements MigrationInterface {
     await queryRunner.query(`
         CREATE TABLE IF NOT EXISTS files (
             id SERIAL PRIMARY KEY,
-            filename VARCHAR(255) NOT NULL,
+            container_name VARCHAR(255) NOT NULL,
+            blob_name VARCHAR(255) NOT NULL,
+            file_url VARCHAR(255) NOT NULL,
             uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE (id),
-            UNIQUE (filename)
+            UNIQUE (container_name, blob_name)
         );
     `);
 

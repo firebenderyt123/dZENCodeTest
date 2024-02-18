@@ -11,6 +11,6 @@ export class User {
   @Column('varchar', { length: 100, unique: true })
   email: string;
 
-  @Column('varchar', { length: 255, nullable: true })
-  site_url?: string;
+  @Column('varchar', { name: 'site_url', length: 255, nullable: true })
+  siteUrl?: string;
 }

@@ -7,4 +7,10 @@ export default () => ({
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWD,
   },
+  azure: {
+    storage: {
+      accountName: process.env.AZURE_STORAGE_ACCOUNT_NAME,
+      accountKey: process.env.AZURE_STORAGE_ACCOUNT_KEY,
+    },
+  },
 });

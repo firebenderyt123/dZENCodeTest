@@ -15,18 +15,18 @@ export class CommentsService {
   ) {}
 
   async create(commentData: CreateCommentDto): Promise<Comment> {
-    const { user_id, parent_comment_id, text } = commentData;
+    const { userId, parentId, text } = commentData;
 
     const comment = new Comment();
 
-    comment.parent = parent_comment_id
+    comment.parent = parentId
       ? await this.commentRepository.findOneBy({
-          id: parent_comment_id,
+          id: parentId,
         })
       : null;
 
     comment.user = await this.usersRepositoty.findOneBy({
-      id: user_id,
+      id: userId,
     });
 
     comment.text = text;

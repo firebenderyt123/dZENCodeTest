@@ -35,7 +35,7 @@ export class CommentsController {
     @Query('page') page = 1,
     @Query('limit') limit = 25,
     @Query('orderBy')
-    orderBy: 'username' | 'email' | 'created_at' = 'created_at',
+    orderBy: 'username' | 'email' | 'createdAt' = 'createdAt',
     @Query('order') order: 'ASC' | 'DESC' | 'asc' | 'desc' = 'DESC',
     @Res() reply: FastifyReply,
   ): Promise<void> {
@@ -47,7 +47,7 @@ export class CommentsController {
       throw new BadRequestException('Limit must be a number');
     }
 
-    if (!['username', 'email', 'created_at'].includes(orderBy)) {
+    if (!['username', 'email', 'createdAt'].includes(orderBy)) {
       throw new BadRequestException('Invalid orderBy parameter');
     }
 

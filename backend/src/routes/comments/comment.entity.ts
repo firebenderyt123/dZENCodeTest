@@ -30,6 +30,9 @@ export class Comment {
   @Column('text')
   text: string;
 
-  @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  @Column('timestamp', {
+    name: 'created_at',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
 }

@@ -5,9 +5,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  Matches,
-  MaxLength,
-  MinLength,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -29,5 +26,5 @@ export class CreateUserDto {
   @IsString({ message: 'Site URL should be a string' })
   @IsOptional()
   @Transform(({ value }) => (value ? value.trim() : undefined))
-  site_url?: string;
+  siteUrl?: string;
 }
