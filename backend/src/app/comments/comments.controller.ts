@@ -1,4 +1,4 @@
-import { FastifyReply } from 'fastify';
+import { FastifyRequest } from 'fastify';
 import {
   BadRequestException,
   Body,
@@ -10,25 +10,32 @@ import {
   Param,
   Post,
   Query,
-  Res,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import { Comment } from './comment.entity';
 import { CommentsService } from './comments.service';
+import { CommentList } from './interfaces/comment-list.interface';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AuthService } from '../auth/auth.service';
 
 @Controller()
 export class CommentsController {
-  constructor(private readonly commentsService: CommentsService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly commentsService: CommentsService,
+  ) {}
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(
     @Body() commentData: CreateCommentDto,
-    @Res() reply: FastifyReply,
-  ): Promise<void> {
-    const comment = await this.commentsService.create(commentData);
-    reply.send(comment);
+    @Req() req: FastifyRequest,
+  ): Promise<Comment> {
+    const { id } = this.authService.getTokenPayload(req);
+    return await this.commentsService.create(id, commentData);
   }
 
   @Get()
@@ -39,8 +46,7 @@ export class CommentsController {
     @Query('orderBy')
     orderBy: 'username' | 'email' | 'createdAt' = 'createdAt',
     @Query('order') order: 'ASC' | 'DESC' | 'asc' | 'desc' = 'DESC',
-    @Res() reply: FastifyReply,
-  ): Promise<void> {
+  ): Promise<CommentList> {
     if (isNaN(page)) {
       throw new BadRequestException('Page must be a number');
     }
@@ -66,22 +72,23 @@ export class CommentsController {
             user: obj,
           }
         : obj;
-    const comment = await this.commentsService.find(page, limit, orderObj);
-    reply.send(comment);
+    return await this.commentsService.find(page, limit, orderObj);
   }
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   @HttpCode(HttpStatus.OK)
   async remove(
     @Param('id') commentId: number,
-    @Res() reply: FastifyReply,
-  ): Promise<void> {
+    @Req() req: FastifyRequest,
+  ): Promise<'ok'> {
     if (isNaN(commentId)) {
       throw new BadRequestException(':id must be a number');
     }
 
-    await this.commentsService.remove(commentId);
-    reply.send('ok');
+    const { id } = this.authService.getTokenPayload(req);
+
+    await this.commentsService.remove(commentId, id);
+    return 'ok';
   }
 }

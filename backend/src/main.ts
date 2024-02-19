@@ -22,6 +22,8 @@ async function bootstrap() {
         }));
         return new BadRequestException(result);
       },
+      whitelist: true,
+      forbidNonWhitelisted: true,
       stopAtFirstError: true,
     }),
   );

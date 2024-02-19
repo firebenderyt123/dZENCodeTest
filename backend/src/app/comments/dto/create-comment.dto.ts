@@ -7,12 +7,9 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { TrimLowercase } from 'src/decorators/trim-lowercase.decorator';
 
 export class CreateCommentDto {
-  @IsDefined({ message: 'User id is required' })
-  @IsNumber({}, { message: 'User id should be a number' })
-  userId: number;
-
   @IsNumber({}, { message: 'Parent comment id should be a number' })
   @IsOptional()
   parentId?: number;
@@ -23,6 +20,6 @@ export class CreateCommentDto {
     message: 'Text should be less than 4096 characters long',
   })
   @IsString({ message: 'Text should be a string' })
-  @Transform(({ value }) => typeof value === 'string' && value.trim())
+  @TrimLowercase()
   text: string;
 }

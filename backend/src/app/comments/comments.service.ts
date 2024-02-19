@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsOrder, IsNull, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { Comment } from './comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { CommentList } from './interfaces/comment-list.interface';
 
 @Injectable()
 export class CommentsService {
@@ -13,8 +14,11 @@ export class CommentsService {
     private usersService: UsersService,
   ) {}
 
-  async create(commentData: CreateCommentDto): Promise<Comment> {
-    const { userId, parentId, text } = commentData;
+  async create(
+    userId: number,
+    commentData: CreateCommentDto,
+  ): Promise<Comment> {
+    const { parentId, text } = commentData;
 
     const comment = new Comment();
 
@@ -37,7 +41,7 @@ export class CommentsService {
     page: number,
     limit: number,
     order: FindOptionsOrder<Comment>,
-  ): Promise<{ data: Comment[]; total: { pages: number; comments: number } }> {
+  ): Promise<CommentList> {
     const [rootComments, totalComments] =
       await this.commentRepository.findAndCount({
         take: limit,
@@ -67,17 +71,25 @@ export class CommentsService {
     };
   }
 
-  async remove(id: number): Promise<void> {
-    // const comment = await this.commentRepository.findOneBy({ id });
+  async remove(commentId: number, userId: number): Promise<void> {
+    const comment = await this.findCommentWithUser(commentId);
 
-    // const { id: jwtUserId } = await this.jwtService.verifyAsync(token);
+    if (!comment) return;
 
-    // if (comment.user.id !== jwtUserId)
-    //   throw new ForbiddenException(
-    //     'You are not allowed to delete this comment',
-    //   );
+    if (comment.user.id !== userId)
+      throw new ForbiddenException(
+        'You are not allowed to delete this comment',
+      );
 
-    await this.commentRepository.delete(id);
+    await this.commentRepository.delete(commentId);
+  }
+
+  private async findCommentWithUser(id: number): Promise<Comment | undefined> {
+    return await this.commentRepository
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .where('comment.id = :id', { id })
+      .getOne();
   }
 
   private async getAllCommentsWithChildren(
