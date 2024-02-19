@@ -17,7 +17,7 @@ export class Migration1708103742669 implements MigrationInterface {
 
     // PROFILE
     await queryRunner.query(`
-        CREATE TABLE IF NOT EXISTS profile (
+        CREATE TABLE IF NOT EXISTS secret_info (
             user_id SERIAL PRIMARY KEY,
             password_hash VARCHAR(255) NOT NULL,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -75,7 +75,7 @@ export class Migration1708103742669 implements MigrationInterface {
         DROP TABLE IF EXISTS files
     `);
     await queryRunner.query(`
-        DROP TABLE IF EXISTS profile
+        DROP TABLE IF EXISTS secret_info
     `);
     await queryRunner.query(`
         DROP TABLE IF EXISTS users

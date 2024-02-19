@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { Controller, Delete, Param, Post, Req, Res } from '@nestjs/common';
-import { File } from 'src/helpers/files/file.entity';
+import { File } from '../files/file.entity';
 import { CommentAttachmentsService } from './comment-attachments.service';
 
 @Controller()

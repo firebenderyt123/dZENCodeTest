@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MultipartFile } from '@fastify/multipart';
 import { Repository } from 'typeorm';
-import { File } from 'src/helpers/files/file.entity';
-import { FilesService } from 'src/helpers/files/files.service';
+import { File } from '../files/file.entity';
+import { FilesService } from '../files/files.service';
 import { CommentAttachment } from './comment-attachment.entity';
 
 @Injectable()

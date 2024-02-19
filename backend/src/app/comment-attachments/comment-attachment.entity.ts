@@ -1,5 +1,5 @@
 import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { File } from 'src/helpers/files/file.entity';
+import { File } from '../files/file.entity';
 import { Comment } from '../comments/comment.entity';
 
 @Entity('comment_attachments')

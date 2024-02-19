@@ -23,9 +23,11 @@ export class FilesService {
     const containerName = extension === 'txt' ? 'files' : 'images';
 
     const currentDate = new Date();
-    const directoryName = `${(currentDate.getMonth() + 1)
+    const directoryName = `${currentDate.getFullYear()}/${(
+      currentDate.getMonth() + 1
+    )
       .toString()
-      .padStart(2, '0')}-${currentDate.getFullYear()}`;
+      .padStart(2, '0')}`;
 
     const blobName = directoryName + '/' + newFileName;
 

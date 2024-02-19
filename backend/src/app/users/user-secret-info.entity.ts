@@ -3,16 +3,16 @@ import {
   Column,
   PrimaryGeneratedColumn,
   JoinColumn,
-  ManyToOne,
+  OneToOne,
 } from 'typeorm';
-import { User } from '../users/user.entity';
+import { User } from './user.entity';
 
-@Entity('profile')
-export class Profile {
+@Entity('secret_info')
+export class SecretInfo {
   @PrimaryGeneratedColumn({ name: 'user_id', type: 'int' })
   userId: number;
 
-  @ManyToOne(() => User)
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: User;
 

@@ -7,6 +7,10 @@ export default () => ({
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASSWD,
   },
+  jwt: {
+    secret: process.env.JWT_SECRET,
+    expiresIn: process.env.JWT_EXPIRATION_TIME,
+  },
   azure: {
     storage: {
       accountName: process.env.AZURE_STORAGE_ACCOUNT_NAME,

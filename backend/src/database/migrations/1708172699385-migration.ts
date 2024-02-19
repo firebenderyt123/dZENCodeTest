@@ -6,13 +6,13 @@ export class Migration1708172699385 implements MigrationInterface {
         INSERT INTO users (username, email)
             VALUES ('user1', 'user1@example.com')`);
     await queryRunner.query(`
-        INSERT INTO profile (user_id, password_hash)
+        INSERT INTO secret_info (user_id, password_hash)
             VALUES (1, md5('Qwerty123!'))`);
     await queryRunner.query(`
         INSERT INTO users (username, email)
             VALUES ('user2', 'user2@example.com')`);
     await queryRunner.query(`
-        INSERT INTO profile (user_id, password_hash)
+        INSERT INTO secret_info (user_id, password_hash)
             VALUES (2, md5('Qwerty123!'))`);
   }
 

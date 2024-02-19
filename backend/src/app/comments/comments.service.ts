@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsOrder, IsNull, Repository } from 'typeorm';
+import { UsersService } from '../users/users.service';
 import { Comment } from './comment.entity';
-import { User } from '../users/user.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
@@ -10,8 +10,7 @@ export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
-    @InjectRepository(User)
-    private usersRepositoty: Repository<User>,
+    private usersService: UsersService,
   ) {}
 
   async create(commentData: CreateCommentDto): Promise<Comment> {
@@ -25,7 +24,7 @@ export class CommentsService {
         })
       : null;
 
-    comment.user = await this.usersRepositoty.findOneBy({
+    comment.user = await this.usersService.findOneBy({
       id: userId,
     });
 
