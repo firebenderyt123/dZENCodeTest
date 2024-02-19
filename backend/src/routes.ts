@@ -1,12 +1,13 @@
 import { Routes } from '@nestjs/core';
+import { AuthModule } from './app/auth/auth.module';
 import { CommentsModule } from './app/comments/comments.module';
 import { CommentAttachmentsModule } from './app/comment-attachments/comment-attachments.module';
-import { UsersModule } from './app/users/users.module';
 
 export const routes: Routes = [
   {
     path: '/api/v1',
     children: [
+      { path: '/auth', module: AuthModule },
       {
         path: '/comments',
         module: CommentsModule,
@@ -17,9 +18,8 @@ export const routes: Routes = [
           },
         ],
       },
-      { path: '/users', module: UsersModule },
     ],
   },
 ];
 
-export const modules = [CommentsModule, CommentAttachmentsModule, UsersModule];
+export const modules = [AuthModule, CommentsModule, CommentAttachmentsModule];

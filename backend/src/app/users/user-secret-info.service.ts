@@ -24,7 +24,7 @@ export class SecretInfoService {
       userId,
       passwordHash,
     });
-    this.secretInfoRepository.save(secretInfo);
+    await this.secretInfoRepository.save(secretInfo);
   }
 
   hashPassword(password: string): string {

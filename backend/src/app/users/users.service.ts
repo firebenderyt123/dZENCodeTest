@@ -16,13 +16,15 @@ export class UsersService {
   async create(userData: CreateUserDto): Promise<User> {
     const { username, email, siteUrl, password } = userData;
 
-    const existingUserByEmail = this.usersRepository.findBy({ email });
+    const existingUserByEmail = await this.findOneBy({ email });
     if (existingUserByEmail)
       throw new ConflictException(
         'User with the provided email already exists',
       );
 
-    const existingUserByUsername = this.usersRepository.findBy({ username });
+    const existingUserByUsername = await this.findOneBy({
+      username,
+    });
     if (existingUserByUsername)
       throw new ConflictException(
         'User with the provided username already exists',
@@ -41,7 +43,7 @@ export class UsersService {
 
   async findOneBy(
     where: FindOptionsWhere<User> | FindOptionsWhere<User>[],
-  ): Promise<User> {
+  ): Promise<User | null> {
     return await this.usersRepository.findOneBy(where);
   }
 
@@ -52,7 +54,7 @@ export class UsersService {
   async searchByEmailAndPassword(
     email: string,
     password: string,
-  ): Promise<User> {
+  ): Promise<User | null> {
     const passwordHash = this.secretInfoService.hashPassword(password);
 
     const query = this.secretInfoService
@@ -61,6 +63,8 @@ export class UsersService {
       .where('user.email = :email', { email })
       .andWhere('secretInfo.passwordHash = :passwordHash', { passwordHash });
 
-    return (await query.getOne()).user;
+    const secretInfo = await query.getOne();
+
+    return secretInfo ? secretInfo.user : null;
   }
 }

@@ -1,5 +1,13 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { Controller, Delete, Param, Post, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Param,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { File } from '../files/file.entity';
 import { CommentAttachmentsService } from './comment-attachments.service';
 
@@ -19,6 +27,7 @@ export class CommentAttachmentsController {
   //   .build({
   //     errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
   //   }),
+  // @UseGuards(JwtAuthGuard)
   @Post(':id')
   async addAttachment(
     @Param('id') commentId: number,
@@ -37,6 +46,7 @@ export class CommentAttachmentsController {
     reply.send(uploadedFiles);
   }
 
+  // @UseGuards(JwtAuthGuard)
   @Delete(':attachmentId')
   async removeAttachemnt(
     @Param('attachmentId') attachmentId: number,

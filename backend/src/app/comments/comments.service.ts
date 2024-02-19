@@ -68,6 +68,15 @@ export class CommentsService {
   }
 
   async remove(id: number): Promise<void> {
+    // const comment = await this.commentRepository.findOneBy({ id });
+
+    // const { id: jwtUserId } = await this.jwtService.verifyAsync(token);
+
+    // if (comment.user.id !== jwtUserId)
+    //   throw new ForbiddenException(
+    //     'You are not allowed to delete this comment',
+    //   );
+
     await this.commentRepository.delete(id);
   }
 

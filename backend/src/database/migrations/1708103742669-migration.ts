@@ -15,7 +15,7 @@ export class Migration1708103742669 implements MigrationInterface {
         )
     `);
 
-    // PROFILE
+    // SECRET_INFO
     await queryRunner.query(`
         CREATE TABLE IF NOT EXISTS secret_info (
             user_id SERIAL PRIMARY KEY,

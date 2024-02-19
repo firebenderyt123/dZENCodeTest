@@ -1,26 +1,33 @@
-import { FastifyReply } from 'fastify';
 import {
   Body,
   Controller,
   HttpCode,
   HttpStatus,
   Post,
-  Res,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { User } from '../users/user.entity';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
-import { SignUpDto } from './dto/sign-up.dto';
+import { Auth } from './interfaces/auth.interface';
 
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @UseGuards(LocalAuthGuard)
+  @Post('/sign-in')
+  @HttpCode(HttpStatus.OK)
+  async signIn(@Req() req: { user: User }): Promise<Auth> {
+    console.log(req.user);
+    return await this.authService.signIn(req.user);
+  }
+
+  @Post('/sign-up')
   @HttpCode(HttpStatus.CREATED)
-  async signUp(
-    @Body() userData: SignUpDto,
-    @Res() reply: FastifyReply,
-  ): Promise<void> {
-    const user = await this.authService.signUp(userData);
-    reply.send(user);
+  async signUp(@Body() userData: CreateUserDto): Promise<Auth> {
+    return await this.authService.signUp(userData);
   }
 }

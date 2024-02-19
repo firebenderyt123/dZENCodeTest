@@ -1,15 +1,9 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  JoinColumn,
-  OneToOne,
-} from 'typeorm';
+import { Entity, Column, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity('secret_info')
 export class SecretInfo {
-  @PrimaryGeneratedColumn({ name: 'user_id', type: 'int' })
+  @PrimaryColumn({ name: 'user_id', type: 'int' })
   userId: number;
 
   @OneToOne(() => User, { onDelete: 'CASCADE' })
