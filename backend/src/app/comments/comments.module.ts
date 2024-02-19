@@ -10,5 +10,6 @@ import { UsersModule } from '../users/users.module';
   imports: [AuthModule, UsersModule, TypeOrmModule.forFeature([Comment])],
   controllers: [CommentsController],
   providers: [CommentsService],
+  exports: [CommentsService],
 })
 export class CommentsModule {}

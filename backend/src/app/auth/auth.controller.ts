@@ -21,7 +21,6 @@ export class AuthController {
   @Post('/sign-in')
   @HttpCode(HttpStatus.OK)
   async signIn(@Req() req: { user: User }): Promise<Auth> {
-    console.log(req.user);
     return await this.authService.signIn(req.user);
   }
 

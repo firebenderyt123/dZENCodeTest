@@ -1,19 +1,21 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyRequest } from 'fastify';
 import {
   Controller,
   Delete,
   Param,
   Post,
   Req,
-  Res,
   UseGuards,
 } from '@nestjs/common';
 import { File } from '../files/file.entity';
 import { CommentAttachmentsService } from './comment-attachments.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AuthService } from '../auth/auth.service';
 
 @Controller()
 export class CommentAttachmentsController {
   constructor(
+    private readonly authService: AuthService,
     private readonly commentAttachmentsService: CommentAttachmentsService,
   ) {}
 
@@ -27,32 +29,32 @@ export class CommentAttachmentsController {
   //   .build({
   //     errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
   //   }),
-  // @UseGuards(JwtAuthGuard)
-  @Post(':id')
+  @UseGuards(JwtAuthGuard)
+  @Post(':commentId')
   async addAttachment(
-    @Param('id') commentId: number,
-    @Req() request: FastifyRequest,
-    @Res() reply: FastifyReply,
-  ) {
-    const multiPart = request.files();
-
+    @Param('commentId') commentId: number,
+    @Req() req: FastifyRequest,
+  ): Promise<File[]> {
+    const { id } = this.authService.getTokenPayload(req);
+    const multiPart = req.files();
     const uploadedFiles: File[] = [];
 
     for await (const part of multiPart) {
       uploadedFiles.push(
-        await this.commentAttachmentsService.addAttachment(commentId, part),
+        await this.commentAttachmentsService.addAttachment(id, commentId, part),
       );
     }
-    reply.send(uploadedFiles);
+    return uploadedFiles;
   }
 
-  // @UseGuards(JwtAuthGuard)
-  @Delete(':attachmentId')
+  @UseGuards(JwtAuthGuard)
+  @Delete(':fileId')
   async removeAttachemnt(
-    @Param('attachmentId') attachmentId: number,
-    @Res() reply: FastifyReply,
-  ) {
-    await this.commentAttachmentsService.removeAttachment(attachmentId);
-    reply.send('ok');
+    @Param('fileId') fileId: number,
+    @Req() req: FastifyRequest,
+  ): Promise<'ok'> {
+    const { id } = this.authService.getTokenPayload(req);
+    await this.commentAttachmentsService.removeAttachment(id, fileId);
+    return 'ok';
   }
 }

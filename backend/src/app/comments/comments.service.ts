@@ -72,7 +72,7 @@ export class CommentsService {
   }
 
   async remove(commentId: number, userId: number): Promise<void> {
-    const comment = await this.findCommentWithUser(commentId);
+    const comment = await this.findCommentWithUserById(commentId);
 
     if (!comment) return;
 
@@ -84,12 +84,11 @@ export class CommentsService {
     await this.commentRepository.delete(commentId);
   }
 
-  private async findCommentWithUser(id: number): Promise<Comment | undefined> {
-    return await this.commentRepository
-      .createQueryBuilder('comment')
-      .leftJoinAndSelect('comment.user', 'user')
-      .where('comment.id = :id', { id })
-      .getOne();
+  async findCommentWithUserById(id: number): Promise<Comment | null> {
+    return await this.commentRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
   }
 
   private async getAllCommentsWithChildren(

@@ -1,4 +1,10 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { File } from '../files/file.entity';
 import { Comment } from '../comments/comment.entity';
 
@@ -14,7 +20,7 @@ export class CommentAttachment {
   @PrimaryColumn({ name: 'file_id', type: 'int' })
   fileId: number;
 
-  @ManyToOne(() => File, { onDelete: 'CASCADE' })
+  @OneToOne(() => File, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'file_id' })
   file: File;
 }

@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MultipartFile } from '@fastify/multipart';
 import { Repository } from 'typeorm';
+import { CommentsService } from '../comments/comments.service';
 import { File } from '../files/file.entity';
 import { FilesService } from '../files/files.service';
 import { CommentAttachment } from './comment-attachment.entity';
@@ -11,10 +16,26 @@ export class CommentAttachmentsService {
   constructor(
     @InjectRepository(CommentAttachment)
     private commentAttachmentRepository: Repository<CommentAttachment>,
+    private commentService: CommentsService,
     private filesService: FilesService,
   ) {}
 
-  async addAttachment(commentId: number, file: MultipartFile): Promise<File> {
+  async addAttachment(
+    userId: number,
+    commentId: number,
+    file: MultipartFile,
+  ): Promise<File> {
+    const comment =
+      await this.commentService.findCommentWithUserById(commentId);
+
+    if (!comment) throw new NotFoundException('Comment not found');
+
+    if (comment.user.id !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to add attachment to this comment',
+      );
+    }
+
     const uploadedFile = await this.filesService.upload(file);
 
     const commentAttachment = this.commentAttachmentRepository.create({
@@ -27,7 +48,26 @@ export class CommentAttachmentsService {
     return uploadedFile;
   }
 
-  async removeAttachment(fileId: number): Promise<void> {
+  async removeAttachment(userId: number, fileId: number): Promise<void> {
+    const attachment = await this.findAttachmentWithUserByFileId(fileId);
+
+    if (!attachment) return;
+
+    if (attachment.comment.user.id !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to delete this attachment',
+      );
+    }
+
     await this.filesService.remove(fileId);
+  }
+
+  private async findAttachmentWithUserByFileId(
+    fileId: number,
+  ): Promise<CommentAttachment | null> {
+    return await this.commentAttachmentRepository.findOne({
+      where: { fileId },
+      relations: ['comment', 'comment.user'],
+    });
   }
 }
