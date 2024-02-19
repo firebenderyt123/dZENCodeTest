@@ -4,12 +4,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MultipartFile } from '@fastify/multipart';
 import { Repository } from 'typeorm';
 import { CommentsService } from '../comments/comments.service';
 import { File } from '../files/file.entity';
 import { FilesService } from '../files/files.service';
 import { CommentAttachment } from './comment-attachment.entity';
+import { FileUpload } from '../files/interfaces/file-upload.interface';
+import { ImageUpload } from '../files/interfaces/image-upload.interface';
 
 @Injectable()
 export class CommentAttachmentsService {
@@ -23,7 +24,7 @@ export class CommentAttachmentsService {
   async addAttachment(
     userId: number,
     commentId: number,
-    file: MultipartFile,
+    file: FileUpload,
   ): Promise<File> {
     const comment =
       await this.commentService.findCommentWithUserById(commentId);
@@ -36,7 +37,14 @@ export class CommentAttachmentsService {
       );
     }
 
-    const uploadedFile = await this.filesService.upload(file);
+    const isImage = this.filesService.isFileImage(file);
+
+    let fileToUpload: FileUpload = file;
+    if (isImage) {
+      fileToUpload = await this.filesService.resizeImage(file as ImageUpload);
+    }
+
+    const uploadedFile = await this.filesService.upload(fileToUpload);
 
     const commentAttachment = this.commentAttachmentRepository.create({
       file: uploadedFile,

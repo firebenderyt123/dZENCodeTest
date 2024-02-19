@@ -5,12 +5,17 @@ import {
   Param,
   Post,
   Req,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nest-lab/fastify-multer';
 import { File } from '../files/file.entity';
 import { CommentAttachmentsService } from './comment-attachments.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AuthService } from '../auth/auth.service';
+import { FileUpload } from '../files/interfaces/file-upload.interface';
+import { ParseFilePipe } from '../files/pipes/parse-file.pipe';
 
 @Controller()
 export class CommentAttachmentsController {
@@ -19,29 +24,20 @@ export class CommentAttachmentsController {
     private readonly commentAttachmentsService: CommentAttachmentsService,
   ) {}
 
-  // new ParseFilePipeBuilder()
-  //   .addFileTypeValidator({
-  //     fileType: /\.(jpg|jpeg|gif|png|txt)$/,
-  //   })
-  //   .addMaxSizeValidator({
-  //     maxSize: 102400,
-  //   })
-  //   .build({
-  //     errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-  //   }),
   @UseGuards(JwtAuthGuard)
   @Post(':commentId')
+  @UseInterceptors(FilesInterceptor('files'))
   async addAttachment(
     @Param('commentId') commentId: number,
     @Req() req: FastifyRequest,
+    @UploadedFiles(new ParseFilePipe()) files: FileUpload[],
   ): Promise<File[]> {
     const { id } = this.authService.getTokenPayload(req);
-    const multiPart = req.files();
     const uploadedFiles: File[] = [];
 
-    for await (const part of multiPart) {
+    for await (const file of files) {
       uploadedFiles.push(
-        await this.commentAttachmentsService.addAttachment(id, commentId, part),
+        await this.commentAttachmentsService.addAttachment(id, commentId, file),
       );
     }
     return uploadedFiles;

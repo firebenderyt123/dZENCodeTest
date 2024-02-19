@@ -1,23 +1,32 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MultipartFile } from '@fastify/multipart';
 import { Repository } from 'typeorm';
 import { randomBytes } from 'crypto';
 import { AzureBlobService } from '../azure/azure-blob.service';
 import { File } from './file.entity';
+import { FileUpload } from './interfaces/file-upload.interface';
+import { ImageResizeService } from './image-resize.service';
+import { ImageUpload } from './interfaces/image-upload.interface';
 
 @Injectable()
 export class FilesService {
+  private readonly allowedImageTypes = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/gif',
+  ];
+
   constructor(
     @InjectRepository(File)
     private filesRepository: Repository<File>,
     private azureBlobService: AzureBlobService,
+    private imageResizeService: ImageResizeService,
   ) {}
 
-  async upload(file: MultipartFile): Promise<File> {
-    const { filename, file: fileStream } = file;
-    const buffer = await this.streamToBuffer(fileStream);
-    const extension = filename.split('.').pop();
+  async upload(file: FileUpload): Promise<File> {
+    const { originalname, buffer } = file;
+    const extension = originalname.split('.').pop();
     const newFileName = randomBytes(16).toString('hex') + '.' + extension;
 
     const containerName = extension === 'txt' ? 'files' : 'images';
@@ -61,12 +70,19 @@ export class FilesService {
     await this.filesRepository.delete(id);
   }
 
-  private async streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
-      const chunks: Buffer[] = [];
-      stream.on('data', (chunk: Buffer) => chunks.push(chunk));
-      stream.on('end', () => resolve(Buffer.concat(chunks)));
-      stream.on('error', reject);
-    });
+  isFileImage(file: FileUpload): boolean {
+    return this.allowedImageTypes.includes(file.mimetype);
+  }
+
+  async resizeImage(
+    file: ImageUpload,
+    maxWidth: number = 320,
+    maxHeight: number = 240,
+  ): Promise<ImageUpload> {
+    return await this.imageResizeService.resizeImageIfNeeded(
+      file,
+      maxWidth,
+      maxHeight,
+    );
   }
 }
