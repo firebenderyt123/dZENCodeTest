@@ -1,17 +1,24 @@
 import Head from "next/head";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import MainComponent from "@/components/Main";
 import CommentsListComponent from "@/components/CommentsList";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import commentsService from "@/services/comments.service";
+import commentsService, { GetCommentsProps } from "@/services/comments.service";
 
 export default function CommentsPage() {
   const dispatch = useAppDispatch();
   const commentsState = useAppSelector((comments) => comments.comments);
 
+  const handleGetComments = useCallback(
+    (props: GetCommentsProps) => {
+      dispatch(commentsService.getComments(props));
+    },
+    [dispatch]
+  );
+
   useEffect(() => {
-    dispatch(commentsService.getComments({}));
-  }, [dispatch]);
+    handleGetComments({});
+  }, [handleGetComments]);
 
   return (
     <>
@@ -26,7 +33,8 @@ export default function CommentsPage() {
       </Head>
       <MainComponent>
         <CommentsListComponent
-          commentsState={commentsState}></CommentsListComponent>
+          commentsState={commentsState}
+          getComments={handleGetComments}></CommentsListComponent>
       </MainComponent>
     </>
   );

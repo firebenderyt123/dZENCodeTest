@@ -18,9 +18,6 @@ interface Props {
 }
 type Ref = ForwardedRef<HTMLLIElement>;
 
-const veryLongText =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut aliquet tempus magna ac tincidunt. Nullam vel rutrum velit. Cras pulvinar massa vitae laoreet dictum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed aliquam porttitor risus eget vehicula. Integer in orci dolor. Donec pharetra sapien ut quam malesuada, eget volutpat justo porttitor. Vestibulum laoreet fringilla diam, quis rutrum lectus vehicula quis. Vestibulum neque justo, rhoncus sit amet scelerisque eu, convallis quis elit. Integer auctor justo at lacinia fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut aliquet tempus magna ac tincidunt. Nullam vel rutrum velit. Cras pulvinar massa vitae laoreet dictum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed aliquam porttitor risus eget vehicula. Integer in orci dolor. Donec pharetra sapien ut quam malesuada, eget volutpat justo porttitor. Vestibulum laoreet fringilla diam, quis rutrum lectus vehicula quis. Vestibulum neque justo, rhoncus sit amet scelerisque eu, convallis quis elit. Integer auctor justo at lacinia fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut aliquet tempus magna ac tincidunt. Nullam vel rutrum velit. Cras pulvinar massa vitae laoreet dictum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed aliquam porttitor risus eget vehicula. Integer in orci dolor. Donec pharetra sapien ut quam malesuada, eget volutpat justo porttitor. Vestibulum laoreet fringilla diam, quis rutrum lectus vehicula quis. Vestibulum neque justo, rhoncus sit amet scelerisque eu, convallis quis elit. Integer auctor justo at lacinia fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut aliquet tempus magna ac tincidunt. Nullam vel rutrum velit. Cras pulvinar massa vitae laoreet dictum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed aliquam porttitor risus eget vehicula. Integer in orci dolor. Donec pharetra sapien ut quam malesuada, eget volutpat justo porttitor. Vestibulum laoreet fringilla diam, quis rutrum lectus vehicula quis. Vestibulum neque justo, rhoncus sit amet scelerisque eu, convallis quis elit. Integer auctor justo at lacinia fringilla.";
-
 function Component({ comment, parentCommentText }: Props, ref: Ref) {
   const { id, text, createdAt, user, replies } = comment;
 
@@ -69,7 +66,7 @@ function Component({ comment, parentCommentText }: Props, ref: Ref) {
         {userInfo}
       </InlineBox>
       {parentTextBlock}
-      <CommentText>{veryLongText}</CommentText>
+      <CommentText>{text}</CommentText>
       {repliesBlock}
     </ListItemStyled>
   );
@@ -119,4 +116,5 @@ const BoldText = styled(Typography)(() => ({
 const CommentText = styled(ListItemText)(() => ({
   width: "100%",
   padding: "1rem 0 2.25rem",
+  overflow: "hidden",
 }));

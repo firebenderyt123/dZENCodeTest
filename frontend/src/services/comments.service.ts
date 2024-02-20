@@ -37,3 +37,5 @@ class CommentsService extends BaseService {
 }
 const commentsService = new CommentsService();
 export default commentsService;
+
+export type GetCommentsProps = Partial<CommentsGetRequestProps>;
