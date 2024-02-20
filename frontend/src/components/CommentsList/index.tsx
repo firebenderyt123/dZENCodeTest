@@ -1,14 +1,15 @@
 import { ChangeEvent, useState } from "react";
 import { Pagination } from "@mui/material";
-import { Comment } from "@/interfaces/comment.interface";
+import { CommentsState } from "@/lib/comments/comments.reducer";
 import CommentComponent, { ListStyled } from "../Comment";
 
 interface Props {
-  comments: Comment[];
-  totalPages: number;
+  commentsState: CommentsState;
 }
 
-export default function CommentsListComponent({ comments, totalPages }: Props) {
+export default function CommentsListComponent({ commentsState }: Props) {
+  const { pending, data, error } = commentsState;
+
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const handlePageChange = (_: ChangeEvent<unknown>, page: number) => {
@@ -18,14 +19,14 @@ export default function CommentsListComponent({ comments, totalPages }: Props) {
   return (
     <>
       <ListStyled>
-        {comments.map((comment) => (
+        {data?.comments.map((comment) => (
           <CommentComponent
             key={comment.id}
             comment={comment}></CommentComponent>
         ))}
       </ListStyled>
       <Pagination
-        count={totalPages}
+        count={data?.total.pages || currentPage}
         variant="outlined"
         shape="rounded"
         page={currentPage}

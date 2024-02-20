@@ -1,9 +1,18 @@
 import Head from "next/head";
+import { useEffect } from "react";
 import MainComponent from "@/components/Main";
 import CommentsListComponent from "@/components/CommentsList";
-import { comments } from "./comments";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import commentsService from "@/services/comments.service";
 
 export default function CommentsPage() {
+  const dispatch = useAppDispatch();
+  const commentsState = useAppSelector((comments) => comments.comments);
+
+  useEffect(() => {
+    dispatch(commentsService.getComments());
+  }, [dispatch]);
+
   return (
     <>
       <Head>
@@ -17,8 +26,7 @@ export default function CommentsPage() {
       </Head>
       <MainComponent>
         <CommentsListComponent
-          comments={comments}
-          totalPages={2}></CommentsListComponent>
+          commentsState={commentsState}></CommentsListComponent>
       </MainComponent>
     </>
   );
