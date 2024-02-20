@@ -3,7 +3,6 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
 import { Box, styled } from "@mui/material";
 import theme from "@/theme";
-import StoreProvider from "./StoreProvider";
 
 export default function Document() {
   return (
@@ -12,10 +11,8 @@ export default function Document() {
       <Body component="body">
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
-            <StoreProvider>
-              <Main />
-              <NextScript />
-            </StoreProvider>
+            <Main />
+            <NextScript />
           </ThemeProvider>
         </AppRouterCacheProvider>
       </Body>

@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    apiRoot: "https://localhost:8000/api/v1",
+    apiRoot: "http://localhost:8000/api/v1",
     apiComments: "/comments",
   },
 };

@@ -10,7 +10,7 @@ export default function CommentsPage() {
   const commentsState = useAppSelector((comments) => comments.comments);
 
   useEffect(() => {
-    dispatch(commentsService.getComments());
+    dispatch(commentsService.getComments({}));
   }, [dispatch]);
 
   return (

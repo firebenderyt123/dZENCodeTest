@@ -1,18 +1,29 @@
+import { CommentsGetRequestProps } from "@/api/comments/comments-get.interface";
+import commentsApi from "@/api/comments";
 import { AppDispatch } from "@/lib/store";
 import {
   commentsError,
   commentsPending,
   commentsSuccess,
 } from "@/lib/comments/comments.actions";
-import commentsApi from "@/api/comments";
 import BaseService from "./base.service";
 
 class CommentsService extends BaseService {
-  getComments() {
+  getComments({
+    page = 1,
+    limit = 25,
+    orderBy = "createdAt",
+    order = "DESC",
+  }: Partial<CommentsGetRequestProps>) {
     return async (dispatch: AppDispatch) => {
       dispatch(commentsPending());
       try {
-        const data = await commentsApi.commentsGetRequest();
+        const data = await commentsApi.commentsGetRequest({
+          page,
+          limit,
+          orderBy,
+          order,
+        });
         if (super.instanceOfError(data)) {
           dispatch(commentsError(data));
         } else {
