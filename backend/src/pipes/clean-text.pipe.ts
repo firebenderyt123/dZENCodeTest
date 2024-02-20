@@ -15,6 +15,18 @@ export class CleanTextPipe implements PipeTransform<string, string> {
       allowedSchemes: this.allowedSchemes,
       disallowedTagsMode: 'discard',
       nestingLimit: 4,
+      transformTags: {
+        a: (tagName: string, attribs: sanitizeHtml.Attributes) => ({
+          tagName: tagName,
+          attribs: {
+            href: '#',
+            ...attribs,
+          },
+        }),
+      },
+      exclusiveFilter: function (frame) {
+        return this.allowedTags.includes(frame.tag) && !frame.text.trim();
+      },
     });
 
     return cleanText;
