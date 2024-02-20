@@ -1,5 +1,6 @@
 import { FastifyRequest } from 'fastify';
 import {
+  BadRequestException,
   Controller,
   Delete,
   Param,
@@ -32,6 +33,10 @@ export class CommentAttachmentsController {
     @Req() req: FastifyRequest,
     @UploadedFiles(new ParseFilePipe()) files: FileUpload[],
   ): Promise<File[]> {
+    if (isNaN(commentId)) {
+      throw new BadRequestException(':id must be a number');
+    }
+
     const { id } = this.authService.getTokenPayload(req);
     const uploadedFiles: File[] = [];
 
@@ -49,6 +54,10 @@ export class CommentAttachmentsController {
     @Param('fileId') fileId: number,
     @Req() req: FastifyRequest,
   ): Promise<'ok'> {
+    if (isNaN(fileId)) {
+      throw new BadRequestException(':id must be a number');
+    }
+
     const { id } = this.authService.getTokenPayload(req);
     await this.commentAttachmentsService.removeAttachment(id, fileId);
     return 'ok';
