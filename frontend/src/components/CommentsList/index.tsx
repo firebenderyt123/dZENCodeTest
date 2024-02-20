@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { Pagination } from "@mui/material";
-import { Comment } from "../Comment/comment.interface";
+import { Comment } from "@/interfaces/comment.interface";
 import CommentComponent, { ListStyled } from "../Comment";
 
 interface Props {

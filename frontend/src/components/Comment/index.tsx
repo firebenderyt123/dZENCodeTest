@@ -1,4 +1,4 @@
-import { ForwardedRef, MouseEvent, RefObject, forwardRef, useRef } from "react";
+import { ForwardedRef, RefObject, forwardRef, useRef } from "react";
 import {
   Avatar,
   Box,
@@ -10,7 +10,7 @@ import {
   styled,
 } from "@mui/material";
 import { formatDateForComments } from "@/utils/date-format.util";
-import { Comment } from "./comment.interface";
+import { Comment } from "@/interfaces/comment.interface";
 
 interface Props {
   comment: Comment;
@@ -19,7 +19,7 @@ interface Props {
 type Ref = ForwardedRef<HTMLLIElement>;
 
 const veryLongText =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut aliquet tempus magna ac tincidunt. Nullam vel rutrum velit. Cras pulvinar massa vitae laoreet dictum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed aliquam porttitor risus eget vehicula. Integer in orci dolor. Donec pharetra sapien ut quam malesuada, eget volutpat justo porttitor. Vestibulum laoreet fringilla diam, quis rutrum lectus vehicula quis. Vestibulum neque justo, rhoncus sit amet scelerisque eu, convallis quis elit. Integer auctor justo at lacinia fringilla.";
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut aliquet tempus magna ac tincidunt. Nullam vel rutrum velit. Cras pulvinar massa vitae laoreet dictum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed aliquam porttitor risus eget vehicula. Integer in orci dolor. Donec pharetra sapien ut quam malesuada, eget volutpat justo porttitor. Vestibulum laoreet fringilla diam, quis rutrum lectus vehicula quis. Vestibulum neque justo, rhoncus sit amet scelerisque eu, convallis quis elit. Integer auctor justo at lacinia fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut aliquet tempus magna ac tincidunt. Nullam vel rutrum velit. Cras pulvinar massa vitae laoreet dictum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed aliquam porttitor risus eget vehicula. Integer in orci dolor. Donec pharetra sapien ut quam malesuada, eget volutpat justo porttitor. Vestibulum laoreet fringilla diam, quis rutrum lectus vehicula quis. Vestibulum neque justo, rhoncus sit amet scelerisque eu, convallis quis elit. Integer auctor justo at lacinia fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut aliquet tempus magna ac tincidunt. Nullam vel rutrum velit. Cras pulvinar massa vitae laoreet dictum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed aliquam porttitor risus eget vehicula. Integer in orci dolor. Donec pharetra sapien ut quam malesuada, eget volutpat justo porttitor. Vestibulum laoreet fringilla diam, quis rutrum lectus vehicula quis. Vestibulum neque justo, rhoncus sit amet scelerisque eu, convallis quis elit. Integer auctor justo at lacinia fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut aliquet tempus magna ac tincidunt. Nullam vel rutrum velit. Cras pulvinar massa vitae laoreet dictum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed aliquam porttitor risus eget vehicula. Integer in orci dolor. Donec pharetra sapien ut quam malesuada, eget volutpat justo porttitor. Vestibulum laoreet fringilla diam, quis rutrum lectus vehicula quis. Vestibulum neque justo, rhoncus sit amet scelerisque eu, convallis quis elit. Integer auctor justo at lacinia fringilla.";
 
 function Component({ comment, parentCommentText }: Props, ref: Ref) {
   const { id, text, createdAt, user, replies } = comment;
@@ -101,10 +101,10 @@ const AvatarStyled = styled(Avatar)(() => ({
   borderRadius: "100%",
 }));
 
-const ParentTextBlock = styled(Box)(() => ({
+const ParentTextBlock = styled(Typography)(() => ({
   borderLeft: "0.1875rem solid #b3c2e1",
-  margin: "0.625rem 0",
-  padding: "0.4375rem 0.2188rem",
+  margin: "0.625rem 0 0.625rem 0.625rem",
+  padding: "0.4375rem 0.53125rem",
   width: "100%",
   textWrap: "nowrap",
   overflow: "hidden",
