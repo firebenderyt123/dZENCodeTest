@@ -63,7 +63,7 @@ export class CommentsService {
     );
 
     return {
-      data: allComments,
+      comments: allComments,
       total: {
         pages: Math.ceil(totalComments / limit),
         comments: totalComments,

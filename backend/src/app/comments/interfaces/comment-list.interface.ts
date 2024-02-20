@@ -1,6 +1,6 @@
 import { Comment } from '../comment.entity';
 
 export interface CommentList {
-  data: Comment[];
+  comments: Comment[];
   total: { pages: number; comments: number };
 }
