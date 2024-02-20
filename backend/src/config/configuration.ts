@@ -11,6 +11,9 @@ export default () => ({
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRATION_TIME,
   },
+  cors: {
+    origin: process.env.CORS_ORIGIN,
+  },
   azure: {
     storage: {
       accountName: process.env.AZURE_STORAGE_ACCOUNT_NAME,
