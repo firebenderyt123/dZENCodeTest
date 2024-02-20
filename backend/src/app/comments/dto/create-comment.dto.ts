@@ -1,4 +1,3 @@
-import { Transform } from 'class-transformer';
 import {
   IsDefined,
   IsNumber,
@@ -7,6 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { CleanTextHTML } from 'src/decorators/clean-text.decorator';
 import { TrimLowercase } from 'src/decorators/trim-lowercase.decorator';
 
 export class CreateCommentDto {
@@ -21,5 +21,6 @@ export class CreateCommentDto {
   })
   @IsString({ message: 'Text should be a string' })
   @TrimLowercase()
+  @CleanTextHTML()
   text: string;
 }

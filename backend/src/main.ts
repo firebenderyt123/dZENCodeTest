@@ -5,7 +5,6 @@ import {
 } from '@nestjs/platform-fastify';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-// import multipart from '@fastify/multipart';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -27,8 +26,6 @@ async function bootstrap() {
       stopAtFirstError: true,
     }),
   );
-
-  // await app.register(multipart);
 
   const configService = app.get(ConfigService);
   const port = configService.get('port');
