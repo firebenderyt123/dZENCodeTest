@@ -3,21 +3,22 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import FormField from "@/components/FormFields/FormField";
 import { useAuth } from "@/contexts/AuthContext";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { SignInSchema, signInSchema } from "@/schemas/sign-in.schema";
+import { SignUpSchema, signUpSchema } from "@/schemas/sign-up.schema";
 
-export default function SignInForm() {
+export default function SignUpForm() {
   const auth = useAuth();
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<SignInSchema>({
-    resolver: yupResolver(signInSchema),
+  } = useForm<SignUpSchema>({
+    resolver: yupResolver(signUpSchema),
   });
 
-  const onSubmit: SubmitHandler<SignInSchema> = (data) => {
-    auth?.login(data);
+  const onSubmit: SubmitHandler<SignUpSchema> = (data) => {
+    const { repeatPassword, ...userData } = data;
+    auth?.register(userData);
     reset();
   };
 
@@ -25,7 +26,7 @@ export default function SignInForm() {
     <Container component="main" maxWidth="xs">
       <div>
         <Typography component="h1" variant="h5">
-          Sign in
+          Sign up
         </Typography>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormField
@@ -35,13 +36,31 @@ export default function SignInForm() {
             type="email"
           />
           <FormField
+            {...register("username")}
+            fieldError={errors.username}
+            label="Username"
+            type="text"
+          />
+          <FormField
+            {...register("siteUrl")}
+            fieldError={errors.siteUrl}
+            label="Home page"
+            type="url"
+          />
+          <FormField
             {...register("password")}
             fieldError={errors.password}
             label="Password"
             type="password"
           />
+          <FormField
+            {...register("repeatPassword")}
+            fieldError={errors.repeatPassword}
+            label="Repeat Password"
+            type="password"
+          />
           <Button type="submit" fullWidth variant="contained" color="primary">
-            Sign In
+            Sign Up
           </Button>
         </form>
       </div>

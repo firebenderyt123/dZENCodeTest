@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Error } from "@/interfaces/error.interface";
 import { User } from "@/interfaces/user.interface";
-import { SignInResponse } from "@/api/auth/sign-in-response.interface";
+import { AuthResponse } from "@/api/auth/auth-response.interface";
 
 export interface AuthState {
   pending: boolean;
@@ -25,13 +25,13 @@ const authSlice = createSlice({
       state.pending = true;
       state.error = null;
     },
-    loginSuccess: (state, action: PayloadAction<SignInResponse>) => {
+    authSuccess: (state, action: PayloadAction<AuthResponse>) => {
       state.pending = false;
       state.user = action.payload.user;
       state.isAuthenticated = true;
       state.error = null;
     },
-    loginFailed: (state, action: PayloadAction<Error>) => {
+    authFailed: (state, action: PayloadAction<Error>) => {
       state.pending = false;
       state.user = null;
       state.isAuthenticated = false;
@@ -46,6 +46,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { authRequest, loginSuccess, loginFailed, logoutSuccess } =
+export const { authRequest, authSuccess, authFailed, logoutSuccess } =
   authSlice.actions;
 export default authSlice.reducer;
