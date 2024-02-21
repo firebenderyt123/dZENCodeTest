@@ -7,35 +7,37 @@ import FormDialog from "../FormDialog";
 
 export default function Header() {
   const auth = useAuth();
+  const isAuthenticated = auth?.authState?.isAuthenticated ?? false;
+
   const signInButtonRef = useRef<HTMLButtonElement>(null);
   const signUpButtonRef = useRef<HTMLButtonElement>(null);
 
-  const signInForm = !auth?.authState.isAuthenticated && (
+  const signInForm = !isAuthenticated && (
     <FormDialog ref={signInButtonRef}>
       <SignInForm />
     </FormDialog>
   );
 
-  const signUpForm = !auth?.authState.isAuthenticated && (
+  const signUpForm = !isAuthenticated && (
     <FormDialog ref={signUpButtonRef}>
       <SignUpForm />
     </FormDialog>
   );
 
-  const signInButton = !auth?.authState.isAuthenticated && (
+  const signInButton = !isAuthenticated && (
     <Button color="inherit" ref={signInButtonRef}>
       Sign In
     </Button>
   );
 
-  const signUpButton = !auth?.authState.isAuthenticated && (
+  const signUpButton = !isAuthenticated && (
     <Button color="inherit" ref={signUpButtonRef}>
       Sign Up
     </Button>
   );
 
-  const logoutButton = auth?.authState.isAuthenticated && (
-    <Button color="inherit" onClick={auth.logout}>
+  const logoutButton = isAuthenticated && (
+    <Button color="inherit" onClick={auth?.logout}>
       Logout
     </Button>
   );

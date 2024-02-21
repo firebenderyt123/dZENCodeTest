@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useContext, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect } from "react";
 import { AuthState } from "@/lib/auth/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import authService, { SignInProps, SignUpProps } from "@/services/auth.service";
@@ -30,6 +30,10 @@ export default function AuthProvider({ children }: Props) {
   const logout = () => {
     dispatch(authService.logoutUser());
   };
+
+  useEffect(() => {
+    dispatch(authService.getProfile());
+  }, [dispatch]);
 
   return (
     <AuthContext.Provider value={{ authState, login, register, logout }}>

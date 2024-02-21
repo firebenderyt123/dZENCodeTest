@@ -3,14 +3,17 @@ import { SignUpRequestProps } from "@/api/auth/sign-up-request.interface";
 import { AuthResponse } from "@/api/auth/auth-response.interface";
 import { Error as MyError } from "@/interfaces/error.interface";
 import authApi from "@/api/auth";
+import profileApi from "@/api/profile";
 import {
   authRequest,
   authFailed,
   authSuccess,
   logoutSuccess,
+  profileSuccess,
+  profileFailed,
 } from "@/lib/auth/auth.slice";
 import { AppDispatch } from "@/lib/store";
-import { deleteCookie, setCookie } from "@/utils/cookies.util";
+import { deleteCookie, getCookie, setCookie } from "@/utils/cookies.util";
 import BaseService from "./base.service";
 
 class AuthService extends BaseService {
@@ -38,6 +41,21 @@ class AuthService extends BaseService {
   logoutUser = () => async (dispatch: AppDispatch) => {
     deleteCookie("accessToken");
     dispatch(logoutSuccess());
+  };
+
+  getProfile = () => async (dispatch: AppDispatch) => {
+    dispatch(authRequest());
+    const token = getCookie("accessToken");
+    try {
+      const response = await profileApi.profileGetRequest(token);
+      if (super.instanceOfError(response)) {
+        dispatch(profileFailed(response));
+      } else {
+        dispatch(profileSuccess(response));
+      }
+    } catch (error) {
+      super.reportError(error as Error);
+    }
   };
 
   private handleAuthentication = async (

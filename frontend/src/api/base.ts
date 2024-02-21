@@ -13,6 +13,20 @@ export default class BaseApi {
     }
   }
 
+  protected async getAuthorizedRequest<R>(
+    token: string,
+    url: string,
+    config?: AxiosRequestConfig
+  ) {
+    const conf = {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+      ...config,
+    };
+    return this.getRequest<R>(url, conf);
+  }
+
   protected async postRequest<D, R>(
     url: string,
     data?: D,

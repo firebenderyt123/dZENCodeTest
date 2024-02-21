@@ -16,11 +16,11 @@ export class AuthService {
 
   async signUp(userData: CreateUserDto): Promise<Auth> {
     const user = await this.usersService.create(userData);
-    return await this.getAuthToken(user);
+    return await this.getAuth(user);
   }
 
   async signIn(user: User): Promise<Auth> {
-    return await this.getAuthToken(user);
+    return await this.getAuth(user);
   }
 
   async validateUser(email: string, password: string): Promise<User> {
@@ -33,10 +33,7 @@ export class AuthService {
     return payload;
   }
 
-  private async getAuthToken(
-    user: User,
-    options?: JwtSignOptions,
-  ): Promise<Auth> {
+  private async getAuth(user: User, options?: JwtSignOptions): Promise<Auth> {
     return {
       accessToken: await this.jwtService.signAsync({ id: user.id }, options),
       user,

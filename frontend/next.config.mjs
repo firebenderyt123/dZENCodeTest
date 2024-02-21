@@ -6,6 +6,7 @@ const nextConfig = {
     apiComments: "/comments",
     signIn: "/auth/sign-in",
     signUp: "/auth/sign-up",
+    profile: "/profile",
   },
 };
 
