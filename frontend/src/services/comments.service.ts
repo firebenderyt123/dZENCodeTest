@@ -24,13 +24,9 @@ class CommentsService extends BaseService {
           orderBy,
           order,
         });
-        if (super.instanceOfError(data)) {
-          dispatch(commentsError(data));
-        } else {
-          dispatch(commentsSuccess(data));
-        }
+        dispatch(commentsSuccess(data));
       } catch (error) {
-        super.reportError(error as Error);
+        super.errorHandler(error, (err) => dispatch(commentsError(err)));
       }
     };
   }

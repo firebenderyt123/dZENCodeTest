@@ -6,7 +6,15 @@ export default class BaseService {
     errorNotify(error.message);
   }
 
-  protected instanceOfError(data: any): data is MyError {
-    return "message" in data && "statusCode" in data;
+  protected errorHandler(error: unknown, callback: (data: MyError) => void) {
+    if (this.instanceOfMyError(error)) {
+      callback(error);
+    } else {
+      this.reportError(error as Error);
+    }
+  }
+
+  private instanceOfMyError(error: any): error is MyError {
+    return "message" in error && "statusCode" in error;
   }
 }

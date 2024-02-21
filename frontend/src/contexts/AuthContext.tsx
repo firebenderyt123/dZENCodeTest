@@ -1,7 +1,14 @@
-import { ReactNode, createContext, useContext, useEffect } from "react";
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+} from "react";
 import { AuthState } from "@/lib/auth/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import authService, { SignInProps, SignUpProps } from "@/services/auth.service";
+import authWebSocketService from "@/services/auth-websocket.service";
 
 interface AuthContextType {
   authState: AuthState;
@@ -27,13 +34,24 @@ export default function AuthProvider({ children }: Props) {
     dispatch(authService.registerUser(userData));
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     dispatch(authService.logoutUser());
-  };
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(authService.getProfile());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (authState.isAuthenticated) {
+      authWebSocketService.reconnect();
+    }
+
+    authWebSocketService.onDisconnect(() => {
+      console.log("You was disconnected!");
+      logout();
+    });
+  }, [authState.isAuthenticated, logout]);
 
   return (
     <AuthContext.Provider value={{ authState, login, register, logout }}>

@@ -5,11 +5,11 @@ export default class BaseApi {
   protected async getRequest<R>(
     url: string,
     config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<R | MyError>> {
+  ): Promise<AxiosResponse<R>> {
     try {
-      return await axios.get<R | MyError>(url, config);
+      return await axios.get<R>(url, config);
     } catch (error) {
-      throw this.requestError<R>(error as AxiosError);
+      throw this.requestError(error as AxiosError);
     }
   }
 
@@ -31,23 +31,23 @@ export default class BaseApi {
     url: string,
     data?: D,
     config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<R | MyError>> {
+  ): Promise<AxiosResponse<R>> {
     try {
-      return await axios.post<R | MyError>(url, data, config);
+      return await axios.post<R>(url, data, config);
     } catch (error) {
-      throw this.requestError<R>(error as AxiosError);
+      throw this.requestError(error as AxiosError);
     }
   }
 
-  protected requestError<R>(
+  protected requestError(
     error: AxiosError,
     message = "Something went wrong :("
-  ): AxiosResponse<R> | Error {
+  ): MyError | Error {
     if (!error.response || error.response.status >= 500) {
       console.log(error.message);
       return new Error(message);
     } else {
-      return error.response as AxiosResponse<R>;
+      return error.response.data as MyError;
     }
   }
 }

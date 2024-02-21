@@ -1,7 +1,6 @@
 import { SignInRequestProps } from "@/api/auth/sign-in-request.interface";
 import { SignUpRequestProps } from "@/api/auth/sign-up-request.interface";
 import { AuthResponse } from "@/api/auth/auth-response.interface";
-import { Error as MyError } from "@/interfaces/error.interface";
 import authApi from "@/api/auth";
 import profileApi from "@/api/profile";
 import {
@@ -13,17 +12,17 @@ import {
   profileFailed,
 } from "@/lib/auth/auth.slice";
 import { AppDispatch } from "@/lib/store";
-import { deleteCookie, getCookie, setCookie } from "@/utils/cookies.util";
 import BaseService from "./base.service";
+import cookiesService from "./cookies.service";
 
 class AuthService extends BaseService {
   loginUser = (data: SignInRequestProps) => async (dispatch: AppDispatch) => {
     dispatch(authRequest());
     try {
       const response = await authApi.signInRequest(data);
-      this.handleAuthentication(response, dispatch);
+      this.authSuccess(response, dispatch);
     } catch (error) {
-      super.reportError(error as Error);
+      super.errorHandler(error, (err) => dispatch(authFailed(err)));
     }
   };
 
@@ -32,43 +31,39 @@ class AuthService extends BaseService {
       dispatch(authRequest());
       try {
         const response = await authApi.signUpRequest(data);
-        this.handleAuthentication(response, dispatch);
+        this.authSuccess(response, dispatch);
       } catch (error) {
-        super.reportError(error as Error);
+        super.errorHandler(error, (err) => dispatch(authFailed(err)));
       }
     };
 
   logoutUser = () => async (dispatch: AppDispatch) => {
-    deleteCookie("accessToken");
+    cookiesService.deleteToken();
     dispatch(logoutSuccess());
   };
 
   getProfile = () => async (dispatch: AppDispatch) => {
     dispatch(authRequest());
-    const token = getCookie("accessToken");
+    const token: string = cookiesService.getToken();
+    if (!token) {
+      dispatch(logoutSuccess());
+      return;
+    }
     try {
       const response = await profileApi.profileGetRequest(token);
-      if (super.instanceOfError(response)) {
-        dispatch(profileFailed(response));
-      } else {
-        dispatch(profileSuccess(response));
-      }
+      dispatch(profileSuccess(response));
     } catch (error) {
-      super.reportError(error as Error);
+      super.errorHandler(error, (err) => {
+        cookiesService.deleteToken();
+        dispatch(profileFailed(err));
+      });
     }
   };
 
-  private handleAuthentication = async (
-    response: MyError | AuthResponse,
-    dispatch: AppDispatch
-  ) => {
-    if (super.instanceOfError(response)) {
-      dispatch(authFailed(response));
-    } else {
-      setCookie("accessToken", response.accessToken);
-      dispatch(authSuccess(response));
-    }
-  };
+  private authSuccess(response: AuthResponse, dispatch: AppDispatch) {
+    cookiesService.setToken(response.accessToken);
+    dispatch(authSuccess(response));
+  }
 }
 const authService = new AuthService();
 export default authService;
