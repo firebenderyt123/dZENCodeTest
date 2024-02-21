@@ -1,17 +1,20 @@
 import io, { Socket, ManagerOptions, SocketOptions } from "socket.io-client";
 
-class WebSocketService<T = undefined> {
-  private socket: Socket;
-  private uri: string;
-  private options?: Partial<ManagerOptions & SocketOptions & T>;
+class WebSocketService {
+  protected socket: Socket;
+  protected uri: string;
+  protected options?: Partial<ManagerOptions & SocketOptions>;
 
-  constructor(uri: string, opts?: Partial<ManagerOptions & SocketOptions & T>) {
+  constructor(uri: string, opts?: Partial<ManagerOptions & SocketOptions>) {
     this.uri = uri;
     this.options = opts;
-    this.socket = io(uri, opts);
+    this.socket = io(uri, {
+      transports: ["websocket"],
+      ...opts,
+    });
   }
 
-  reconnect(opts?: Partial<ManagerOptions & SocketOptions & T>) {
+  reconnect(opts?: Partial<ManagerOptions & SocketOptions>) {
     this.disconnect();
     this.options = opts;
     this.socket = io(this.uri, opts);

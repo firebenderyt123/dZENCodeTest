@@ -48,9 +48,12 @@ export default function AuthProvider({ children }: Props) {
     }
 
     authWebSocketService.onDisconnect(() => {
-      console.log("You was disconnected!");
       logout();
     });
+
+    return () => {
+      authWebSocketService.disconnect();
+    };
   }, [authState.isAuthenticated, logout]);
 
   return (
