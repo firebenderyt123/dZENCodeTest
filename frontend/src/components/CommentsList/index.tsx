@@ -9,10 +9,7 @@ interface Props {
   getComments: (props: GetCommentsProps) => void;
 }
 
-export default function CommentsListComponent({
-  commentsState,
-  getComments,
-}: Props) {
+export default function CommentsList({ commentsState, getComments }: Props) {
   const { pending, data, error } = commentsState;
 
   const [currentPage, setCurrentPage] = useState<number>(1);

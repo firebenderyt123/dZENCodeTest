@@ -1,7 +1,6 @@
 import Head from "next/head";
 import { useCallback, useEffect } from "react";
-import MainComponent from "@/components/Main";
-import CommentsListComponent from "@/components/CommentsList";
+import CommentsList from "@/components/CommentsList";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import commentsService, { GetCommentsProps } from "@/services/comments.service";
 
@@ -31,11 +30,9 @@ export default function CommentsPage() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <MainComponent>
-        <CommentsListComponent
-          commentsState={commentsState}
-          getComments={handleGetComments}></CommentsListComponent>
-      </MainComponent>
+      <CommentsList
+        commentsState={commentsState}
+        getComments={handleGetComments}></CommentsList>
     </>
   );
 }
