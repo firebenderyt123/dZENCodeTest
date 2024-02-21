@@ -2,6 +2,7 @@ import { Button, Typography, Container } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
 import EmailField from "@/components/FormFields/EmailField";
 import PasswordField from "@/components/FormFields/PasswordField";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Inputs = {
   email: string;
@@ -9,6 +10,7 @@ type Inputs = {
 };
 
 export default function SignInForm() {
+  const auth = useAuth();
   const {
     register,
     handleSubmit,
@@ -16,7 +18,7 @@ export default function SignInForm() {
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
+    auth?.login(data);
   };
 
   return (

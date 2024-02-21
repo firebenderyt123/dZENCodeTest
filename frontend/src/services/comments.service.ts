@@ -14,7 +14,7 @@ class CommentsService extends BaseService {
     limit = 25,
     orderBy = "createdAt",
     order = "DESC",
-  }: Partial<CommentsGetRequestProps>) {
+  }: GetCommentsProps) {
     return async (dispatch: AppDispatch) => {
       dispatch(commentsPending());
       try {

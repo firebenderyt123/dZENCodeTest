@@ -2,22 +2,38 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { Error as MyError } from "@/interfaces/error.interface";
 
 export default class BaseApi {
-  protected async getRequest<T>(
+  protected async getRequest<R>(
     url: string,
     config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<T | MyError>> {
+  ): Promise<AxiosResponse<R | MyError>> {
     try {
-      return await axios.get<T | MyError>(url, config);
+      return await axios.get<R | MyError>(url, config);
     } catch (error) {
-      throw this.requestError(error as AxiosError);
+      throw this.requestError<R>(error as AxiosError);
     }
   }
 
-  protected requestError(
+  protected async postRequest<D, R>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig
+  ): Promise<AxiosResponse<R | MyError>> {
+    try {
+      return await axios.post<R | MyError>(url, data, config);
+    } catch (error) {
+      throw this.requestError<R>(error as AxiosError);
+    }
+  }
+
+  protected requestError<R>(
     error: AxiosError,
     message = "Something went wrong :("
-  ) {
-    console.log(error.message);
-    return new Error(message);
+  ): AxiosResponse<R> | Error {
+    if (!error.response || error.response.status >= 500) {
+      console.log(error.message);
+      return new Error(message);
+    } else {
+      return error.response as AxiosResponse<R>;
+    }
   }
 }
