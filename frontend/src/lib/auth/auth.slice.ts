@@ -6,14 +6,12 @@ import { AuthResponse } from "@/api/auth/auth-response.interface";
 export interface AuthState {
   pending: boolean;
   user: User | null;
-  isAuthenticated: boolean;
   error: Error | null;
 }
 
 const initialState: AuthState = {
   pending: false,
   user: null,
-  isAuthenticated: false,
   error: null,
 };
 
@@ -28,31 +26,26 @@ const authSlice = createSlice({
     authSuccess: (state, action: PayloadAction<AuthResponse>) => {
       state.pending = false;
       state.user = action.payload.user;
-      state.isAuthenticated = true;
       state.error = null;
     },
     authFailed: (state, action: PayloadAction<Error>) => {
       state.pending = false;
       state.user = null;
-      state.isAuthenticated = false;
       state.error = action.payload;
     },
     logoutSuccess: (state) => {
       state.pending = false;
       state.user = null;
-      state.isAuthenticated = false;
       state.error = null;
     },
     profileSuccess: (state, action: PayloadAction<User>) => {
       state.pending = false;
       state.user = action.payload;
-      state.isAuthenticated = true;
       state.error = null;
     },
     profileFailed: (state, action: PayloadAction<Error>) => {
       state.pending = false;
       state.user = null;
-      state.isAuthenticated = false;
       state.error = action.payload;
     },
   },

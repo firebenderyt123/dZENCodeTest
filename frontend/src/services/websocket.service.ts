@@ -1,14 +1,16 @@
 import io, { Socket, ManagerOptions, SocketOptions } from "socket.io-client";
 
 class WebSocketService {
+  private readonly wsRoot = process.env.wsRoot as string;
+
   protected socket: Socket;
   protected uri: string;
   protected options?: Partial<ManagerOptions & SocketOptions>;
 
   constructor(uri: string, opts?: Partial<ManagerOptions & SocketOptions>) {
-    this.uri = uri;
+    this.uri = this.wsRoot + uri;
     this.options = opts;
-    this.socket = io(uri, {
+    this.socket = io(this.uri, {
       transports: ["websocket"],
       ...opts,
     });

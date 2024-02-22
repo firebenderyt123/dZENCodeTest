@@ -15,6 +15,7 @@ interface AuthContextType {
   login: (userData: SignInProps) => void;
   register: (userData: SignUpProps) => void;
   logout: () => void;
+  doiIfAuthenticated: (callback: () => void) => void;
 }
 const AuthContext = createContext<AuthContextType | null>(null);
 export const useAuth = () => useContext(AuthContext);
@@ -26,38 +27,46 @@ export default function AuthProvider({ children }: Props) {
   const dispatch = useAppDispatch();
   const authState = useAppSelector((reducers) => reducers.auth);
 
-  const login = (userData: SignInProps) => {
-    dispatch(authService.loginUser(userData));
-  };
+  const login = useCallback(
+    (userData: SignInProps) => {
+      dispatch(authService.loginUser(userData));
+    },
+    [dispatch]
+  );
 
-  const register = (userData: SignUpProps) => {
-    dispatch(authService.registerUser(userData));
-  };
+  const register = useCallback(
+    (userData: SignUpProps) => {
+      dispatch(authService.registerUser(userData));
+    },
+    [dispatch]
+  );
 
   const logout = useCallback(() => {
     dispatch(authService.logoutUser());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (!authState.isAuthenticated) {
-      dispatch(authService.getProfile());
-    }
-  }, [authState.isAuthenticated, dispatch, logout]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
+  const doiIfAuthenticated = useCallback(
+    (callback: () => void) => {
       authWebSocketService.isAuthenticated((isAuthenticated) => {
         if (!isAuthenticated) {
           logout();
+          return;
         }
+        callback();
       });
-    }, 60000);
+    },
+    [logout]
+  );
 
-    return () => clearInterval(intervalId);
-  }, [logout]);
+  useEffect(() => {
+    if (!authState.user) {
+      dispatch(authService.getProfile());
+    }
+  }, [authState.user, dispatch]);
 
   return (
-    <AuthContext.Provider value={{ authState, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ authState, login, register, logout, doiIfAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

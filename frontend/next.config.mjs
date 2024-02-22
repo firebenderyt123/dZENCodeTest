@@ -7,6 +7,7 @@ const nextConfig = {
     signIn: "/auth/sign-in",
     signUp: "/auth/sign-up",
     profile: "/profile",
+    wsRoot: "ws://localhost:8000",
   },
 };
 

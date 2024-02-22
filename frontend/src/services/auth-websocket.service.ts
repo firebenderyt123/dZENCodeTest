@@ -5,7 +5,7 @@ class AuthWebSocketService extends WebSocketService {
   private token: string;
 
   constructor(path: string) {
-    super("ws://localhost:8000" + path);
+    super(path);
     this.token = "";
   }
 
