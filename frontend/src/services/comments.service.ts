@@ -5,7 +5,7 @@ import {
   getCommentsRequest,
   getCommentsSuccess,
   getCommentsFailed,
-} from "@/lib/comments/comments.slice";
+} from "@/lib/slices/comments.slice";
 import BaseService from "./base.service";
 
 class CommentsService extends BaseService {

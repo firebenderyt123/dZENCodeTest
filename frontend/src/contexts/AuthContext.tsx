@@ -5,7 +5,7 @@ import {
   useContext,
   useEffect,
 } from "react";
-import { AuthState } from "@/lib/auth/auth.slice";
+import { AuthState } from "@/lib/slices/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import authService, { SignInProps, SignUpProps } from "@/services/auth.service";
 
@@ -44,7 +44,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   }, [dispatch]);
 
   useEffect(() => {
-    if (!authState.user) {
+    if (!authState.user && !authState.error) {
       dispatch(authService.getProfile());
     }
     if (authState.isAuthenticated && authState.error?.statusCode === 401) {

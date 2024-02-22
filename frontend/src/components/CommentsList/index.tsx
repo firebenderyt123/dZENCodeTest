@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { Pagination } from "@mui/material";
-import { CommentsState } from "@/lib/comments/comments.slice";
+import { CommentsState } from "@/lib/slices/comments.slice";
 import { GetCommentsProps } from "@/services/comments.service";
 import CommentComponent, { ListStyled } from "../Comment";
 

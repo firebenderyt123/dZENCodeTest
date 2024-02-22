@@ -10,7 +10,7 @@ import {
   logoutSuccess,
   profileSuccess,
   profileFailed,
-} from "@/lib/auth/auth.slice";
+} from "@/lib/slices/auth.slice";
 import { AppDispatch } from "@/lib/store";
 import BaseService from "./base.service";
 import cookiesService from "./cookies.service";

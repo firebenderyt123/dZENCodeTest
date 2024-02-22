@@ -6,85 +6,60 @@ import {
   FormLabel,
   Textarea,
   IconButton,
-  Menu,
-  MenuItem,
-  ListItemDecorator,
+  styled,
 } from "@mui/joy";
-import Check from "@mui/icons-material/Check";
 import FormatBold from "@mui/icons-material/FormatBold";
 import FormatItalic from "@mui/icons-material/FormatItalic";
 import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import htmlTagsService, { AllowedTags } from "@/services/html-tags.service";
 
 interface CommentBoxProps {
   onSubmit: (comment: string) => void;
 }
 
 export default function CommentBox({ onSubmit }: CommentBoxProps) {
-  const [italic, setItalic] = useState(false);
-  const [fontWeight, setFontWeight] = useState("normal");
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [commentText, setCommentText] = useState("");
+
+  const addTag = (tag: AllowedTags) => {
+    setCommentText((prevText) => prevText + htmlTagsService.getTag(tag));
+  };
+
   return (
     <FormControl>
       <FormLabel>Your comment</FormLabel>
-      <Textarea
+      <TextareaStyled
         placeholder="Type something here…"
         minRows={3}
         endDecorator={
-          <Box
-            sx={{
-              display: "flex",
-              gap: "var(--Textarea-paddingBlock)",
-              pt: "var(--Textarea-paddingBlock)",
-              borderTop: "1px solid",
-              borderColor: "divider",
-              flex: "auto",
-            }}>
+          <BottomPanel>
             <IconButton
               variant="plain"
               color="neutral"
-              onClick={(event) => setAnchorEl(event.currentTarget)}>
+              onClick={() => addTag("strong")}
+              value={commentText}>
               <FormatBold />
               <KeyboardArrowDown fontSize="medium" />
             </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={() => setAnchorEl(null)}
-              size="sm"
-              placement="bottom-start"
-              sx={{ "--ListItemDecorator-size": "24px" }}>
-              {["200", "normal", "bold"].map((weight) => (
-                <MenuItem
-                  key={weight}
-                  selected={fontWeight === weight}
-                  onClick={() => {
-                    setFontWeight(weight);
-                    setAnchorEl(null);
-                  }}
-                  sx={{ fontWeight: weight }}>
-                  <ListItemDecorator>
-                    {fontWeight === weight && <Check fontSize="small" />}
-                  </ListItemDecorator>
-                  {weight === "200" ? "lighter" : weight}
-                </MenuItem>
-              ))}
-            </Menu>
-            <IconButton
-              variant={italic ? "soft" : "plain"}
-              color={italic ? "primary" : "neutral"}
-              aria-pressed={italic}
-              onClick={() => setItalic((bool) => !bool)}>
+            <IconButton variant={"soft"} color={"primary"}>
               <FormatItalic />
             </IconButton>
             <Button sx={{ ml: "auto" }}>Send</Button>
-          </Box>
+          </BottomPanel>
         }
-        sx={{
-          minWidth: 300,
-          fontWeight,
-          fontStyle: italic ? "italic" : "initial",
-        }}
       />
     </FormControl>
   );
 }
+
+const TextareaStyled = styled(Textarea)(() => ({
+  minWidth: 280,
+}));
+
+const BottomPanel = styled(Box)(({ theme }) => ({
+  display: "flex",
+  gap: theme.spacing(1),
+  paddingTop: theme.spacing(1),
+  borderTop: "1px solid",
+  borderColor: theme.palette.divider,
+  flex: "auto",
+}));
