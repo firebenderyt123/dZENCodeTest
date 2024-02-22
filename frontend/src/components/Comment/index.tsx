@@ -12,13 +12,13 @@ import {
 import { formatDateForComments } from "@/utils/date-format.util";
 import { Comment } from "@/interfaces/comment.interface";
 
-interface Props {
+interface ComponentProps {
   comment: Comment;
   parentCommentText?: string;
 }
 type Ref = ForwardedRef<HTMLLIElement>;
 
-function Component({ comment, parentCommentText }: Props, ref: Ref) {
+function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
   const { id, text, createdAt, user, replies } = comment;
 
   const currRef = useRef<HTMLLIElement>(null);

@@ -2,19 +2,18 @@ import { ForwardedRef, forwardRef } from "react";
 import { FieldError } from "react-hook-form";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
 
-type Props = {
+type FormFieldProps = {
   fieldError?: FieldError;
 } & TextFieldProps;
 function FormField(
-  { fieldError, ...props }: Props,
-  ref: ForwardedRef<HTMLInputElement>
+  { fieldError, ...props }: FormFieldProps,
+  ref: ForwardedRef<HTMLDivElement>
 ) {
   return (
     <TextField
       variant="outlined"
       margin="normal"
       fullWidth
-      autoFocus
       error={!!fieldError}
       helperText={fieldError?.message}
       ref={ref}

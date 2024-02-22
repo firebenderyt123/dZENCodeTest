@@ -1,14 +1,14 @@
 import { ReactNode } from "react";
-import { Container, styled } from "@mui/material";
+import { Container, styled } from "@mui/joy";
 
-interface Props {
+interface MainProps {
   children: ReactNode;
 }
 
-export default function MainComponent({ children }: Props) {
-  return <Main>{children}</Main>;
+export default function Main({ children }: MainProps) {
+  return <MainStyled>{children}</MainStyled>;
 }
 
-const Main = styled(Container)(() => ({
+const MainStyled = styled(Container)(() => ({
   margin: "auto",
 }));

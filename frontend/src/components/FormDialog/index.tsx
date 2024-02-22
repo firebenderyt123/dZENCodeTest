@@ -8,12 +8,12 @@ import {
 } from "react";
 import { Dialog, DialogContent } from "@mui/material";
 
-interface Props {
+interface FormDialogProps {
   children: ReactNode;
 }
 type Ref = ForwardedRef<HTMLButtonElement>;
 
-function Component({ children }: Props, ref: Ref) {
+function Component({ children }: FormDialogProps, ref: Ref) {
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {

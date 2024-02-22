@@ -1,15 +1,18 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { Pagination } from "@mui/material";
-import { CommentsState } from "@/lib/comments/comments.reducer";
+import { CommentsState } from "@/lib/comments/comments.slice";
 import { GetCommentsProps } from "@/services/comments.service";
 import CommentComponent, { ListStyled } from "../Comment";
 
-interface Props {
+interface CommentsListProps {
   commentsState: CommentsState;
   getComments: (props: GetCommentsProps) => void;
 }
 
-export default function CommentsList({ commentsState, getComments }: Props) {
+export default function CommentsList({
+  commentsState,
+  getComments,
+}: CommentsListProps) {
   const { pending, data, error } = commentsState;
 
   const [currentPage, setCurrentPage] = useState<number>(1);
