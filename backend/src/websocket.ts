@@ -1,3 +1,3 @@
-import { AuthWebSocketModule } from './app/websocket/auth/auth-websocket.module';
+import { CommentsModule } from './app/websocket/comments/comments.module';
 
-export const websocketModules = [AuthWebSocketModule];
+export const websocketModules = [CommentsModule];

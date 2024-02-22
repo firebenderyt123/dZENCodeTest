@@ -54,7 +54,6 @@ class AuthService extends BaseService {
       dispatch(profileSuccess(response));
     } catch (error) {
       super.errorHandler(error, (err) => {
-        cookiesService.deleteToken();
         dispatch(profileFailed(err));
       });
     }

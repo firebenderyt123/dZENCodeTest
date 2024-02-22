@@ -14,7 +14,7 @@ export default class BaseService {
     }
   }
 
-  private instanceOfMyError(error: any): error is MyError {
+  protected instanceOfMyError(error: any): error is MyError {
     return "message" in error && "statusCode" in error;
   }
 }

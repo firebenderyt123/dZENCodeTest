@@ -18,10 +18,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 export const useAuth = () => useContext(AuthContext);
 
-interface Props {
+interface AuthProviderProps {
   children: ReactNode;
 }
-export default function AuthProvider({ children }: Props) {
+export default function AuthProvider({ children }: AuthProviderProps) {
   const dispatch = useAppDispatch();
   const authState = useAppSelector((reducers) => reducers.auth);
 
@@ -47,7 +47,16 @@ export default function AuthProvider({ children }: Props) {
     if (!authState.user) {
       dispatch(authService.getProfile());
     }
-  }, [authState.user, dispatch]);
+    if (authState.isAuthenticated && authState.error?.statusCode === 401) {
+      logout();
+    }
+  }, [
+    authState.error,
+    authState.isAuthenticated,
+    authState.user,
+    dispatch,
+    logout,
+  ]);
 
   return (
     <AuthContext.Provider value={{ authState, login, register, logout }}>
