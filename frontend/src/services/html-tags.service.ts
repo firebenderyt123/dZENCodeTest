@@ -1,33 +1,33 @@
 export type AllowedTags = "a" | "code" | "i" | "strong";
 
 class HtmlTagsService {
-  getTag(tag: AllowedTags) {
+  wrapWithTag(tag: AllowedTags, text: string = ""): string {
     switch (tag) {
       case "a":
-        return this.getATag();
+        return this.wrapWithA(text);
       case "code":
-        return this.getCodeTag();
+        return this.wrapWithCode(text);
       case "i":
-        return this.getITag();
+        return this.wrapWithI(text);
       case "strong":
-        return this.getStrongTag();
+        return this.wrapWithStrong(text);
     }
   }
 
-  private getATag() {
-    return '<a href="" title=""></a>';
+  private wrapWithA(text: string) {
+    return `<a href="" title="">${text}</a>`;
   }
 
-  private getCodeTag() {
-    return "<code></code>";
+  private wrapWithCode(text: string) {
+    return `<code>${text}</code>`;
   }
 
-  private getITag() {
-    return "<i></i>";
+  private wrapWithI(text: string) {
+    return `<i>${text}</i>`;
   }
 
-  private getStrongTag() {
-    return "<strong></strong>";
+  private wrapWithStrong(text: string) {
+    return `<strong>${text}</strong>`;
   }
 }
 const htmlTagsService = new HtmlTagsService();

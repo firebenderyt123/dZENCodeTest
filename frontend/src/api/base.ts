@@ -39,6 +39,21 @@ export default class BaseApi {
     }
   }
 
+  protected async postAuthorizedRequest<D, R>(
+    token: string,
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig
+  ): Promise<AxiosResponse<R>> {
+    const conf = {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+      ...config,
+    };
+    return this.postRequest<D, R>(url, data, conf);
+  }
+
   protected requestError(
     error: AxiosError,
     message = "Something went wrong :("

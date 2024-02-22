@@ -3,7 +3,7 @@ import { useCallback, useEffect } from "react";
 import CommentsList from "@/components/CommentsList";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import commentsService, { GetCommentsProps } from "@/services/comments.service";
-import CommentBox from "@/components/FormFields/CommentBox";
+import CommentBox from "@/components/CommentBox";
 
 export default function CommentsPage() {
   const dispatch = useAppDispatch();
