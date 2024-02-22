@@ -2,10 +2,10 @@ import { CommentsGetRequestProps } from "@/api/comments/comments-get.interface";
 import commentsApi from "@/api/comments";
 import { AppDispatch } from "@/lib/store";
 import {
-  commentsError,
-  commentsPending,
-  commentsSuccess,
-} from "@/lib/comments/comments.actions";
+  getCommentsRequest,
+  getCommentsSuccess,
+  getCommentsFailed,
+} from "@/lib/comments/comments.slice";
 import BaseService from "./base.service";
 
 class CommentsService extends BaseService {
@@ -16,7 +16,7 @@ class CommentsService extends BaseService {
     order = "DESC",
   }: GetCommentsProps) {
     return async (dispatch: AppDispatch) => {
-      dispatch(commentsPending());
+      dispatch(getCommentsRequest());
       try {
         const data = await commentsApi.commentsGetRequest({
           page,
@@ -24,9 +24,9 @@ class CommentsService extends BaseService {
           orderBy,
           order,
         });
-        dispatch(commentsSuccess(data));
+        dispatch(getCommentsSuccess(data));
       } catch (error) {
-        super.errorHandler(error, (err) => dispatch(commentsError(err)));
+        super.errorHandler(error, (err) => dispatch(getCommentsFailed(err)));
       }
     };
   }

@@ -8,14 +8,12 @@ import {
 import { AuthState } from "@/lib/auth/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import authService, { SignInProps, SignUpProps } from "@/services/auth.service";
-import authWebSocketService from "@/services/auth-websocket.service";
 
 interface AuthContextType {
   authState: AuthState;
   login: (userData: SignInProps) => void;
   register: (userData: SignUpProps) => void;
   logout: () => void;
-  doiIfAuthenticated: (callback: () => void) => void;
 }
 const AuthContext = createContext<AuthContextType | null>(null);
 export const useAuth = () => useContext(AuthContext);
@@ -45,19 +43,6 @@ export default function AuthProvider({ children }: Props) {
     dispatch(authService.logoutUser());
   }, [dispatch]);
 
-  const doiIfAuthenticated = useCallback(
-    (callback: () => void) => {
-      authWebSocketService.isAuthenticated((isAuthenticated) => {
-        if (!isAuthenticated) {
-          logout();
-          return;
-        }
-        callback();
-      });
-    },
-    [logout]
-  );
-
   useEffect(() => {
     if (!authState.user) {
       dispatch(authService.getProfile());
@@ -65,8 +50,7 @@ export default function AuthProvider({ children }: Props) {
   }, [authState.user, dispatch]);
 
   return (
-    <AuthContext.Provider
-      value={{ authState, login, register, logout, doiIfAuthenticated }}>
+    <AuthContext.Provider value={{ authState, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
