@@ -39,22 +39,22 @@ export default function AuthProvider({ children }: Props) {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(authService.getProfile());
-  }, [dispatch]);
+    if (!authState.isAuthenticated) {
+      dispatch(authService.getProfile());
+    }
+  }, [authState.isAuthenticated, dispatch, logout]);
 
   useEffect(() => {
-    if (authState.isAuthenticated) {
-      authWebSocketService.reconnect();
-    }
+    const intervalId = setInterval(() => {
+      authWebSocketService.isAuthenticated((isAuthenticated) => {
+        if (!isAuthenticated) {
+          logout();
+        }
+      });
+    }, 60000);
 
-    authWebSocketService.onDisconnect(() => {
-      logout();
-    });
-
-    return () => {
-      authWebSocketService.disconnect();
-    };
-  }, [authState.isAuthenticated, logout]);
+    return () => clearInterval(intervalId);
+  }, [logout]);
 
   return (
     <AuthContext.Provider value={{ authState, login, register, logout }}>

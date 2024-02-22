@@ -5,7 +5,8 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
-  ConnectedSocket,
+  SubscribeMessage,
+  MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -18,15 +19,7 @@ export class AuthWebSocketGateway
 
   constructor(private jwtService: JwtService) {}
 
-  async handleConnection(@ConnectedSocket() client: Socket) {
-    const token = this.extractTokenFromHandshake(client.handshake);
-    const payload = await this.jwtService.decode(token);
-
-    if (!payload) {
-      this.handleDisconnect(client);
-      return;
-    }
-  }
+  async handleConnection() {}
 
   handleDisconnect(client: Socket) {
     client.disconnect(true);
@@ -34,8 +27,9 @@ export class AuthWebSocketGateway
 
   afterInit() {}
 
-  private extractTokenFromHandshake(handshake: Socket['handshake']): string {
-    const value = handshake.query.token;
-    return Array.isArray(value) ? value[0] : value;
+  @SubscribeMessage('isAuthenticated')
+  async handleEvent(@MessageBody() token: string): Promise<boolean> {
+    const payload = await this.jwtService.decode(token);
+    return !!payload;
   }
 }

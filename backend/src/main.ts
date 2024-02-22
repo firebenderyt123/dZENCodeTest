@@ -5,6 +5,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { ConfigService } from '@nestjs/config';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -28,7 +29,9 @@ async function bootstrap() {
   );
 
   const configService = app.get(ConfigService);
+
   app.enableCors({ origin: configService.get('cors.origin') });
+  app.useWebSocketAdapter(new IoAdapter(app));
 
   const port = configService.get('port');
   await app.listen(port);
