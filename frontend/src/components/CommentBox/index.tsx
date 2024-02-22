@@ -9,6 +9,7 @@ import {
 } from "@/schemas/create-comment.shema";
 import InnerCommentBox from "./InnerCommentBox";
 import { transformHtmlText } from "@/utils/sanitize-html";
+import CommentPreview from "./CommentPreview";
 
 interface WithCommentBoxProps {
   onSubmit: (data: CreateCommentSchema) => void;
@@ -19,7 +20,6 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
     const {
       register,
       handleSubmit,
-      reset,
       setValue,
       trigger,
       watch,
@@ -72,7 +72,6 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
       trigger("text").then((isValid) => {
         if (isValid) {
           onSubmit(data);
-          reset();
         }
       });
     };
@@ -96,6 +95,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
             <FormHelperTextStyled>{errors?.text?.message}</FormHelperTextStyled>
           )}
         </FormControl>
+        <CommentPreview html={commentText} />
       </form>
     );
   };

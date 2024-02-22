@@ -87,7 +87,7 @@ const BottomPanel = styled(Box)(({ theme }) => ({
 
 const SendButton = styled(Button)(() => ({
   marginLeft: "auto",
-  padding: "0.3125rem 0.125rem 0.3125rem 0.625rem",
+  padding: "0.5rem 0.25rem 0.5rem 0.625rem",
   "& > span": {
     margin: "0 0 -0.0625rem 0",
 
