@@ -18,26 +18,28 @@ export default function ImagePreviewPanel({
   removeFile,
 }: ImagePreviewPanel) {
   return (
-    <ImagePreviewBox>
-      {files.map((file, index) => (
-        <BadgeStyled
-          key={index}
-          badgeContent={<CloseIcon onClick={() => removeFile(file)} />}>
-          <Tooltip title={file.data.name} arrow variant="outlined">
-            {file.preview ? (
-              <ImageStyled
-                src={file.preview}
-                alt={file.data.name}
-                height="50"
-                width="50"
-              />
-            ) : (
-              <FileIcon />
-            )}
-          </Tooltip>
-        </BadgeStyled>
-      ))}
-    </ImagePreviewBox>
+    !!files.length && (
+      <ImagePreviewBox>
+        {files.map((file, index) => (
+          <BadgeStyled
+            key={index}
+            badgeContent={<CloseIcon onClick={() => removeFile(file)} />}>
+            <Tooltip title={file.data.name} arrow variant="outlined">
+              {file.preview ? (
+                <ImageStyled
+                  src={file.preview}
+                  alt={file.data.name}
+                  height="50"
+                  width="50"
+                />
+              ) : (
+                <FileIcon />
+              )}
+            </Tooltip>
+          </BadgeStyled>
+        ))}
+      </ImagePreviewBox>
+    )
   );
 }
 

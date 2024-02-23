@@ -7,12 +7,22 @@ import { CommentWithParent } from "@/interfaces/comment-with-parent.interface";
 export interface CommentsState {
   pending: boolean;
   data: CommentsResponse | null;
+  commentsPerPage: number;
+  total: {
+    pages: number;
+    comments: number;
+  };
   error: Error | null;
 }
 
 const initialState: CommentsState = {
   pending: false,
   data: null,
+  commentsPerPage: 25,
+  total: {
+    pages: 0,
+    comments: 0,
+  },
   error: null,
 };
 
@@ -44,6 +54,10 @@ const commentsSlice = createSlice({
         state.data.comments = parent
           ? insertCommentIntoReplies(state.data.comments, parent.id, newComment)
           : [newComment, ...state.data.comments];
+        state.total = {
+          comments: state.total.comments + 1,
+          pages: Math.ceil((state.total.comments + 1) / state.commentsPerPage),
+        };
       }
     },
   },
