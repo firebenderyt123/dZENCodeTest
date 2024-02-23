@@ -31,7 +31,12 @@ function UploadFileIconButton(
   return (
     <IconButton component="label" {...props} ref={ref}>
       {children}
-      <VisuallyHiddenInput type="file" multiple onChange={handleFileChange} />
+      <VisuallyHiddenInput
+        type="file"
+        multiple
+        accept=".jpg,.jpeg,.gif,.png,.txt"
+        onChange={handleFileChange}
+      />
     </IconButton>
   );
 }
