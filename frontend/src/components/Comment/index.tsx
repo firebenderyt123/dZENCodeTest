@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { formatDateForComments } from "@/utils/date-format.util";
 import { Comment } from "@/interfaces/comment.interface";
+import BoxInnerHtml from "../BoxInnerHtml";
 
 interface ComponentProps {
   comment: Comment;
@@ -66,7 +67,7 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
         {userInfo}
       </InlineBox>
       {parentTextBlock}
-      <CommentText>{text}</CommentText>
+      <CommentText html={text} />
       {repliesBlock}
     </ListItemStyled>
   );
@@ -113,7 +114,7 @@ const BoldText = styled(Typography)(() => ({
   fontWeight: 700,
 }));
 
-const CommentText = styled(ListItemText)(() => ({
+const CommentText = styled(BoxInnerHtml)(() => ({
   width: "100%",
   padding: "1rem 0 2.25rem",
   overflow: "hidden",

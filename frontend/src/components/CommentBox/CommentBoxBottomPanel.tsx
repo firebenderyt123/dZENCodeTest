@@ -7,7 +7,7 @@ import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import PreviewRoundedIcon from "@mui/icons-material/PreviewRounded";
 import { Box, Button, IconButton, styled } from "@mui/joy";
 import { AllowedTags } from "@/services/html-tags.service";
-import { useComments } from "@/hooks/useComments";
+import { useComments } from "@/contexts/CommentsContext";
 
 interface CommentBoxBottomPanelProps {
   preview: boolean;
@@ -20,7 +20,7 @@ export default function CommentBoxBottomPanel({
   previewButtonOnClick,
   wrapWithTagHandler,
 }: CommentBoxBottomPanelProps) {
-  const { commentDraftState } = useComments();
+  const comments = useComments();
   return (
     <BottomPanel>
       <IconButton
@@ -58,7 +58,7 @@ export default function CommentBoxBottomPanel({
       </IconButton>
       <SendButton
         type="submit"
-        loading={commentDraftState.pending}
+        loading={comments?.commentDraftState.pending}
         endDecorator={<SendRoundedIcon />}>
         Send
       </SendButton>

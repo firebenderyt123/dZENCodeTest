@@ -1,31 +1,8 @@
 import Head from "next/head";
-import { useEffect } from "react";
-import CommentsList from "@/components/CommentsList";
-import CommentBox from "@/components/CommentBox";
-import { useComments } from "@/hooks/useComments";
+import CommentsPageContent from "@/components/PageContents/CommentsPageContent";
+import CommentsProvider from "@/contexts/CommentsContext";
 
 export default function CommentsPage() {
-  const {
-    commentsState,
-    commentDraftState,
-    createComment,
-    getComments,
-    onCommentPublished,
-    offCommentPublished,
-  } = useComments();
-
-  useEffect(() => {
-    if (!commentsState.data && !commentsState.error) getComments({});
-  }, [commentsState, getComments]);
-
-  useEffect(() => {
-    onCommentPublished();
-
-    return () => {
-      offCommentPublished();
-    };
-  }, [offCommentPublished, onCommentPublished]);
-
   return (
     <>
       <Head>
@@ -37,13 +14,9 @@ export default function CommentsPage() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <CommentBox
-        commentDraftState={commentDraftState}
-        onSubmitHandler={createComment}
-      />
-      <CommentsList
-        commentsState={commentsState}
-        getComments={getComments}></CommentsList>
+      <CommentsProvider>
+        <CommentsPageContent />
+      </CommentsProvider>
     </>
   );
 }

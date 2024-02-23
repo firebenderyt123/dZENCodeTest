@@ -47,16 +47,13 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     if (!authState.user && !authState.error) {
       dispatch(authService.getProfile());
     }
-    if (authState.isAuthenticated && authState.error?.statusCode === 401) {
+  }, [authState.error, authState.user, dispatch]);
+
+  useEffect(() => {
+    if (authState.error?.statusCode === 401) {
       logout();
     }
-  }, [
-    authState.error,
-    authState.isAuthenticated,
-    authState.user,
-    dispatch,
-    logout,
-  ]);
+  }, [authState.error?.statusCode, logout]);
 
   return (
     <AuthContext.Provider value={{ authState, login, register, logout }}>

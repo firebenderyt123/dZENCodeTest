@@ -2,7 +2,7 @@ import { ForwardedRef, forwardRef, useCallback, useState } from "react";
 import { Box, Textarea, styled, TextareaProps } from "@mui/joy";
 
 import { AllowedTags } from "@/services/html-tags.service";
-import CommentPreview from "./CommentPreview";
+import BoxInnerHtml from "../BoxInnerHtml";
 import CommentBoxBottomPanel from "./CommentBoxBottomPanel";
 
 interface CommentBoxProps {
@@ -67,7 +67,7 @@ const TopPanel = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.level1,
 }));
 
-const CommentPreviewStyled = styled(CommentPreview)(() => ({
+const CommentPreviewStyled = styled(BoxInnerHtml)(() => ({
   margin: "0.4375rem",
   wordBreak: "break-word",
 }));

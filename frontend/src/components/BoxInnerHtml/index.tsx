@@ -1,12 +1,12 @@
 import { Box, BoxProps } from "@mui/material";
 
-interface CommentPreviewProps {
+interface BoxInnerHtmlProps {
   html: string;
 }
 
-export default function CommentPreview({
+export default function BoxInnerHtml({
   html,
   ...props
-}: CommentPreviewProps & BoxProps) {
+}: BoxInnerHtmlProps & BoxProps) {
   return <Box dangerouslySetInnerHTML={{ __html: html }} {...props} />;
 }
