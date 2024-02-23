@@ -88,6 +88,8 @@ class CommentsService extends BaseService {
     });
     return [newFilesArray, errors];
   }
+
+  uploadAttachments() {}
 }
 const commentsService = new CommentsService();
 export default commentsService;

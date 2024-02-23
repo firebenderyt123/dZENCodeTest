@@ -20,7 +20,7 @@ export default class BaseApi {
   ) {
     const conf = {
       headers: {
-        Authorization: "Bearer " + token,
+        ...this.getAuthHeaders(token),
       },
       ...config,
     };
@@ -47,7 +47,23 @@ export default class BaseApi {
   ): Promise<AxiosResponse<R>> {
     const conf = {
       headers: {
-        Authorization: "Bearer " + token,
+        ...this.getAuthHeaders(token),
+      },
+      ...config,
+    };
+    return this.postRequest<D, R>(url, data, conf);
+  }
+
+  protected async postFormDataAuthorizedRequest<D, R>(
+    token: string,
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig
+  ): Promise<AxiosResponse<R>> {
+    const conf = {
+      headers: {
+        ...this.getAuthHeaders(token),
+        "Content-Type": "multipart/form-data",
       },
       ...config,
     };
@@ -64,5 +80,9 @@ export default class BaseApi {
     } else {
       return error.response.data as ErrorResponse;
     }
+  }
+
+  private getAuthHeaders(token: string) {
+    return { Authorization: "Bearer " + token };
   }
 }

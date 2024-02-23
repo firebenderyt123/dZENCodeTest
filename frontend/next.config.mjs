@@ -4,6 +4,7 @@ const nextConfig = {
   env: {
     apiRoot: "http://localhost:8000/api/v1",
     apiComments: "/comments",
+    apiCommentsAttachments: "/comments/attachments",
     signIn: "/auth/sign-in",
     signUp: "/auth/sign-up",
     profile: "/profile",
