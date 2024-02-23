@@ -1,26 +1,12 @@
-import {
-  WebSocketGateway,
-  WebSocketServer,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  OnGatewayInit,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Injectable } from '@nestjs/common';
+import { WebSocketGateway } from '@nestjs/websockets';
+import { Comment } from 'src/app/comments/comment.entity';
+import { BaseGateway } from '../base.gateway';
 
+@Injectable()
 @WebSocketGateway({ namespace: 'comments' })
-export class CommentsGateway
-  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
-{
-  @WebSocketServer()
-  server: Server;
-
-  constructor() {}
-
-  async handleConnection() {}
-
-  handleDisconnect(client: Socket) {
-    client.disconnect(true);
+export class CommentsGateway extends BaseGateway {
+  commentPublishedBroadcast(comment: Comment) {
+    this.server.emit('commentPublished', comment);
   }
-
-  afterInit() {}
 }

@@ -6,4 +6,4 @@ import { CommentsGateway } from './comments.gateway';
   providers: [CommentsGateway],
   exports: [CommentsGateway],
 })
-export class CommentsModule {}
+export class CommentsGatewayModule {}

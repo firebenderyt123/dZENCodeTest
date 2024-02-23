@@ -1,3 +1,3 @@
-import { CommentsModule } from './app/websocket/comments/comments.module';
+import { CommentsGatewayModule } from './app/websocket/comments/comments.module';
 
-export const websocketModules = [CommentsModule];
+export const websocketModules = [CommentsGatewayModule];

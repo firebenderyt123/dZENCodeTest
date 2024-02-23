@@ -5,12 +5,26 @@ import CommentBox from "@/components/CommentBox";
 import { useComments } from "@/hooks/useComments";
 
 export default function CommentsPage() {
-  const { commentsState, commentDraftState, createComment, getComments } =
-    useComments();
+  const {
+    commentsState,
+    commentDraftState,
+    createComment,
+    getComments,
+    onCommentPublished,
+    offCommentPublished,
+  } = useComments();
 
   useEffect(() => {
     if (!commentsState.data && !commentsState.error) getComments({});
   }, [commentsState, getComments]);
+
+  useEffect(() => {
+    onCommentPublished();
+
+    return () => {
+      offCommentPublished();
+    };
+  }, [offCommentPublished, onCommentPublished]);
 
   return (
     <>

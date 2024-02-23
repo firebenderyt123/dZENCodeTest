@@ -6,6 +6,7 @@ import {
   getCommentsRequest,
   getCommentsSuccess,
   getCommentsFailed,
+  insertComment,
 } from "@/lib/slices/comments.slice";
 import {
   createCommentFailed,
@@ -14,6 +15,7 @@ import {
 } from "@/lib/slices/comment-draft.slice";
 import BaseService from "./base.service";
 import cookiesService from "./cookies.service";
+import commentsWebSocketService from "./comments-websocket.service";
 
 class CommentsService extends BaseService {
   getComments({
@@ -49,6 +51,18 @@ class CommentsService extends BaseService {
         super.errorHandler(error, (err) => dispatch(createCommentFailed(err)));
       }
     };
+  }
+
+  onCommentPublished() {
+    return async (dispatch: AppDispatch) => {
+      commentsWebSocketService.onCommentPublished((comment) => {
+        dispatch(insertComment(comment));
+      });
+    };
+  }
+
+  offCommentPublished() {
+    commentsWebSocketService.offCommentPublished();
   }
 }
 const commentsService = new CommentsService();

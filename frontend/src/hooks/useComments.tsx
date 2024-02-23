@@ -12,6 +12,8 @@ interface CommentsOutput {
   commentDraftState: CommentDraftState;
   createComment: (data: CreateCommentProps) => void;
   getComments: (props: GetCommentsProps) => void;
+  onCommentPublished: () => void;
+  offCommentPublished: () => void;
 }
 
 export const useComments = (): CommentsOutput => {
@@ -33,5 +35,20 @@ export const useComments = (): CommentsOutput => {
     [dispatch]
   );
 
-  return { commentsState, commentDraftState, createComment, getComments };
+  const onCommentPublished = useCallback(() => {
+    dispatch(commentsService.onCommentPublished());
+  }, [dispatch]);
+
+  const offCommentPublished = useCallback(() => {
+    commentsService.offCommentPublished();
+  }, []);
+
+  return {
+    commentsState,
+    commentDraftState,
+    createComment,
+    getComments,
+    onCommentPublished,
+    offCommentPublished,
+  };
 };

@@ -19,7 +19,10 @@ class WebSocketService {
   reconnect(opts?: Partial<ManagerOptions & SocketOptions>) {
     this.disconnect();
     this.options = opts;
-    this.socket = io(this.uri, opts);
+    this.socket = io(this.uri, {
+      transports: ["websocket"],
+      ...opts,
+    });
     this.connect();
   }
 
@@ -37,6 +40,10 @@ class WebSocketService {
 
   onDisconnect(action: () => void) {
     this.socket.on("disconnect", action);
+  }
+
+  isConnected() {
+    return this.socket.connected;
   }
 }
 export default WebSocketService;

@@ -5,6 +5,7 @@ import { UsersService } from '../users/users.service';
 import { Comment } from './comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentList } from './interfaces/comment-list.interface';
+import { CommentsGateway } from '../websocket/comments/comments.gateway';
 
 @Injectable()
 export class CommentsService {
@@ -12,6 +13,7 @@ export class CommentsService {
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
     private usersService: UsersService,
+    private commentsGateway: CommentsGateway,
   ) {}
 
   async create(
@@ -33,8 +35,11 @@ export class CommentsService {
     });
 
     comment.text = text;
+    const savedComment = await this.commentRepository.save(comment);
 
-    return await this.commentRepository.save(comment);
+    this.commentsGateway.commentPublishedBroadcast(savedComment);
+
+    return savedComment;
   }
 
   async find(
