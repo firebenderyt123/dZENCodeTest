@@ -1,6 +1,7 @@
 import Head from "next/head";
 import CommentsPageContent from "@/components/PageContents/CommentsPageContent";
 import CommentsProvider from "@/contexts/CommentsContext";
+import CommentFormProvider from "@/contexts/CommentFormContext";
 
 export default function CommentsPage() {
   return (
@@ -15,7 +16,9 @@ export default function CommentsPage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <CommentsProvider>
-        <CommentsPageContent />
+        <CommentFormProvider>
+          <CommentsPageContent />
+        </CommentFormProvider>
       </CommentsProvider>
     </>
   );

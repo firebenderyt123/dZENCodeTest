@@ -7,7 +7,8 @@ import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import PreviewRoundedIcon from "@mui/icons-material/PreviewRounded";
 import { Box, Button, IconButton, styled } from "@mui/joy";
 import { AllowedTags } from "@/services/html-tags.service";
-import { useComments } from "@/contexts/CommentsContext";
+import { useCommentForm } from "@/contexts/CommentFormContext";
+import UploadFileIconButton from "../UploadFile/UploadFileIconButton";
 
 interface CommentBoxBottomPanelProps {
   preview: boolean;
@@ -20,49 +21,54 @@ export default function CommentBoxBottomPanel({
   previewButtonOnClick,
   wrapWithTagHandler,
 }: CommentBoxBottomPanelProps) {
-  const comments = useComments();
+  const commentForm = useCommentForm();
   return (
-    <BottomPanel>
-      <IconButton
-        variant="soft"
-        color="neutral"
-        onClick={() => wrapWithTagHandler("strong")}>
-        <FormatBold />
-      </IconButton>
-      <IconButton
-        variant="soft"
-        color="neutral"
-        onClick={() => wrapWithTagHandler("i")}>
-        <FormatItalic />
-      </IconButton>
-      <IconButton
-        variant="soft"
-        color="neutral"
-        onClick={() => wrapWithTagHandler("code")}>
-        <CodeIcon />
-      </IconButton>
-      <IconButton
-        variant="soft"
-        color="neutral"
-        onClick={() => wrapWithTagHandler("a")}>
-        <AddLinkIcon />
-      </IconButton>
-      <IconButton variant="soft" color="neutral">
-        <AttachFileIcon />
-      </IconButton>
-      <IconButton
-        variant="soft"
-        color={preview ? "primary" : "neutral"}
-        onClick={previewButtonOnClick}>
-        <PreviewRoundedIcon />
-      </IconButton>
-      <SendButton
-        type="submit"
-        loading={comments?.commentDraftState.pending}
-        endDecorator={<SendRoundedIcon />}>
-        Send
-      </SendButton>
-    </BottomPanel>
+    commentForm && (
+      <BottomPanel>
+        <IconButton
+          variant="soft"
+          color="neutral"
+          onClick={() => wrapWithTagHandler("strong")}>
+          <FormatBold />
+        </IconButton>
+        <IconButton
+          variant="soft"
+          color="neutral"
+          onClick={() => wrapWithTagHandler("i")}>
+          <FormatItalic />
+        </IconButton>
+        <IconButton
+          variant="soft"
+          color="neutral"
+          onClick={() => wrapWithTagHandler("code")}>
+          <CodeIcon />
+        </IconButton>
+        <IconButton
+          variant="soft"
+          color="neutral"
+          onClick={() => wrapWithTagHandler("a")}>
+          <AddLinkIcon />
+        </IconButton>
+        <UploadFileIconButton
+          onInputChange={commentForm.uploadFile}
+          variant="soft"
+          color="neutral">
+          <AttachFileIcon />
+        </UploadFileIconButton>
+        <IconButton
+          variant="soft"
+          color={preview ? "primary" : "neutral"}
+          onClick={previewButtonOnClick}>
+          <PreviewRoundedIcon />
+        </IconButton>
+        <SendButton
+          type="submit"
+          loading={commentForm.commentDraftState.pending}
+          endDecorator={<SendRoundedIcon />}>
+          Send
+        </SendButton>
+      </BottomPanel>
+    )
   );
 }
 

@@ -10,12 +10,7 @@ import { ImageUpload } from './interfaces/image-upload.interface';
 
 @Injectable()
 export class FilesService {
-  private readonly allowedImageTypes = [
-    'image/jpeg',
-    'image/jpg',
-    'image/png',
-    'image/gif',
-  ];
+  private readonly allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
 
   constructor(
     @InjectRepository(File)

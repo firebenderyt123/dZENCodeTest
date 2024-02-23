@@ -2,9 +2,11 @@ import { useEffect } from "react";
 import CommentsList from "@/components/CommentsList";
 import CommentBox from "@/components/CommentBox";
 import { useComments } from "@/contexts/CommentsContext";
+import { useCommentForm } from "@/contexts/CommentFormContext";
 
 export default function CommentsPageContent() {
   const comments = useComments();
+  const commentForm = useCommentForm();
 
   useEffect(() => {
     if (!comments?.commentsState.data && !comments?.commentsState.error)
@@ -21,11 +23,11 @@ export default function CommentsPageContent() {
 
   return (
     <>
-      {comments && (
+      {comments && commentForm && (
         <>
           <CommentBox
-            commentDraftState={comments.commentDraftState}
-            onSubmitHandler={comments.createComment}
+            commentDraftState={commentForm.commentDraftState}
+            onSubmitHandler={commentForm.createComment}
           />
           <CommentsList
             commentsState={comments.commentsState}
