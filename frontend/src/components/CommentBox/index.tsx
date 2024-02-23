@@ -1,10 +1,12 @@
 import { useCallback, useRef } from "react";
 import {
+  Box,
   FormControl,
   FormLabel,
   styled,
   FormHelperText,
   TextareaProps,
+  Tooltip,
 } from "@mui/joy";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -17,6 +19,8 @@ import InnerCommentBox from "./InnerCommentBox";
 import { transformHtmlText } from "@/utils/sanitize-html";
 import { CreateCommentProps } from "@/services/comments.service";
 import { CommentDraftState } from "@/lib/slices/comment-draft.slice";
+import { useCommentForm } from "@/contexts/CommentFormContext";
+import ImagePreviewPanel from "../ImagePreviewPanel";
 
 interface WithCommentBoxProps {
   commentDraftState: CommentDraftState;
@@ -28,6 +32,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
     commentDraftState,
     onSubmitHandler,
   }: WithCommentBoxProps & TextareaProps) {
+    const commentForm = useCommentForm();
     const {
       register,
       handleSubmit,
@@ -36,6 +41,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
       watch,
       formState: { errors },
     } = useForm<CreateCommentSchema>({
+      mode: "onChange",
       resolver: yupResolver(createCommentSchema),
     });
     const { ref, ...commentProps } = register("text");
@@ -43,7 +49,17 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
     const commentText = watch("text", "");
 
     const commentError: string =
-      errors?.text?.message || commentDraftState.error?.message || "";
+      errors?.text?.message ||
+      commentDraftState.error?.message ||
+      commentForm?.uploadError ||
+      "";
+
+    const imagePreviews = commentForm && (
+      <ImagePreviewPanel
+        files={commentForm.files}
+        removeFile={commentForm.removeFile}
+      />
+    );
 
     const wrapWithTagHandler = useCallback(
       (tag: AllowedTags) => {
@@ -119,6 +135,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
             checkHtmlHandler={checkHtmlHandler}
             wrapWithTagHandler={wrapWithTagHandler}
           />
+          {imagePreviews}
           {commentError && (
             <FormHelperTextStyled>{commentError}</FormHelperTextStyled>
           )}
