@@ -1,5 +1,11 @@
-import { useRef } from "react";
-import { FormControl, FormLabel, styled, FormHelperText } from "@mui/joy";
+import { useCallback, useRef } from "react";
+import {
+  FormControl,
+  FormLabel,
+  styled,
+  FormHelperText,
+  TextareaProps,
+} from "@mui/joy";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import htmlTagsService, { AllowedTags } from "@/services/html-tags.service";
@@ -9,14 +15,19 @@ import {
 } from "@/schemas/create-comment.shema";
 import InnerCommentBox from "./InnerCommentBox";
 import { transformHtmlText } from "@/utils/sanitize-html";
-import CommentPreview from "./CommentPreview";
+import { CreateCommentProps } from "@/services/comments.service";
+import { CommentDraftState } from "@/lib/slices/comment-draft.slice";
 
 interface WithCommentBoxProps {
-  onSubmit: (data: CreateCommentSchema) => void;
+  commentDraftState: CommentDraftState;
+  onSubmitHandler: (data: CreateCommentProps) => void;
 }
 
 export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
-  return function WithCommentBox({ onSubmit }: WithCommentBoxProps) {
+  return function WithCommentBox({
+    commentDraftState,
+    onSubmitHandler,
+  }: WithCommentBoxProps & TextareaProps) {
     const {
       register,
       handleSubmit,
@@ -31,47 +42,62 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
     const commentRef = useRef<HTMLDivElement | null>(null);
     const commentText = watch("text", "");
 
-    const wrapWithTagHandler = (tag: AllowedTags) => {
-      const container = commentRef.current;
-      if (!container) return;
-      const textarea = container.firstChild as HTMLTextAreaElement;
+    const commentError: string =
+      errors?.text?.message || commentDraftState.error?.message || "";
 
-      const startPos = textarea.selectionStart;
-      const endPos = textarea.selectionEnd;
+    const wrapWithTagHandler = useCallback(
+      (tag: AllowedTags) => {
+        const container = commentRef.current;
+        if (!container) return;
+        const textarea = container.querySelector(
+          "textarea"
+        ) as HTMLTextAreaElement;
 
-      if (startPos === endPos) {
-        const wrappedText = htmlTagsService.wrapWithTag(tag);
-        setValue(
-          "text",
-          commentText.substring(0, startPos) +
-            wrappedText +
-            commentText.substring(endPos, commentText.length)
-        );
-        textarea.selectionStart = startPos + wrappedText.length;
-      } else {
-        const wrappedText = htmlTagsService.wrapWithTag(
-          tag,
-          commentText.substring(startPos, endPos)
-        );
-        setValue(
-          "text",
-          commentText.substring(0, startPos) +
-            wrappedText +
-            commentText.substring(endPos, commentText.length)
-        );
-        textarea.selectionStart = startPos + wrappedText.length;
-      }
+        const startPos = textarea.selectionStart;
+        const endPos = textarea.selectionEnd;
 
-      textarea.selectionEnd = textarea.selectionStart;
-      textarea.focus();
-      trigger("text");
-    };
+        if (startPos === endPos) {
+          const wrappedText = htmlTagsService.wrapWithTag(tag);
+          setValue(
+            "text",
+            commentText.substring(0, startPos) +
+              wrappedText +
+              commentText.substring(endPos, commentText.length)
+          );
+          textarea.selectionStart = startPos + wrappedText.length;
+        } else {
+          const wrappedText = htmlTagsService.wrapWithTag(
+            tag,
+            commentText.substring(startPos, endPos)
+          );
+          setValue(
+            "text",
+            commentText.substring(0, startPos) +
+              wrappedText +
+              commentText.substring(endPos, commentText.length)
+          );
+          textarea.selectionStart = startPos + wrappedText.length;
+        }
+
+        textarea.selectionEnd = textarea.selectionStart;
+        textarea.focus();
+        trigger("text");
+      },
+      [commentText, setValue, trigger]
+    );
+
+    const checkHtmlHandler = useCallback(
+      (html: string = commentText) => {
+        setValue("text", transformHtmlText(html.trim()));
+      },
+      [commentText, setValue]
+    );
 
     const submitHandler: SubmitHandler<CreateCommentSchema> = (data) => {
-      setValue("text", transformHtmlText(data.text.trim()));
+      checkHtmlHandler(data.text);
       trigger("text").then((isValid) => {
         if (isValid) {
-          onSubmit(data);
+          onSubmitHandler(data);
         }
       });
     };
@@ -89,13 +115,14 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
             placeholder="Type something here…"
             minRows={3}
             error={!!errors.text}
+            commentText={commentText}
+            checkHtmlHandler={checkHtmlHandler}
             wrapWithTagHandler={wrapWithTagHandler}
           />
-          {errors.text && (
-            <FormHelperTextStyled>{errors?.text?.message}</FormHelperTextStyled>
+          {commentError && (
+            <FormHelperTextStyled>{commentError}</FormHelperTextStyled>
           )}
         </FormControl>
-        <CommentPreview html={commentText} />
       </form>
     );
   };

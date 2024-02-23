@@ -38,7 +38,7 @@ class CommentsService extends BaseService {
     };
   }
 
-  createComment(commentData: CommentsCreateRequestProps) {
+  createComment(commentData: CreateCommentProps) {
     return async (dispatch: AppDispatch) => {
       dispatch(createCommentRequest());
       try {
@@ -55,3 +55,4 @@ const commentsService = new CommentsService();
 export default commentsService;
 
 export type GetCommentsProps = Partial<CommentsGetRequestProps>;
+export type CreateCommentProps = CommentsCreateRequestProps;

@@ -1,69 +1,49 @@
-import { ForwardedRef, forwardRef } from "react";
-import {
-  Button,
-  Box,
-  Textarea,
-  IconButton,
-  styled,
-  TextareaProps,
-} from "@mui/joy";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
-import AddLinkIcon from "@mui/icons-material/AddLink";
-import CodeIcon from "@mui/icons-material/Code";
-import FormatBold from "@mui/icons-material/FormatBold";
-import FormatItalic from "@mui/icons-material/FormatItalic";
-import SendRoundedIcon from "@mui/icons-material/SendRounded";
+import { ForwardedRef, forwardRef, useCallback, useState } from "react";
+import { Box, Textarea, styled, TextareaProps } from "@mui/joy";
+
 import { AllowedTags } from "@/services/html-tags.service";
+import CommentPreview from "./CommentPreview";
+import CommentBoxBottomPanel from "./CommentBoxBottomPanel";
 
 interface CommentBoxProps {
+  commentText: string;
+  checkHtmlHandler: (html?: string) => void;
   wrapWithTagHandler: (tag: AllowedTags) => void;
 }
 
 function InnerCommentBox(
-  { wrapWithTagHandler, ...props }: CommentBoxProps & TextareaProps,
+  {
+    commentText,
+    checkHtmlHandler,
+    wrapWithTagHandler,
+    ...props
+  }: CommentBoxProps & TextareaProps,
   ref: ForwardedRef<HTMLDivElement> | null
 ) {
+  const [preview, setPreview] = useState<boolean>(true);
+
+  const previewButtonOnClick = useCallback(() => {
+    setPreview((prev) => !prev);
+    checkHtmlHandler();
+  }, [checkHtmlHandler]);
+
   return (
     <>
       <TextareaStyled
         ref={ref}
+        startDecorator={
+          preview && (
+            <TopPanel>
+              <CommentPreviewStyled html={commentText} />
+            </TopPanel>
+          )
+        }
         endDecorator={
-          <BottomPanel>
-            <IconButton
-              variant="soft"
-              color="neutral"
-              onClick={() => wrapWithTagHandler("strong")}>
-              <FormatBold />
-            </IconButton>
-            <IconButton
-              variant="soft"
-              color="neutral"
-              onClick={() => wrapWithTagHandler("i")}>
-              <FormatItalic />
-            </IconButton>
-            <IconButton
-              variant="soft"
-              color="neutral"
-              onClick={() => wrapWithTagHandler("code")}>
-              <CodeIcon />
-            </IconButton>
-            <IconButton
-              variant="soft"
-              color="neutral"
-              onClick={() => wrapWithTagHandler("a")}>
-              <AddLinkIcon />
-            </IconButton>
-            <IconButton variant="soft" color="neutral">
-              <AttachFileIcon />
-            </IconButton>
-            <Button>Preview</Button>
-            <SendButton
-              type="submit"
-              loadingPosition="end"
-              endDecorator={<SendRoundedIcon />}>
-              Send
-            </SendButton>
-          </BottomPanel>
+          <CommentBoxBottomPanel
+            preview={preview}
+            previewButtonOnClick={previewButtonOnClick}
+            wrapWithTagHandler={wrapWithTagHandler}
+          />
         }
         {...props}
       />
@@ -74,25 +54,20 @@ export default forwardRef(InnerCommentBox);
 
 const TextareaStyled = styled(Textarea)(() => ({
   minWidth: 280,
+  position: "relative",
 }));
 
-const BottomPanel = styled(Box)(({ theme }) => ({
+const TopPanel = styled(Box)(({ theme }) => ({
   display: "flex",
   gap: theme.spacing(1),
-  paddingTop: theme.spacing(1),
-  borderTop: "1px solid",
+  paddingBottom: theme.spacing(1),
+  borderBottom: "1px solid",
   borderColor: theme.palette.divider,
   flex: "auto",
+  backgroundColor: theme.palette.background.level1,
 }));
 
-const SendButton = styled(Button)(() => ({
-  marginLeft: "auto",
-  padding: "0.5rem 0.25rem 0.5rem 0.625rem",
-  "& > span": {
-    margin: "0 0 -0.0625rem 0",
-
-    "& > svg": {
-      height: "1rem",
-    },
-  },
+const CommentPreviewStyled = styled(CommentPreview)(() => ({
+  margin: "0.4375rem",
+  wordBreak: "break-word",
 }));

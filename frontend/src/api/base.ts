@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { Error as MyError } from "@/interfaces/error.interface";
+import { ErrorResponse } from "@/interfaces/error-response.interface";
 
 export default class BaseApi {
   protected async getRequest<R>(
@@ -57,12 +57,12 @@ export default class BaseApi {
   protected requestError(
     error: AxiosError,
     message = "Something went wrong :("
-  ): MyError | Error {
+  ): ErrorResponse | Error {
     if (!error.response || error.response.status >= 500) {
       console.log(error.message);
       return new Error(message);
     } else {
-      return error.response.data as MyError;
+      return error.response.data as ErrorResponse;
     }
   }
 }

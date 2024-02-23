@@ -1,24 +1,16 @@
 import Head from "next/head";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import CommentsList from "@/components/CommentsList";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import commentsService, { GetCommentsProps } from "@/services/comments.service";
 import CommentBox from "@/components/CommentBox";
+import { useComments } from "@/hooks/useComments";
 
 export default function CommentsPage() {
-  const dispatch = useAppDispatch();
-  const commentsState = useAppSelector((comments) => comments.comments);
-
-  const handleGetComments = useCallback(
-    (props: GetCommentsProps) => {
-      dispatch(commentsService.getComments(props));
-    },
-    [dispatch]
-  );
+  const { commentsState, commentDraftState, createComment, getComments } =
+    useComments();
 
   useEffect(() => {
-    handleGetComments({});
-  }, [handleGetComments]);
+    if (!commentsState.data && !commentsState.error) getComments({});
+  }, [commentsState, getComments]);
 
   return (
     <>
@@ -31,10 +23,13 @@ export default function CommentsPage() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <CommentBox onSubmit={() => console.log(1)} />
+      <CommentBox
+        commentDraftState={commentDraftState}
+        onSubmitHandler={createComment}
+      />
       <CommentsList
         commentsState={commentsState}
-        getComments={handleGetComments}></CommentsList>
+        getComments={getComments}></CommentsList>
     </>
   );
 }
