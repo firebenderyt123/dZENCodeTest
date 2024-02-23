@@ -50,6 +50,7 @@ const commentsSlice = createSlice({
         const newComment = {
           ...comment,
           replies: [],
+          attachments: [],
         };
         state.data.comments = parent
           ? insertCommentIntoReplies(state.data.comments, parent.id, newComment)

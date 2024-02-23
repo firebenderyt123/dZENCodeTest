@@ -1,7 +1,7 @@
-export interface CommentAttachment {
-  containerName: string;
-  blobName: string;
-  fileUrl: string;
-  id: number;
-  uploadedAt: string;
+export interface Attachment {
+  fileId: number;
+  file: {
+    containerName: string;
+    fileUrl: string;
+  };
 }
