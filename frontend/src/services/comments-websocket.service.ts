@@ -1,8 +1,8 @@
-import { CommentWithParent } from "@/interfaces/comment-with-parent.interface";
+import { CommentCreated } from "@/interfaces/comment-created.interface";
 import WebSocketService from "./websocket.service";
 
 class CommentsWebSocketService extends WebSocketService {
-  onCommentPublished(callback: (comment: CommentWithParent) => void) {
+  onCommentPublished(callback: (comment: CommentCreated) => void) {
     this.socket.on("commentPublished", callback);
   }
 

@@ -13,8 +13,8 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { Comment } from './comment.entity';
 import { CommentsService } from './comments.service';
+import { CommentCreated } from './interfaces/comment-create.interface';
 import { CommentList } from './interfaces/comment-list.interface';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -33,7 +33,7 @@ export class CommentsController {
   async create(
     @Body() commentData: CreateCommentDto,
     @Req() req: FastifyRequest,
-  ): Promise<Comment> {
+  ): Promise<CommentCreated> {
     const { id } = this.authService.getTokenPayload(req);
     return await this.commentsService.create(id, commentData);
   }

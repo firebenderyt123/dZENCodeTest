@@ -3,7 +3,7 @@ import { API_PATH } from "../config";
 import { CommentsResponse } from "./comments-response.interface";
 import { CommentsGetRequestProps } from "./comments-get.interface";
 import { CommentsCreateRequestProps } from "./comments-create.interface";
-import { CommentWithParent } from "@/interfaces/comment-with-parent.interface";
+import { CommentCreated } from "@/interfaces/comment-created.interface";
 import { CommentsAttachmentsUploadResponse } from "./comments-attachments-upload.interface";
 
 class CommentsApi extends BaseApi {
@@ -18,7 +18,7 @@ class CommentsApi extends BaseApi {
   async commentsCreateRequest(token: string, data: CommentsCreateRequestProps) {
     const response = await super.postAuthorizedRequest<
       CommentsCreateRequestProps,
-      CommentWithParent
+      CommentCreated
     >(token, API_PATH.ROOT + API_PATH.COMMENTS, data);
     return response.data;
   }

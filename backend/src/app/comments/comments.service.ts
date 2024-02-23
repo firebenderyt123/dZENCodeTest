@@ -6,6 +6,7 @@ import { Comment } from './comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentList } from './interfaces/comment-list.interface';
 import { CommentsGateway } from '../websocket/comments/comments.gateway';
+import { CommentCreated } from './interfaces/comment-create.interface';
 
 @Injectable()
 export class CommentsService {
@@ -19,7 +20,7 @@ export class CommentsService {
   async create(
     userId: number,
     commentData: CreateCommentDto,
-  ): Promise<Comment> {
+  ): Promise<CommentCreated> {
     const { parentId, text } = commentData;
 
     const comment = new Comment();
@@ -37,9 +38,17 @@ export class CommentsService {
     comment.text = text;
     const savedComment = await this.commentRepository.save(comment);
 
-    this.commentsGateway.commentPublishedBroadcast(savedComment);
+    const respComment = {
+      parentId: savedComment.parent.id,
+      id: savedComment.id,
+      text: savedComment.text,
+      user: { ...savedComment.user },
+      createdAt: savedComment.createdAt,
+    };
 
-    return savedComment;
+    this.commentsGateway.commentPublishedBroadcast(respComment);
+
+    return respComment;
   }
 
   async find(

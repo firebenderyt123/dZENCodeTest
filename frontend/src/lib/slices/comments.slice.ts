@@ -2,7 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Error } from "@/interfaces/error.interface";
 import { CommentsResponse } from "@/api/comments/comments-response.interface";
 import { Comment } from "@/interfaces/comment.interface";
-import { CommentWithParent } from "@/interfaces/comment-with-parent.interface";
+import { CommentCreated } from "@/interfaces/comment-created.interface";
 
 export interface CommentsState {
   pending: boolean;
@@ -44,16 +44,16 @@ const commentsSlice = createSlice({
       state.data = null;
       state.error = action.payload;
     },
-    insertComment: (state, action: PayloadAction<CommentWithParent>) => {
+    insertComment: (state, action: PayloadAction<CommentCreated>) => {
       if (state.data) {
-        const { parent, ...comment } = action.payload;
+        const { parentId, ...comment } = action.payload;
         const newComment = {
           ...comment,
           replies: [],
           attachments: [],
         };
         state.data.comments = parent
-          ? insertCommentIntoReplies(state.data.comments, parent.id, newComment)
+          ? insertCommentIntoReplies(state.data.comments, parentId, newComment)
           : [newComment, ...state.data.comments];
         state.total = {
           comments: state.total.comments + 1,

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { WebSocketGateway } from '@nestjs/websockets';
-import { Comment } from 'src/app/comments/comment.entity';
+import { CommentCreated } from 'src/app/comments/interfaces/comment-create.interface';
 import { BaseGateway } from '../base.gateway';
 
 @Injectable()
 @WebSocketGateway({ namespace: 'comments' })
 export class CommentsGateway extends BaseGateway {
-  commentPublishedBroadcast(comment: Comment) {
+  commentPublishedBroadcast(comment: CommentCreated) {
     this.server.emit('commentPublished', comment);
   }
 }
