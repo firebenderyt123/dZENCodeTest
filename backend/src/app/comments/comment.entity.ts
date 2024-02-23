@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { User } from '../users/user.entity';
+import { CommentAttachment } from '../comment-attachments/comment-attachment.entity';
 
 @Entity('comments')
 export class Comment {
@@ -26,6 +27,11 @@ export class Comment {
 
   @OneToMany(() => Comment, (comment) => comment.parent, { cascade: true })
   replies: Comment[];
+
+  @OneToMany(() => CommentAttachment, (attachment) => attachment.comment, {
+    cascade: true,
+  })
+  attachments: CommentAttachment[];
 
   @Column('text')
   text: string;

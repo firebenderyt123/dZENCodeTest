@@ -17,7 +17,7 @@ export class CommentAttachment {
   @JoinColumn({ name: 'comment_id' })
   comment: Comment;
 
-  @PrimaryColumn({ name: 'file_id', type: 'int' })
+  @PrimaryColumn({ name: 'file_id', type: 'int', unique: true })
   fileId: number;
 
   @OneToOne(() => File, { onDelete: 'CASCADE' })

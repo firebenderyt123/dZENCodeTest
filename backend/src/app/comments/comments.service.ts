@@ -53,7 +53,7 @@ export class CommentsService {
         skip: (page - 1) * limit,
         where: { parent: IsNull() },
         order,
-        relations: ['user'],
+        relations: ['user', 'attachments'],
       });
 
     const allComments = await Promise.all(
@@ -103,7 +103,16 @@ export class CommentsService {
     const comments = await this.commentRepository.find({
       where: { parent: { id: commentId } },
       order,
-      relations: ['user'],
+      relations: ['user', 'attachments', 'attachments.file'],
+      select: {
+        attachments: {
+          fileId: true,
+          file: {
+            containerName: true,
+            fileUrl: true,
+          },
+        },
+      },
     });
 
     if (comments.length === 0) {
