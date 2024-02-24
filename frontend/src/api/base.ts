@@ -43,13 +43,13 @@ export default class BaseApi {
     token: string,
     url: string,
     data?: D,
-    config?: AxiosRequestConfig
+    captcha?: string
   ): Promise<AxiosResponse<R>> {
     const conf = {
       headers: {
         ...this.getAuthHeaders(token),
+        Recaptcha: captcha,
       },
-      ...config,
     };
     return this.postRequest<D, R>(url, data, conf);
   }
@@ -58,14 +58,14 @@ export default class BaseApi {
     token: string,
     url: string,
     data?: D,
-    config?: AxiosRequestConfig
+    captcha?: string
   ): Promise<AxiosResponse<R>> {
     const conf = {
       headers: {
         ...this.getAuthHeaders(token),
         "Content-Type": "multipart/form-data",
+        Recaptcha: captcha,
       },
-      ...config,
     };
     return this.postRequest<D, R>(url, data, conf);
   }

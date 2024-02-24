@@ -15,11 +15,15 @@ class CommentsApi extends BaseApi {
     return response.data;
   }
 
-  async commentsCreateRequest(token: string, data: CommentsCreateRequestProps) {
+  async commentsCreateRequest(
+    token: string,
+    data: CommentsCreateRequestProps,
+    captcha: string
+  ) {
     const response = await super.postAuthorizedRequest<
       CommentsCreateRequestProps,
       CommentCreated
-    >(token, API_PATH.ROOT + API_PATH.COMMENTS, data);
+    >(token, API_PATH.ROOT + API_PATH.COMMENTS, data, captcha);
     return response.data;
   }
 

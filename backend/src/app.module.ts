@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { RouterModule } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
 import configuration from './config/configuration';
 import { websocketModules } from './websocket';
 import { routes, modules } from './routes';
@@ -13,6 +14,15 @@ import './config/configuration';
       isGlobal: true,
       load: [configuration],
       envFilePath: ['.env.development'],
+    }),
+    GoogleRecaptchaModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        secretKey: configService.get('recaptcha.secretKey'),
+        response: (req) => req.headers.recaptcha,
+        // skipIf: process.env.NODE_ENV !== 'production',
+        debug: configService.get('recaptcha.debug'),
+      }),
+      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({

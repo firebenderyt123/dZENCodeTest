@@ -20,4 +20,8 @@ export default () => ({
       accountKey: process.env.AZURE_STORAGE_ACCOUNT_KEY,
     },
   },
+  recaptcha: {
+    secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY,
+    debug: /^true$/.test(process.env.GOOGLE_RECAPTCHA_DEBUG),
+  },
 });

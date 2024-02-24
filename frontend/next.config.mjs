@@ -9,6 +9,7 @@ const nextConfig = {
     signUp: "/auth/sign-up",
     profile: "/profile",
     wsRoot: "ws://localhost:8000",
+    googleRecaptchaPublicKey: "6LcycH4pAAAAAJ0r0zKDCBBwvNTGhixAZjx1SyMB",
   },
   images: {
     disableStaticImages: true,

@@ -1,12 +1,10 @@
 import { useCallback, useRef } from "react";
 import {
-  Box,
   FormControl,
   FormLabel,
   styled,
   FormHelperText,
   TextareaProps,
-  Tooltip,
 } from "@mui/joy";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -21,10 +19,12 @@ import { CreateCommentProps } from "@/services/comments.service";
 import { CommentDraftState } from "@/lib/slices/comment-draft.slice";
 import { useCommentForm } from "@/contexts/CommentFormContext";
 import AttachmentsPreviewPanel from "../AttachmentsPreviewPanel";
+import Recaptcha, { ReCAPTCHA } from "../Recaptcha";
+import { errorNotify } from "@/utils/notifications";
 
 interface WithCommentBoxProps {
   commentDraftState: CommentDraftState;
-  onSubmitHandler: (data: CreateCommentProps) => void;
+  onSubmitHandler: (data: CreateCommentProps, captcha: string) => void;
 }
 
 export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
@@ -45,6 +45,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
       resolver: yupResolver(createCommentSchema),
     });
     const { ref, ...commentProps } = register("text");
+    const captchaRef = useRef<ReCAPTCHA | null>(null);
     const commentRef = useRef<HTMLDivElement | null>(null);
     const commentText = watch("text", "");
 
@@ -110,10 +111,17 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
     );
 
     const submitHandler: SubmitHandler<CreateCommentSchema> = (data) => {
+      if (!captchaRef.current)
+        errorNotify("Ouch! Captcha not loaded, try to refresh page");
+
       checkHtmlHandler(data.text);
       trigger("text").then((isValid) => {
-        if (isValid) {
-          onSubmitHandler(data);
+        if (isValid && captchaRef.current) {
+          const captcha = captchaRef.current.getValue();
+          if (captcha) {
+            onSubmitHandler(data, captcha);
+            captchaRef.current.reset();
+          } else errorNotify("Captcha is required");
         }
       });
     };
@@ -139,6 +147,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
           {commentError && (
             <FormHelperTextStyled>{commentError}</FormHelperTextStyled>
           )}
+          <Recaptcha ref={captchaRef} />
         </FormControl>
       </form>
     );

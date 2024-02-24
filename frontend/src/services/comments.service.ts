@@ -40,14 +40,19 @@ class CommentsService extends BaseService {
     };
   }
 
-  createComment(commentData: CreateCommentProps, files: File[]) {
+  createComment(
+    commentData: CreateCommentProps,
+    files: File[],
+    captcha: string
+  ) {
     return async (dispatch: AppDispatch) => {
       dispatch(createCommentRequest());
       try {
         const token: string = cookiesService.getToken();
         const comment = await commentsApi.commentsCreateRequest(
           token,
-          commentData
+          commentData,
+          captcha
         );
         await this.uploadAttachments(comment.id, files);
         commentsWebSocketService.publishComment(comment.id);

@@ -16,7 +16,7 @@ interface CommentFormContextType {
   commentDraftState: CommentDraftState;
   files: MyFile[];
   uploadError: string;
-  createComment: (data: CreateCommentProps) => void;
+  createComment: (data: CreateCommentProps, captcha: string) => void;
   uploadFile: (file: File[]) => void;
   removeFile: (file: MyFile) => void;
 }
@@ -42,9 +42,9 @@ export default function CommentFormProvider({
   const commentDraftState = useAppSelector((reducers) => reducers.commentDraft);
 
   const createComment = useCallback(
-    (data: CreateCommentProps) => {
+    (data: CreateCommentProps, captcha: string) => {
       const commentFiles = files.map((item) => item.data);
-      dispatch(commentsService.createComment(data, commentFiles));
+      dispatch(commentsService.createComment(data, commentFiles, captcha));
     },
     [dispatch, files]
   );

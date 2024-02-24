@@ -13,6 +13,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { GoogleRecaptchaGuard } from '@nestlab/google-recaptcha';
 import { CommentsService } from './comments.service';
 import { CommentCreated } from './interfaces/comment-create.interface';
 import { CommentList } from './interfaces/comment-list.interface';
@@ -27,7 +28,7 @@ export class CommentsController {
     private readonly commentsService: CommentsService,
   ) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, GoogleRecaptchaGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(
