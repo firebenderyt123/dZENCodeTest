@@ -20,7 +20,7 @@ import { transformHtmlText } from "@/utils/sanitize-html";
 import { CreateCommentProps } from "@/services/comments.service";
 import { CommentDraftState } from "@/lib/slices/comment-draft.slice";
 import { useCommentForm } from "@/contexts/CommentFormContext";
-import ImagePreviewPanel from "../ImagePreviewPanel";
+import AttachmentsPreviewPanel from "../AttachmentsPreviewPanel";
 
 interface WithCommentBoxProps {
   commentDraftState: CommentDraftState;
@@ -54,8 +54,8 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
       commentForm?.uploadError ||
       "";
 
-    const imagePreviews = commentForm && (
-      <ImagePreviewPanel
+    const attachmentPreviews = commentForm && (
+      <AttachmentsPreviewPanel
         files={commentForm.files}
         removeFile={commentForm.removeFile}
       />
@@ -135,7 +135,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
             checkHtmlHandler={checkHtmlHandler}
             wrapWithTagHandler={wrapWithTagHandler}
           />
-          {imagePreviews}
+          {attachmentPreviews}
           {commentError && (
             <FormHelperTextStyled>{commentError}</FormHelperTextStyled>
           )}

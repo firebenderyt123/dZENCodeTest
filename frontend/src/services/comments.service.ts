@@ -95,7 +95,7 @@ class CommentsService extends BaseService {
   }
 
   private async uploadAttachments(commentId: number, files: File[]) {
-    if (!!files.length) return;
+    if (!files.length) return;
     const token: string = cookiesService.getToken();
     const formData = new FormData();
     files.forEach((file) => {

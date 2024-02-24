@@ -10,6 +10,9 @@ const nextConfig = {
     profile: "/profile",
     wsRoot: "ws://localhost:8000",
   },
+  images: {
+    domains: ["firebenderyt.blob.core.windows.net"],
+  },
 };
 
 export default nextConfig;

@@ -5,13 +5,14 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  ListItemText,
   Typography,
   styled,
 } from "@mui/material";
 import { formatDateForComments } from "@/utils/date-format.util";
 import { Comment } from "@/interfaces/comment.interface";
 import BoxInnerHtml from "../BoxInnerHtml";
+import { AttachmentsPreviewBox } from "../AttachmentsPreviewPanel";
+import CommentAttachment from "./CommentAttachment";
 
 interface ComponentProps {
   comment: Comment;
@@ -20,7 +21,7 @@ interface ComponentProps {
 type Ref = ForwardedRef<HTMLLIElement>;
 
 function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
-  const { id, text, createdAt, user, replies } = comment;
+  const { id, text, createdAt, user, replies, attachments } = comment;
 
   const currRef = useRef<HTMLLIElement>(null);
 
@@ -60,6 +61,19 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
     </ListStyled>
   );
 
+  const attachmentsBlock = !!attachments.length && (
+    <AttachmentsPreviewBox>
+      {attachments.map(({ fileId, file }) => (
+        <CommentAttachment
+          key={fileId}
+          containerName={file.containerName}
+          url={file.fileUrl}
+          alt=""
+        />
+      ))}
+    </AttachmentsPreviewBox>
+  );
+
   return (
     <ListItemStyled ref={currRef} id={`comment-${id}`}>
       <InlineBox>
@@ -68,6 +82,7 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
       </InlineBox>
       {parentTextBlock}
       <CommentText html={text} />
+      {attachmentsBlock}
       {repliesBlock}
     </ListItemStyled>
   );
@@ -116,6 +131,6 @@ const BoldText = styled(Typography)(() => ({
 
 const CommentText = styled(BoxInnerHtml)(() => ({
   width: "100%",
-  padding: "1rem 0 2.25rem",
+  padding: "0.5rem 0 0",
   overflow: "hidden",
 }));

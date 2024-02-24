@@ -1,7 +1,7 @@
 export interface CommentAttachment {
   fileId: number;
   file: {
-    containerName: string;
+    containerName: "images" | "files";
     fileUrl: string;
   };
 }
