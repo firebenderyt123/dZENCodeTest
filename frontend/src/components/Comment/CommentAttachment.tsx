@@ -1,6 +1,9 @@
+import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import { styled } from "@mui/joy";
 import InsertDriveFileRoundedIcon from "@mui/icons-material/InsertDriveFileRounded";
+import ViewAttachmentModal from "../AttachmentsPreviewPanel/ViewAttachmentModal";
 
 interface CommentAttachmentProps {
   containerName: "images" | "files";
@@ -13,10 +16,25 @@ export default function CommentAttachment({
   url,
   alt,
 }: CommentAttachmentProps) {
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+
   return containerName === "images" ? (
-    <ImageStyled src={url} alt={alt} height="50" width="50" />
+    <>
+      <ImageStyled
+        src={url}
+        alt={alt}
+        height="50"
+        width="50"
+        onClick={() => setModalOpen(true)}
+      />
+      <ViewAttachmentModal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <FullSizeImage src={url} alt="image" width="320" height="240" />
+      </ViewAttachmentModal>
+    </>
   ) : (
-    <FileIcon />
+    <Link href={url}>
+      <FileIcon />
+    </Link>
   );
 }
 
@@ -32,9 +50,15 @@ const ImageStyled = styled(Image)(({ theme }) => ({
 const FileIcon = styled(InsertDriveFileRoundedIcon)(({ theme }) => ({
   fontSize: "3.125rem",
   cursor: "pointer",
+  color: theme.palette.text.primary,
   borderRadius: "0.4375rem",
   ":hover": {
     border: "2px solid",
     borderColor: theme.palette.primary[400],
   },
+}));
+
+const FullSizeImage = styled(Image)(() => ({
+  height: "100%",
+  width: "100%",
 }));
