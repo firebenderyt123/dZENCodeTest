@@ -9,7 +9,11 @@ import { FileUpload } from '../interfaces/file-upload.interface';
 
 @Injectable()
 export class ParseFilePipe implements PipeTransform {
-  async transform(files: FileUpload[]): Promise<FileUpload[]> {
+  async transform(files: FileUpload[] | undefined): Promise<FileUpload[]> {
+    if (!files || !Array.isArray(files)) {
+      throw new BadRequestException('Invalid files provided');
+    }
+
     const processedFiles: FileUpload[] = [];
     for await (const file of files) {
       const result = await new ParseFilePipeBuilder()
@@ -25,7 +29,7 @@ export class ParseFilePipe implements PipeTransform {
         .transform(file);
 
       if (!result) {
-        throw new BadRequestException();
+        throw new BadRequestException('Invalid file type or size');
       }
 
       processedFiles.push(file);

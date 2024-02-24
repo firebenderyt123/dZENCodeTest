@@ -1,31 +1,29 @@
 import { ErrorResponse } from "@/interfaces/error-response.interface";
-import { Error as MyError } from "@/interfaces/error.interface";
+import { ErrorData } from "@/interfaces/error.interface";
 import { errorNotify } from "@/utils/notifications";
 
 export default class BaseService {
-  protected reportError(error: Error) {
-    errorNotify(error.message);
-  }
-
-  protected errorHandler(error: unknown, callback: (data: MyError) => void) {
-    if (this.instanceOfMyError(error)) {
-      let newMessage = error.message;
+  protected errorHandler(
+    error: unknown,
+    callback: (errorMessage: ErrorData) => void
+  ) {
+    if (this.instanceOfErrorResponse(error)) {
+      let newMessage: string;
       if (Array.isArray(error.message)) {
         newMessage = error.message.map((item) => item.message).join("\n");
-      }
-      callback({ ...error, message: newMessage });
+      } else newMessage = error.message;
+      callback({ message: newMessage, statusCode: error.statusCode });
     } else {
-      this.reportError(error as Error);
-      const newMyError: MyError = {
-        error: "Server Error",
-        message: (error as Error).message,
-        statusCode: 500,
-      };
-      callback(newMyError);
+      const errorMessage = "Oops.. Server error :(";
+      this.reportError(new Error(errorMessage));
+      callback({ message: errorMessage, statusCode: 500 });
     }
   }
 
-  protected instanceOfMyError(error: any): error is MyError {
+  private instanceOfErrorResponse(error: any): error is ErrorResponse {
     return "message" in error && "statusCode" in error;
+  }
+  private reportError(error: Error) {
+    errorNotify(error.message);
   }
 }

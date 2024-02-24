@@ -19,7 +19,52 @@ export class FilesService {
     private imageResizeService: ImageResizeService,
   ) {}
 
-  async upload(file: FileUpload): Promise<File> {
+  async saveFiles(files: FileUpload[]) {
+    const filesToUpload: FileUpload[] = [];
+    for (const file of files) {
+      const isImage = this.isFileImage(file);
+
+      if (isImage) {
+        filesToUpload.push(await this.resizeImage(file as ImageUpload));
+      }
+    }
+    return await this.saveFilesToDB(filesToUpload);
+  }
+
+  async remove(id: number): Promise<void> {
+    const file = await this.filesRepository.findOneBy({ id });
+    if (!file) {
+      throw new NotFoundException(`File with id ${id} not found`);
+    }
+
+    const { containerName, blobName } = file;
+
+    await this.azureBlobService.deleteBlob(containerName, blobName);
+
+    await this.filesRepository.delete(id);
+  }
+
+  private isFileImage(file: FileUpload): boolean {
+    return this.allowedImageTypes.includes(file.mimetype);
+  }
+
+  private async resizeImage(
+    file: ImageUpload,
+    maxWidth: number = 320,
+    maxHeight: number = 240,
+  ): Promise<ImageUpload> {
+    return await this.imageResizeService.resizeImageIfNeeded(
+      file,
+      maxWidth,
+      maxHeight,
+    );
+  }
+
+  private async uploadToAzure(file: FileUpload): Promise<{
+    containerName: 'files' | 'images';
+    blobName: string;
+    fileUrl: string;
+  }> {
     const { originalname, buffer } = file;
     const extension = originalname.split('.').pop();
     const newFileName = randomBytes(16).toString('hex') + '.' + extension;
@@ -41,43 +86,28 @@ export class FilesService {
       buffer,
     );
 
-    const newFile = this.filesRepository.create({
-      containerName,
-      blobName,
-      fileUrl,
-    });
-
-    await this.filesRepository.save(newFile);
-
-    return newFile;
+    return { containerName, blobName, fileUrl };
   }
 
-  async remove(id: number): Promise<void> {
-    const file = await this.filesRepository.findOneBy({ id });
-    if (!file) {
-      throw new NotFoundException(`File with id ${id} not found`);
+  private async saveFilesToDB(files: FileUpload[]): Promise<File[]> {
+    const queryRunner =
+      this.filesRepository.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    const savedFiles: File[] = [];
+    try {
+      for (const file of files) {
+        const uploadedFile = await this.uploadToAzure(file);
+        savedFiles.push(await queryRunner.manager.save(File, uploadedFile));
+        await queryRunner.commitTransaction();
+      }
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-
-    const { containerName, blobName } = file;
-
-    await this.azureBlobService.deleteBlob(containerName, blobName);
-
-    await this.filesRepository.delete(id);
-  }
-
-  isFileImage(file: FileUpload): boolean {
-    return this.allowedImageTypes.includes(file.mimetype);
-  }
-
-  async resizeImage(
-    file: ImageUpload,
-    maxWidth: number = 320,
-    maxHeight: number = 240,
-  ): Promise<ImageUpload> {
-    return await this.imageResizeService.resizeImageIfNeeded(
-      file,
-      maxWidth,
-      maxHeight,
-    );
+    return savedFiles;
   }
 }

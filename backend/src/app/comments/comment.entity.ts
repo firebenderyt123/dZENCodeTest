@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { User } from '../users/user.entity';
-import { CommentAttachment } from '../comment-attachments/comment-attachment.entity';
+import { CommentAttachment } from './comment-attachment.entity';
 
 @Entity('comments')
 export class Comment {

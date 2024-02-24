@@ -1,8 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Error } from "@/interfaces/error.interface";
 import { CommentsResponse } from "@/api/comments/comments-response.interface";
-import { Comment } from "@/interfaces/comment.interface";
-import { CommentCreated } from "@/interfaces/comment-created.interface";
+import { Comment, CommentCreated } from "@/interfaces/comment.interface";
+import { ErrorData } from "@/interfaces/error.interface";
 
 export interface CommentsState {
   pending: boolean;
@@ -12,7 +11,7 @@ export interface CommentsState {
     pages: number;
     comments: number;
   };
-  error: Error | null;
+  error: ErrorData | null;
 }
 
 const initialState: CommentsState = {
@@ -39,7 +38,7 @@ const commentsSlice = createSlice({
       state.data = action.payload;
       state.error = null;
     },
-    getCommentsFailed: (state, action: PayloadAction<Error>) => {
+    getCommentsFailed: (state, action: PayloadAction<ErrorData>) => {
       state.pending = false;
       state.data = null;
       state.error = action.payload;

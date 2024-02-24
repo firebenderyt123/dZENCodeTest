@@ -1,13 +1,13 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Error } from "@/interfaces/error.interface";
 import { User } from "@/interfaces/user.interface";
 import { AuthResponse } from "@/api/auth/auth-response.interface";
+import { ErrorData } from "@/interfaces/error.interface";
 
 export interface AuthState {
   pending: boolean;
   user: User | null;
   isAuthenticated: boolean;
-  error: Error | null;
+  error: ErrorData | null;
 }
 
 const initialState: AuthState = {
@@ -31,7 +31,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.error = null;
     },
-    authFailed: (state, action: PayloadAction<Error>) => {
+    authFailed: (state, action: PayloadAction<ErrorData>) => {
       state.pending = false;
       state.user = null;
       state.isAuthenticated = false;
@@ -49,7 +49,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.error = null;
     },
-    profileFailed: (state, action: PayloadAction<Error>) => {
+    profileFailed: (state, action: PayloadAction<ErrorData>) => {
       state.pending = false;
       state.user = null;
       state.isAuthenticated = false;

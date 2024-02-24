@@ -8,7 +8,7 @@ function Recaptcha(props: RecaptchaProps, ref: ForwardedRef<Captcha>) {
   return (
     <Captcha
       {...props}
-      sitekey={process.env.googleRecaptchaPublicKey || ""}
+      sitekey={process.env.googleRecaptchaPublicKey || " "}
       ref={ref}
     />
   );

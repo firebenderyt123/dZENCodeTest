@@ -49,13 +49,15 @@ class CommentsService extends BaseService {
       dispatch(createCommentRequest());
       try {
         const token: string = cookiesService.getToken();
-        const comment = await commentsApi.commentsCreateRequest(
-          token,
-          commentData,
-          captcha
+        const formData = new FormData();
+        formData.append(
+          "commentData",
+          new Blob([JSON.stringify(commentData)], { type: "application/json" })
         );
-        await this.uploadAttachments(comment.id, files);
-        commentsWebSocketService.publishComment(comment.id);
+        files.forEach((file) => {
+          formData.append("files", file);
+        });
+        await commentsApi.commentsCreateRequest(token, formData, captcha);
         dispatch(createCommentSuccess());
       } catch (error) {
         super.errorHandler(error, (err) => dispatch(createCommentFailed(err)));
@@ -97,16 +99,6 @@ class CommentsService extends BaseService {
       }
     });
     return [newFilesArray, errors];
-  }
-
-  private async uploadAttachments(commentId: number, files: File[]) {
-    if (!files.length) return;
-    const token: string = cookiesService.getToken();
-    const formData = new FormData();
-    files.forEach((file) => {
-      formData.append("files", file);
-    });
-    await commentsApi.uploadAttachments(token, commentId, formData);
   }
 }
 const commentsService = new CommentsService();

@@ -1,48 +1,59 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  FindOneOptions,
-  FindOptionsOrder,
-  FindOptionsRelations,
-  IsNull,
-  Repository,
-} from 'typeorm';
+import { FindOneOptions, FindOptionsOrder, IsNull, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { Comment } from './comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { CommentList } from './interfaces/comment-list.interface';
-import { CommentCreated } from './interfaces/comment-create.interface';
+import { FileUpload } from '../files/interfaces/file-upload.interface';
+import { CommentAttachmentsService } from './comment-attachments.service';
+import { CommentCreated } from './interfaces/comment-created.interface';
+import { CommentList } from './interfaces/comment-list';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
+    private commentAttachmentsService: CommentAttachmentsService,
     private usersService: UsersService,
   ) {}
 
   async create(
     userId: number,
     commentData: CreateCommentDto,
+    files: FileUpload[],
   ): Promise<CommentCreated> {
     const { parentId, text } = commentData;
 
     const comment = new Comment();
-
     comment.parent = parentId
       ? await this.commentRepository.findOneBy({
           id: parentId,
         })
       : null;
-
     comment.user = await this.usersService.findOneBy({
       id: userId,
     });
-
     comment.text = text;
-    const savedComment = await this.commentRepository.save(comment);
 
-    return savedComment;
+    const savedComment = await this.commentRepository.save(comment);
+    const savedAttachments =
+      await this.commentAttachmentsService.saveAttachments(
+        savedComment.id,
+        files,
+      );
+    const response = {
+      ...savedComment,
+      replies: [],
+      attachments: savedAttachments.map(({ fileId, file }) => ({
+        fileId,
+        file: {
+          containerName: file.containerName,
+          fileUrl: file.fileUrl,
+        },
+      })),
+    };
+    return response;
   }
 
   async find(

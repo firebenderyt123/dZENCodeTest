@@ -2,9 +2,7 @@ import BaseApi from "../base";
 import { API_PATH } from "../config";
 import { CommentsResponse } from "./comments-response.interface";
 import { CommentsGetRequestProps } from "./comments-get.interface";
-import { CommentsCreateRequestProps } from "./comments-create.interface";
-import { CommentCreated } from "@/interfaces/comment-created.interface";
-import { CommentsAttachmentsUploaded } from "./comments-attachments-upload.interface";
+import { Comment } from "@/interfaces/comment.interface";
 
 class CommentsApi extends BaseApi {
   async commentsGetRequest(params: CommentsGetRequestProps) {
@@ -17,29 +15,13 @@ class CommentsApi extends BaseApi {
 
   async commentsCreateRequest(
     token: string,
-    data: CommentsCreateRequestProps,
+    formData: FormData,
     captcha: string
-  ) {
-    const response = await super.postAuthorizedRequest<
-      CommentsCreateRequestProps,
-      CommentCreated
-    >(token, API_PATH.ROOT + API_PATH.COMMENTS, data, captcha);
-    return response.data;
-  }
-
-  async uploadAttachments(
-    token: string,
-    commentId: number,
-    formData: FormData
   ) {
     const response = await super.postFormDataAuthorizedRequest<
       FormData,
-      CommentsAttachmentsUploaded[]
-    >(
-      token,
-      API_PATH.ROOT + API_PATH.COMMENTS_ATTACHMENTS + `/${commentId}`,
-      formData
-    );
+      Comment
+    >(token, API_PATH.ROOT + API_PATH.COMMENTS, formData, captcha);
     return response.data;
   }
 }

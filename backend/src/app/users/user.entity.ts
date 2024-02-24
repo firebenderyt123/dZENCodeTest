@@ -12,5 +12,5 @@ export class User {
   email: string;
 
   @Column('varchar', { name: 'site_url', length: 255, nullable: true })
-  siteUrl?: string;
+  siteUrl: string;
 }

@@ -1,10 +1,10 @@
+import { ErrorData } from "@/interfaces/error.interface";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Error } from "@/interfaces/error.interface";
 
 export interface CommentDraftState {
   pending: boolean;
   commentText: string;
-  error: Error | null;
+  error: ErrorData | null;
 }
 
 const initialState: CommentDraftState = {
@@ -26,7 +26,7 @@ const commentDraftSlice = createSlice({
       state.commentText = "";
       state.error = null;
     },
-    createCommentFailed: (state, action: PayloadAction<Error>) => {
+    createCommentFailed: (state, action: PayloadAction<ErrorData>) => {
       state.pending = false;
       state.error = action.payload;
     },
