@@ -11,7 +11,16 @@ const nextConfig = {
     wsRoot: "ws://localhost:8000",
   },
   images: {
-    domains: ["firebenderyt.blob.core.windows.net"],
+    disableStaticImages: true,
+    minimumCacheTTL: 60,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "firebenderyt.blob.core.windows.net",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 };
 
