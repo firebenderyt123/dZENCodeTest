@@ -3,6 +3,7 @@ import { RouterModule } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import configuration from './config/configuration';
+import { websocketModules } from './websocket';
 import { routes, modules } from './routes';
 import './config/configuration';
 
@@ -28,6 +29,7 @@ import './config/configuration';
     }),
     RouterModule.register(routes),
     ...modules,
+    ...websocketModules,
   ],
 })
 export class AppModule {}

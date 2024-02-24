@@ -4,7 +4,7 @@ import { CommentsResponse } from "./comments-response.interface";
 import { CommentsGetRequestProps } from "./comments-get.interface";
 import { CommentsCreateRequestProps } from "./comments-create.interface";
 import { CommentCreated } from "@/interfaces/comment-created.interface";
-import { CommentsAttachmentsUploadResponse } from "./comments-attachments-upload.interface";
+import { CommentsAttachmentsUploaded } from "./comments-attachments-upload.interface";
 
 class CommentsApi extends BaseApi {
   async commentsGetRequest(params: CommentsGetRequestProps) {
@@ -30,7 +30,7 @@ class CommentsApi extends BaseApi {
   ) {
     const response = await super.postFormDataAuthorizedRequest<
       FormData,
-      CommentsAttachmentsUploadResponse
+      CommentsAttachmentsUploaded[]
     >(
       token,
       API_PATH.ROOT + API_PATH.COMMENTS_ATTACHMENTS + `/${commentId}`,

@@ -46,15 +46,10 @@ const commentsSlice = createSlice({
     },
     insertComment: (state, action: PayloadAction<CommentCreated>) => {
       if (state.data) {
-        const { parentId, ...comment } = action.payload;
-        const newComment = {
-          ...comment,
-          replies: [],
-          attachments: [],
-        };
+        const { parent, ...comment } = action.payload;
         state.data.comments = parent
-          ? insertCommentIntoReplies(state.data.comments, parentId, newComment)
-          : [newComment, ...state.data.comments];
+          ? insertCommentIntoReplies(state.data.comments, parent.id, comment)
+          : [comment, ...state.data.comments];
         state.total = {
           comments: state.total.comments + 1,
           pages: Math.ceil((state.total.comments + 1) / state.commentsPerPage),

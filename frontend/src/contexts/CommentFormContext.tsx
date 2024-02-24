@@ -19,7 +19,6 @@ interface CommentFormContextType {
   createComment: (data: CreateCommentProps) => void;
   uploadFile: (file: File[]) => void;
   removeFile: (file: MyFile) => void;
-  sendAttachments: () => void;
 }
 
 const CommentFormContext = createContext<CommentFormContextType | null>(null);
@@ -44,9 +43,10 @@ export default function CommentFormProvider({
 
   const createComment = useCallback(
     (data: CreateCommentProps) => {
-      dispatch(commentsService.createComment(data));
+      const commentFiles = files.map((item) => item.data);
+      dispatch(commentsService.createComment(data, commentFiles));
     },
-    [dispatch]
+    [dispatch, files]
   );
 
   const uploadFile = useCallback(
@@ -78,8 +78,6 @@ export default function CommentFormProvider({
     setFiles((prev) => [...prev.filter((f) => f !== file)]);
   }, []);
 
-  const sendAttachments = useCallback(() => {}, []);
-
   return (
     <CommentFormContext.Provider
       value={{
@@ -89,7 +87,6 @@ export default function CommentFormProvider({
         createComment,
         uploadFile,
         removeFile,
-        sendAttachments,
       }}>
       {children}
     </CommentFormContext.Provider>

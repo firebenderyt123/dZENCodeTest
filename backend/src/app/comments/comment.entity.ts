@@ -23,7 +23,7 @@ export class Comment {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'parent_comment_id' })
-  parent: Comment;
+  parent: Comment | null;
 
   @OneToMany(() => Comment, (comment) => comment.parent, { cascade: true })
   replies: Comment[];

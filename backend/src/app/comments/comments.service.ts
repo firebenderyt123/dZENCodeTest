@@ -1,11 +1,16 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsOrder, IsNull, Repository } from 'typeorm';
+import {
+  FindOneOptions,
+  FindOptionsOrder,
+  FindOptionsRelations,
+  IsNull,
+  Repository,
+} from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { Comment } from './comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CommentList } from './interfaces/comment-list.interface';
-import { CommentsGateway } from '../websocket/comments/comments.gateway';
 import { CommentCreated } from './interfaces/comment-create.interface';
 
 @Injectable()
@@ -14,7 +19,6 @@ export class CommentsService {
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
     private usersService: UsersService,
-    private commentsGateway: CommentsGateway,
   ) {}
 
   async create(
@@ -38,23 +42,13 @@ export class CommentsService {
     comment.text = text;
     const savedComment = await this.commentRepository.save(comment);
 
-    const respComment = {
-      parentId: savedComment.parent.id,
-      id: savedComment.id,
-      text: savedComment.text,
-      user: { ...savedComment.user },
-      createdAt: savedComment.createdAt,
-    };
-
-    this.commentsGateway.commentPublishedBroadcast(respComment);
-
-    return respComment;
+    return savedComment;
   }
 
   async find(
     page: number,
     limit: number,
-    order: FindOptionsOrder<Comment>,
+    order?: FindOptionsOrder<Comment>,
   ): Promise<CommentList> {
     const [rootComments, totalComments] =
       await this.commentRepository.findAndCount({
@@ -62,15 +56,25 @@ export class CommentsService {
         skip: (page - 1) * limit,
         where: { parent: IsNull() },
         order,
-        relations: ['user', 'attachments'],
+        relations: ['user', 'attachments', 'attachments.file'],
       });
 
     const allComments = await Promise.all(
       rootComments.map(async (comment) => {
-        const children = await this.getAllCommentsWithChildren(
-          comment.id,
+        const children = await this.getAllCommentsWithChildren({
+          where: { parent: { id: comment.id } },
           order,
-        );
+          relations: ['user', 'attachments', 'attachments.file'],
+          select: {
+            attachments: {
+              fileId: true,
+              file: {
+                containerName: true,
+                fileUrl: true,
+              },
+            },
+          },
+        });
         comment.replies = children;
         return comment;
       }),
@@ -106,23 +110,9 @@ export class CommentsService {
   }
 
   private async getAllCommentsWithChildren(
-    commentId: number,
-    order: FindOptionsOrder<Comment>,
+    options: FindOneOptions<Comment>,
   ): Promise<Comment[]> {
-    const comments = await this.commentRepository.find({
-      where: { parent: { id: commentId } },
-      order,
-      relations: ['user', 'attachments', 'attachments.file'],
-      select: {
-        attachments: {
-          fileId: true,
-          file: {
-            containerName: true,
-            fileUrl: true,
-          },
-        },
-      },
-    });
+    const comments = await this.commentRepository.find(options);
 
     if (comments.length === 0) {
       return [];
@@ -130,15 +120,28 @@ export class CommentsService {
 
     const commentsWithChildren = await Promise.all(
       comments.map(async (comment) => {
-        const children = await this.getAllCommentsWithChildren(
-          comment.id,
-          order,
-        );
+        const children = await this.getAllCommentsWithChildren({
+          ...options,
+          where: { parent: { id: comment.id } },
+        });
         comment.replies = children;
         return comment;
       }),
     );
 
     return commentsWithChildren;
+  }
+
+  async getCommentWithSpecialParamsById(
+    commentId: number,
+    options?: FindOneOptions<Comment>,
+  ): Promise<Comment | null> {
+    const comment = await this.commentRepository.findOne({
+      ...options,
+      where: { id: commentId },
+      relations: ['user', 'replies', 'attachments', 'attachments.file'],
+    });
+
+    return comment;
   }
 }

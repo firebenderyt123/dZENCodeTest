@@ -1,4 +1,4 @@
-export interface CommentsAttachmentsUploadResponse {
+export interface CommentsAttachmentsUploaded {
   containerName: string;
   blobName: string;
   fileUrl: string;
