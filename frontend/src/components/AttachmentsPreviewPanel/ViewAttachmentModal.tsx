@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Modal, ModalClose, ModalDialog } from "@mui/joy";
+import { Modal, ModalDialog, ModalProps } from "@mui/joy";
 
 interface ViewAttachmentModalProps {
   children: ReactNode;
@@ -11,9 +11,10 @@ export default function ViewAttachmentModal({
   children,
   open,
   onClose,
-}: ViewAttachmentModalProps) {
+  ...props
+}: ViewAttachmentModalProps & ModalProps) {
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} {...props}>
       <ModalDialog>{children}</ModalDialog>
     </Modal>
   );

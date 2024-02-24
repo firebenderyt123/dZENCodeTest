@@ -28,7 +28,7 @@ export default function CommentAttachment({
         onClick={() => setModalOpen(true)}
       />
       <ViewAttachmentModal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <FullSizeImage src={url} alt="image" width="320" height="240" />
+        <Image src={url} alt="image" width="320" height="240" />
       </ViewAttachmentModal>
     </>
   ) : (
@@ -56,9 +56,4 @@ const FileIcon = styled(InsertDriveFileRoundedIcon)(({ theme }) => ({
     border: "2px solid",
     borderColor: theme.palette.primary[400],
   },
-}));
-
-const FullSizeImage = styled(Image)(() => ({
-  height: "100%",
-  width: "100%",
 }));
