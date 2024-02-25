@@ -63,7 +63,7 @@ export default function CommentBoxBottomPanel({
         </IconButton>
         <SendButton
           type="submit"
-          loading={commentForm.commentDraftState.pending}
+          loading={commentForm.state.pending}
           endDecorator={<SendRoundedIcon />}>
           Send
         </SendButton>

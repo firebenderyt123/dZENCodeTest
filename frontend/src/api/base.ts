@@ -24,7 +24,7 @@ export default class BaseApi {
       },
       ...config,
     };
-    return this.getRequest<R>(url, conf);
+    return await this.getRequest<R>(url, conf);
   }
 
   protected async postRequest<D, R>(
@@ -51,7 +51,7 @@ export default class BaseApi {
         Recaptcha: captcha,
       },
     };
-    return await axios.patch<R>(url, data, conf);
+    return await this.postRequest<D, R>(url, data, conf);
   }
 
   protected async postFormDataAuthorizedRequest<D, R>(
@@ -67,10 +67,10 @@ export default class BaseApi {
         Recaptcha: captcha,
       },
     };
-    return this.postRequest<D, R>(url, data, conf);
+    return await this.postRequest<D, R>(url, data, conf);
   }
 
-  protected patchAuthorizedRequest<D, R>(
+  protected async patchAuthorizedRequest<D, R>(
     token: string,
     url: string,
     data?: D
@@ -80,7 +80,11 @@ export default class BaseApi {
         ...this.getAuthHeaders(token),
       },
     };
-    return this.postRequest<D, R>(url, data, conf);
+    try {
+      return await axios.patch<R>(url, data, conf);
+    } catch (error) {
+      throw this.requestError(error as AxiosError);
+    }
   }
 
   protected requestError(

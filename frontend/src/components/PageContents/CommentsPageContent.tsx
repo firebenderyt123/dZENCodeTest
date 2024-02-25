@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import CommentsList from "@/components/CommentsList";
-import CommentBox from "@/components/CommentBox";
 import { useComments } from "@/contexts/CommentsContext";
 import { useCommentForm } from "@/contexts/CommentFormContext";
 import CommentOrderPanel from "../CommentsOrderPanel";
-import UserInfo from "../UserInfo";
+import CommentCreateForm from "../CommentCreateForm";
 
 export default function CommentsPageContent() {
   const comments = useComments();
@@ -27,11 +26,7 @@ export default function CommentsPageContent() {
     <>
       {comments && commentForm && (
         <>
-          <UserInfo onSubmit={() => {}} />
-          <CommentBox
-            commentDraftState={commentForm.commentDraftState}
-            onSubmitHandler={commentForm.createComment}
-          />
+          <CommentCreateForm />
           <CommentOrderPanel />
           <CommentsList
             commentsState={comments.commentsState}

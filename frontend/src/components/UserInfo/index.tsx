@@ -1,35 +1,22 @@
 import { styled } from "@mui/joy";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, UseFormReturn } from "react-hook-form";
 import InputField from "../FormFields/InputField";
-import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  ChangeUserInfoSchema,
-  changeUserInfoSchema,
-} from "@/schemas/change-user-info.schema";
+import { ChangeUserInfoSchema } from "@/schemas/change-user-info.schema";
 import { useUser } from "@/contexts/UserContext";
-import { UserPatchInfo } from "@/services/user.service";
 
 interface UserInfo {
-  onSubmit: (userId: number, data: UserPatchInfo) => void;
+  form: UseFormReturn<ChangeUserInfoSchema, any, ChangeUserInfoSchema>;
 }
-export default function UserInfo({ onSubmit }: UserInfo) {
+export default function UserInfo({ form }: UserInfo) {
   const user = useUser();
   const {
     register,
-    handleSubmit,
     formState: { errors },
-  } = useForm({
-    mode: "onChange",
-    resolver: yupResolver<ChangeUserInfoSchema>(changeUserInfoSchema),
-  });
-
-  const submitHandler: SubmitHandler<ChangeUserInfoSchema> = (data) => {
-    if (user?.state.user?.id) onSubmit(user.state.user.id, data);
-  };
+  } = form;
 
   return (
     user?.state.user && (
-      <form onSubmit={handleSubmit(submitHandler)}>
+      <div>
         <InputStyled
           label="Username"
           defaultValue={user.state.user.username}
@@ -51,7 +38,7 @@ export default function UserInfo({ onSubmit }: UserInfo) {
           helperText={errors.siteUrl?.message}
           {...register("siteUrl")}
         />
-      </form>
+      </div>
     )
   );
 }

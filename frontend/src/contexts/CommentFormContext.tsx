@@ -13,7 +13,7 @@ import commentsService, {
 } from "@/services/comments.service";
 
 interface CommentFormContextType {
-  commentDraftState: CommentDraftState;
+  state: CommentDraftState;
   files: MyFile[];
   uploadError: string;
   createComment: (data: CreateCommentProps, captcha: string) => void;
@@ -39,7 +39,7 @@ export default function CommentFormProvider({
   const [files, setFiles] = useState<MyFile[]>([]);
   const [uploadError, setUploadError] = useState<string>("");
   const dispatch = useAppDispatch();
-  const commentDraftState = useAppSelector((reducers) => reducers.commentDraft);
+  const state = useAppSelector((reducers) => reducers.commentDraft);
 
   const createComment = useCallback(
     (data: CreateCommentProps, captcha: string) => {
@@ -81,7 +81,7 @@ export default function CommentFormProvider({
   return (
     <CommentFormContext.Provider
       value={{
-        commentDraftState,
+        state,
         files,
         uploadError,
         createComment,
