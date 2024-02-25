@@ -2,18 +2,17 @@ import { SignInRequestProps } from "@/api/auth/sign-in-request.interface";
 import { SignUpRequestProps } from "@/api/auth/sign-up-request.interface";
 import { AuthResponse } from "@/api/auth/auth-response.interface";
 import authApi from "@/api/auth";
-import profileApi from "@/api/profile";
 import {
   authRequest,
   authFailed,
   authSuccess,
-  logoutSuccess,
-  profileSuccess,
-  profileFailed,
+  authLogout,
 } from "@/lib/slices/auth.slice";
 import { AppDispatch } from "@/lib/store";
 import BaseService from "./base.service";
 import cookiesService from "./cookies.service";
+import { ErrorData } from "@/interfaces/error.interface";
+import { userInfoSuccess, userLogout } from "@/lib/slices/user.slice";
 
 class AuthService extends BaseService {
   loginUser = (data: SignInRequestProps) => async (dispatch: AppDispatch) => {
@@ -37,31 +36,36 @@ class AuthService extends BaseService {
       }
     };
 
-  logoutUser = () => async (dispatch: AppDispatch) => {
+  logout = () => (dispatch: AppDispatch) => {
     cookiesService.deleteToken();
-    dispatch(logoutSuccess());
+    dispatch(authLogout());
+    dispatch(userLogout());
   };
 
-  getProfile = () => async (dispatch: AppDispatch) => {
-    dispatch(authRequest());
+  isAuthenticated(dispatch: AppDispatch): string | null {
     const token: string = cookiesService.getToken();
     if (!token) {
-      dispatch(logoutSuccess());
-      return;
+      this.forceDeAuthentication(dispatch);
+      return null;
     }
-    try {
-      const response = await profileApi.profileGetRequest(token);
-      dispatch(profileSuccess(response));
-    } catch (error) {
-      super.errorHandler(error, (err) => {
-        dispatch(profileFailed(err));
-      });
+    return token;
+  }
+
+  deauthIfShould(error: ErrorData, dispatch: AppDispatch) {
+    if (error.statusCode === 401) {
+      this.forceDeAuthentication(dispatch);
     }
-  };
+  }
+
+  private forceDeAuthentication(dispatch: AppDispatch) {
+    dispatch(this.logout());
+    super.showError("Not Authenticated");
+  }
 
   private authSuccess(response: AuthResponse, dispatch: AppDispatch) {
     cookiesService.setToken(response.accessToken);
-    dispatch(authSuccess(response));
+    dispatch(authSuccess());
+    dispatch(userInfoSuccess(response.user));
   }
 }
 const authService = new AuthService();

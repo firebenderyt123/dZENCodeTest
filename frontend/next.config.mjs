@@ -7,7 +7,7 @@ const nextConfig = {
     apiCommentsAttachments: "/comments/attachments",
     signIn: "/auth/sign-in",
     signUp: "/auth/sign-up",
-    profile: "/profile",
+    users: "/users",
     wsRoot: "ws://localhost:8000",
     googleRecaptchaPublicKey: "6LcycH4pAAAAAJ0r0zKDCBBwvNTGhixAZjx1SyMB",
   },

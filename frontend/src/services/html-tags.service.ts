@@ -1,6 +1,27 @@
 export type AllowedTags = "a" | "code" | "i" | "strong";
 
 class HtmlTagsService {
+  wrapSelectedTextWithTag(
+    tag: AllowedTags,
+    text: string,
+    startPos: number,
+    endPos: number
+  ): { text: string; wrapEndPos: number } {
+    let wrappedText: string | undefined;
+    if (startPos === endPos) {
+      wrappedText = this.wrapWithTag(tag);
+    } else {
+      wrappedText = this.wrapWithTag(tag, text.substring(startPos, endPos));
+    }
+    const resultText =
+      text.substring(0, startPos) +
+      wrappedText +
+      text.substring(endPos, text.length);
+    const wrapEndPos = startPos + wrappedText.length;
+
+    return { text: resultText, wrapEndPos };
+  }
+
   wrapWithTag(tag: AllowedTags, text: string = ""): string {
     switch (tag) {
       case "a":

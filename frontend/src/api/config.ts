@@ -4,5 +4,5 @@ export const API_PATH = {
   COMMENTS_ATTACHMENTS: process.env.apiCommentsAttachments as string,
   SIGN_IN: process.env.signIn as string,
   SIGN_UP: process.env.signUp as string,
-  PROFILE: process.env.profile as string,
+  USERS: process.env.users as string,
 };

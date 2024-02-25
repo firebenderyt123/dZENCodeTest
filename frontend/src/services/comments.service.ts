@@ -16,7 +16,8 @@ import {
 import BaseService from "./base.service";
 import cookiesService from "./cookies.service";
 import commentsWebSocketService from "./comments-websocket.service";
-import { CommentsResponse } from "@/api/comments/comments-response.interface";
+import authService from "./auth.service";
+import { removeInvalidFiles } from "@/utils/files.utils";
 
 class CommentsService extends BaseService {
   getComments({ page, limit, orderBy, order }: GetCommentsProps) {
@@ -41,7 +42,9 @@ class CommentsService extends BaseService {
           })
         );
       } catch (error) {
-        super.errorHandler(error, (err) => dispatch(getCommentsFailed(err)));
+        super.errorHandler(error, (err) => {
+          dispatch(getCommentsFailed(err));
+        });
       }
     };
   }
@@ -66,7 +69,10 @@ class CommentsService extends BaseService {
         await commentsApi.commentsCreateRequest(token, formData, captcha);
         dispatch(createCommentSuccess());
       } catch (error) {
-        super.errorHandler(error, (err) => dispatch(createCommentFailed(err)));
+        super.errorHandler(error, (err) => {
+          dispatch(createCommentFailed(err));
+          authService.deauthIfShould(err, dispatch);
+        });
       }
     };
   }
@@ -84,27 +90,7 @@ class CommentsService extends BaseService {
   }
 
   removeInvalidAttachments(files: File[]): [File[], Set<string>] {
-    const errors = new Set<string>();
-    const newFilesArray = files.filter((file) => {
-      switch (file.type) {
-        case "image/jpeg":
-        case "image/gif":
-        case "image/png":
-          if (file.size <= 5 * 1024 * 1024) return file; // 5 mb
-          errors.add("Image file size should be less than or equal to 5 MB.");
-          return;
-        case "text/plain":
-          if (file.size <= 100 * 1024) return file; // 100 kb
-          errors.add("Text file size should be less than or equal to 100 KB.");
-          return;
-        default:
-          errors.add(
-            "Invalid file format. Only JPG, GIF, PNG, and TXT files are allowed."
-          );
-          return;
-      }
-    });
-    return [newFilesArray, errors];
+    return removeInvalidFiles(files);
   }
 }
 const commentsService = new CommentsService();

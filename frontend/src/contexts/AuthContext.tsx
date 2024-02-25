@@ -1,16 +1,10 @@
-import {
-  ReactNode,
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-} from "react";
+import { ReactNode, createContext, useCallback, useContext } from "react";
 import { AuthState } from "@/lib/slices/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import authService, { SignInProps, SignUpProps } from "@/services/auth.service";
 
 interface AuthContextType {
-  authState: AuthState;
+  state: AuthState;
   login: (userData: SignInProps) => void;
   register: (userData: SignUpProps) => void;
   logout: () => void;
@@ -23,7 +17,7 @@ interface AuthProviderProps {
 }
 export default function AuthProvider({ children }: AuthProviderProps) {
   const dispatch = useAppDispatch();
-  const authState = useAppSelector((reducers) => reducers.auth);
+  const state = useAppSelector((reducers) => reducers.auth);
 
   const login = useCallback(
     (userData: SignInProps) => {
@@ -40,23 +34,11 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   );
 
   const logout = useCallback(() => {
-    dispatch(authService.logoutUser());
+    dispatch(authService.logout());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (!authState.user && !authState.error) {
-      dispatch(authService.getProfile());
-    }
-  }, [authState.error, authState.user, dispatch]);
-
-  useEffect(() => {
-    if (authState.error?.statusCode === 401) {
-      logout();
-    }
-  }, [authState.error?.statusCode, logout]);
-
   return (
-    <AuthContext.Provider value={{ authState, login, register, logout }}>
+    <AuthContext.Provider value={{ state, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

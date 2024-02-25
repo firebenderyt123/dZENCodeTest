@@ -51,7 +51,7 @@ export default class BaseApi {
         Recaptcha: captcha,
       },
     };
-    return this.postRequest<D, R>(url, data, conf);
+    return await axios.patch<R>(url, data, conf);
   }
 
   protected async postFormDataAuthorizedRequest<D, R>(
@@ -65,6 +65,19 @@ export default class BaseApi {
         ...this.getAuthHeaders(token),
         "Content-Type": "multipart/form-data",
         Recaptcha: captcha,
+      },
+    };
+    return this.postRequest<D, R>(url, data, conf);
+  }
+
+  protected patchAuthorizedRequest<D, R>(
+    token: string,
+    url: string,
+    data?: D
+  ): Promise<AxiosResponse<R>> {
+    const conf = {
+      headers: {
+        ...this.getAuthHeaders(token),
       },
     };
     return this.postRequest<D, R>(url, data, conf);

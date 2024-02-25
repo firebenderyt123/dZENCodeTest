@@ -14,13 +14,13 @@ import {
   createCommentSchema,
 } from "@/schemas/create-comment.shema";
 import InnerCommentBox from "./InnerCommentBox";
-import { transformHtmlText } from "@/utils/sanitize-html";
+import { transformHtmlText } from "@/utils/sanitize-html.utils";
 import { CreateCommentProps } from "@/services/comments.service";
 import { CommentDraftState } from "@/lib/slices/comment-draft.slice";
 import { useCommentForm } from "@/contexts/CommentFormContext";
 import AttachmentsPreviewPanel from "../AttachmentsPreviewPanel";
 import Recaptcha, { ReCAPTCHA } from "../Recaptcha";
-import { errorNotify } from "@/utils/notifications";
+import { errorNotify } from "@/utils/notifications.utils";
 
 interface WithCommentBoxProps {
   commentDraftState: CommentDraftState;
@@ -73,30 +73,16 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
         const startPos = textarea.selectionStart;
         const endPos = textarea.selectionEnd;
 
-        if (startPos === endPos) {
-          const wrappedText = htmlTagsService.wrapWithTag(tag);
-          setValue(
-            "text",
-            commentText.substring(0, startPos) +
-              wrappedText +
-              commentText.substring(endPos, commentText.length)
-          );
-          textarea.selectionStart = startPos + wrappedText.length;
-        } else {
-          const wrappedText = htmlTagsService.wrapWithTag(
-            tag,
-            commentText.substring(startPos, endPos)
-          );
-          setValue(
-            "text",
-            commentText.substring(0, startPos) +
-              wrappedText +
-              commentText.substring(endPos, commentText.length)
-          );
-          textarea.selectionStart = startPos + wrappedText.length;
-        }
+        const wrappedData = htmlTagsService.wrapSelectedTextWithTag(
+          tag,
+          commentText,
+          startPos,
+          endPos
+        );
+        setValue("text", wrappedData.text);
+        textarea.selectionStart = wrappedData.wrapEndPos;
+        textarea.selectionEnd = wrappedData.wrapEndPos;
 
-        textarea.selectionEnd = textarea.selectionStart;
         textarea.focus();
         trigger("text");
       },

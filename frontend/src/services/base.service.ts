@@ -1,8 +1,8 @@
 import { ErrorResponse } from "@/interfaces/error-response.interface";
 import { ErrorData } from "@/interfaces/error.interface";
-import { errorNotify } from "@/utils/notifications";
+import { errorNotify } from "@/utils/notifications.utils";
 
-export default class BaseService {
+export default abstract class BaseService {
   protected errorHandler(
     error: unknown,
     callback: (errorMessage: ErrorData) => void
@@ -14,16 +14,17 @@ export default class BaseService {
       } else newMessage = error.message;
       callback({ message: newMessage, statusCode: error.statusCode });
     } else {
+      console.log(error);
       const errorMessage = "Oops.. Server error :(";
-      this.reportError(new Error(errorMessage));
+      this.showError(errorMessage);
       callback({ message: errorMessage, statusCode: 500 });
     }
+  }
+  protected showError(errorMessage: string) {
+    errorNotify(errorMessage);
   }
 
   private instanceOfErrorResponse(error: any): error is ErrorResponse {
     return "message" in error && "statusCode" in error;
-  }
-  private reportError(error: Error) {
-    errorNotify(error.message);
   }
 }

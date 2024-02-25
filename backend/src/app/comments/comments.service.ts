@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, FindOptionsOrder, IsNull, Repository } from 'typeorm';
-import { UsersService } from '../users/users.service';
+import { UsersProfileService } from '../users/services/users-profile.service';
 import { Comment } from './comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { FileUpload } from '../files/interfaces/file-upload.interface';
@@ -15,7 +15,7 @@ export class CommentsService {
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
     private commentAttachmentsService: CommentAttachmentsService,
-    private usersService: UsersService,
+    private usersProfileService: UsersProfileService,
   ) {}
 
   async create(
@@ -31,7 +31,7 @@ export class CommentsService {
           id: parentId,
         })
       : null;
-    comment.user = await this.usersService.findOneBy({
+    comment.user = await this.usersProfileService.findOneBy({
       id: userId,
     });
     comment.text = text;

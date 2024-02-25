@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryRunner, Repository, SelectQueryBuilder } from 'typeorm';
 import { createHash } from 'crypto';
-import { SecretInfo } from './user-secret-info.entity';
+import { SecretInfo } from '../entities/user-secret-info.entity';
 
 @Injectable()
-export class SecretInfoService {
+export class UsersSecretInfoService {
   constructor(
     @InjectRepository(SecretInfo)
     private secretInfoRepository: Repository<SecretInfo>,

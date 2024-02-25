@@ -18,7 +18,7 @@ import { GoogleRecaptchaGuard } from '@nestlab/google-recaptcha';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AuthService } from '../auth/auth.service';
+import { AuthTokenService } from '../auth/services/auth-token.service';
 import { CommentAttachmentsService } from './comment-attachments.service';
 import { FileUpload } from '../files/interfaces/file-upload.interface';
 import { FileFieldsInterceptor } from '@nest-lab/fastify-multer';
@@ -32,7 +32,7 @@ import { CommentList } from './interfaces/comment-list';
 @Controller()
 export class CommentsController {
   constructor(
-    private readonly authService: AuthService,
+    private readonly authTokenService: AuthTokenService,
     private readonly commentsService: CommentsService,
     private readonly commentAttachmentsService: CommentAttachmentsService,
     private readonly commentsGateway: CommentsGateway,
@@ -52,7 +52,7 @@ export class CommentsController {
     @UploadedFiles()
     data: { commentData: Blob; files?: FileUpload[] },
   ): Promise<CommentCreated> {
-    const { id } = this.authService.getTokenPayload(req);
+    const { id } = this.authTokenService.getTokenPayload(req);
 
     const commentData = JSON.parse(
       data.commentData[0].buffer.toString('utf-8'),
@@ -124,7 +124,7 @@ export class CommentsController {
       throw new BadRequestException(':id must be a number');
     }
 
-    const { id } = this.authService.getTokenPayload(req);
+    const { id } = this.authTokenService.getTokenPayload(req);
 
     await this.commentsService.remove(commentId, id);
     return 'ok';
@@ -140,7 +140,7 @@ export class CommentsController {
       throw new BadRequestException(':id must be a number');
     }
 
-    const { id } = this.authService.getTokenPayload(req);
+    const { id } = this.authTokenService.getTokenPayload(req);
     await this.commentAttachmentsService.removeAttachment(id, fileId);
     return 'ok';
   }

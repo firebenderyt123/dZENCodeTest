@@ -5,7 +5,7 @@ import { AuthResponse } from "./auth-response.interface";
 import BaseApi from "../base";
 
 class AuthApi extends BaseApi {
-  async signInRequest(data: SignInRequestProps) {
+  async signInRequest(data: SignInRequestProps): Promise<AuthResponse> {
     const response = await super.postRequest<SignInRequestProps, AuthResponse>(
       API_PATH.ROOT + API_PATH.SIGN_IN,
       data
@@ -13,7 +13,7 @@ class AuthApi extends BaseApi {
     return response.data;
   }
 
-  async signUpRequest(data: SignUpRequestProps) {
+  async signUpRequest(data: SignUpRequestProps): Promise<AuthResponse> {
     const response = await super.postRequest<SignUpRequestProps, AuthResponse>(
       API_PATH.ROOT + API_PATH.SIGN_UP,
       data

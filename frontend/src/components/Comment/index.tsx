@@ -8,7 +8,7 @@ import {
   Typography,
   styled,
 } from "@mui/material";
-import { formatDateForComments } from "@/utils/date-format.util";
+import { formatDateForComments } from "@/utils/date-format.utils";
 import { Comment } from "@/interfaces/comment.interface";
 import BoxInnerHtml from "../BoxInnerHtml";
 import { AttachmentsPreviewBox } from "../AttachmentsPreviewPanel";

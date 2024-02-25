@@ -1,16 +1,16 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
-import { User } from './user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-import { SecretInfoService } from './user-secret-info.service';
+import { User } from '../entities/user.entity';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UsersSecretInfoService } from './users-secret-info.service';
 
 @Injectable()
-export class UsersService {
+export class UsersProfileService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private secretInfoService: SecretInfoService,
+    private usersSecretInfoService: UsersSecretInfoService,
   ) {}
 
   async create(userData: CreateUserDto): Promise<User> {
@@ -37,7 +37,7 @@ export class UsersService {
     });
 
     const newUser = await this.usersRepository.save(user);
-    await this.secretInfoService.savePassword(newUser.id, password);
+    await this.usersSecretInfoService.savePassword(newUser.id, password);
     return newUser;
   }
 
@@ -55,9 +55,9 @@ export class UsersService {
     email: string,
     password: string,
   ): Promise<User | null> {
-    const passwordHash = this.secretInfoService.hashPassword(password);
+    const passwordHash = this.usersSecretInfoService.hashPassword(password);
 
-    const query = this.secretInfoService
+    const query = this.usersSecretInfoService
       .createQueryBuilder('secretInfo')
       .innerJoinAndSelect('secretInfo.user', 'user')
       .where('user.email = :email', { email })

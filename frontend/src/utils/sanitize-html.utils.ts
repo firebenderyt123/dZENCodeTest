@@ -1,6 +1,7 @@
+import { AllowedTags } from "@/services/html-tags.service";
 import DOMPurify from "dompurify";
 
-const allowedTags = ["a", "code", "i", "strong"];
+const allowedTags: AllowedTags[] = ["a", "code", "i", "strong"];
 
 export function transformHtmlText(initialHtml: string): string {
   DOMPurify.addHook("afterSanitizeAttributes", function (node) {

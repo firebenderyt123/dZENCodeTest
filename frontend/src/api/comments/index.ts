@@ -5,7 +5,9 @@ import { CommentsGetRequestProps } from "./comments-get.interface";
 import { Comment } from "@/interfaces/comment.interface";
 
 class CommentsApi extends BaseApi {
-  async commentsGetRequest(params: CommentsGetRequestProps) {
+  async commentsGetRequest(
+    params: CommentsGetRequestProps
+  ): Promise<CommentsResponse> {
     const response = await super.getRequest<CommentsResponse>(
       API_PATH.ROOT + API_PATH.COMMENTS,
       { params }
@@ -17,7 +19,7 @@ class CommentsApi extends BaseApi {
     token: string,
     formData: FormData,
     captcha: string
-  ) {
+  ): Promise<Comment> {
     const response = await super.postFormDataAuthorizedRequest<
       FormData,
       Comment
