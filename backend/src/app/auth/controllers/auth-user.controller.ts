@@ -7,7 +7,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto } from '../../users/dto/create-user.dto';
+import { RegisterUserDto } from '../dto/register-user.dto';
 import { User } from '../../users/entities/user.entity';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { AuthUserService } from '../services/auth-user.service';
@@ -26,7 +26,7 @@ export class AuthUserController {
 
   @Post('/sign-up')
   @HttpCode(HttpStatus.CREATED)
-  async signUp(@Body() userData: CreateUserDto): Promise<Auth> {
+  async signUp(@Body() userData: RegisterUserDto): Promise<Auth> {
     return await this.authUserService.signUp(userData);
   }
 }

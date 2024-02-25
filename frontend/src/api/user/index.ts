@@ -12,14 +12,10 @@ class UserApi extends BaseApi {
     return response.data;
   }
 
-  async userInfoPatchRequest(
-    token: string,
-    userId: number,
-    userData: UserData
-  ): Promise<User> {
+  async userInfoPatchRequest(token: string, userData: UserData): Promise<User> {
     const response = await super.patchAuthorizedRequest<UserData, User>(
       token,
-      API_PATH.ROOT + API_PATH.USERS + `/${userId}`,
+      API_PATH.ROOT + API_PATH.USERS,
       userData
     );
     return response.data;

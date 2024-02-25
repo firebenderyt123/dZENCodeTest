@@ -13,7 +13,6 @@ import { AuthTokenService } from '../services/auth-token.service';
       }),
       inject: [ConfigService],
     }),
-    ConfigModule.forRoot(),
   ],
   providers: [AuthTokenService],
   exports: [AuthTokenService, JwtModule],

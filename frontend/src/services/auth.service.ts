@@ -45,7 +45,7 @@ class AuthService extends BaseService {
   isAuthenticated(dispatch: AppDispatch): string | null {
     const token: string = cookiesService.getToken();
     if (!token) {
-      this.forceDeAuthentication(dispatch);
+      dispatch(this.logout());
       return null;
     }
     return token;
@@ -53,13 +53,9 @@ class AuthService extends BaseService {
 
   deauthIfShould(error: ErrorData, dispatch: AppDispatch) {
     if (error.statusCode === 401) {
-      this.forceDeAuthentication(dispatch);
+      dispatch(this.logout());
+      super.showError("Not Authenticated");
     }
-  }
-
-  private forceDeAuthentication(dispatch: AppDispatch) {
-    dispatch(this.logout());
-    super.showError("Not Authenticated");
   }
 
   private authSuccess(response: AuthResponse, dispatch: AppDispatch) {

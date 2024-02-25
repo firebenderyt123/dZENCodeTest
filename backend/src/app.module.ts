@@ -19,7 +19,7 @@ import './config/configuration';
       useFactory: (configService: ConfigService) => ({
         secretKey: configService.get('recaptcha.secretKey'),
         response: (req) => req.headers.recaptcha,
-        // skipIf: process.env.NODE_ENV !== 'production',
+        skipIf: process.env.NODE_ENV !== 'production',
         debug: configService.get('recaptcha.debug'),
       }),
       inject: [ConfigService],

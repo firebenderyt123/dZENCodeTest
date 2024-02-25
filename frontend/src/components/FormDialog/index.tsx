@@ -35,6 +35,7 @@ function Component({ children }: FormDialogProps, ref: Ref) {
     return () => {
       if (buttonRef.current) {
         buttonRef.current.removeEventListener("click", handleClickOpen);
+        handleClose();
       }
     };
   }, [ref]);

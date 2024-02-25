@@ -1,9 +1,14 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
-import { CreateUserDto } from '../dto/create-user.dto';
 import { UsersSecretInfoService } from './users-secret-info.service';
+
+type CreateUser = Omit<User, 'id'>;
 
 @Injectable()
 export class UsersProfileService {
@@ -13,32 +18,32 @@ export class UsersProfileService {
     private usersSecretInfoService: UsersSecretInfoService,
   ) {}
 
-  async create(userData: CreateUserDto): Promise<User> {
-    const { username, email, siteUrl, password } = userData;
+  async create(userData: CreateUser, password: string): Promise<User> {
+    const { username, email, siteUrl } = userData;
 
-    const existingUserByEmail = await this.findOneBy({ email });
-    if (existingUserByEmail)
-      throw new ConflictException(
-        'User with the provided email already exists',
-      );
+    await this.checkDuplicateCredentials(username, email);
 
-    const existingUserByUsername = await this.findOneBy({
-      username,
-    });
-    if (existingUserByUsername)
-      throw new ConflictException(
-        'User with the provided username already exists',
-      );
-
-    const user = this.usersRepository.create({
-      username,
-      email,
-      siteUrl,
-    });
-
+    const user = this.usersRepository.create({ username, email, siteUrl });
     const newUser = await this.usersRepository.save(user);
     await this.usersSecretInfoService.savePassword(newUser.id, password);
     return newUser;
+  }
+
+  async patchUser(id: number, userData: Partial<User>) {
+    const { username, email } = userData;
+    const user = await this.usersRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException('User with provided id was not found!');
+    }
+
+    if (username || email) {
+      await this.checkDuplicateCredentials(username, email);
+    }
+
+    Object.assign(user, userData);
+    const patchedUser = await this.usersRepository.save(user);
+    return patchedUser;
   }
 
   async findOneBy(
@@ -66,5 +71,23 @@ export class UsersProfileService {
     const secretInfo = await query.getOne();
 
     return secretInfo ? secretInfo.user : null;
+  }
+
+  private async checkDuplicateCredentials(username: string, email: string) {
+    const existingUser = await this.usersRepository.findOne({
+      where: [{ username }, { email }],
+    });
+
+    if (existingUser) {
+      if (existingUser.username === username) {
+        throw new ConflictException(
+          'User with the provided username already exists',
+        );
+      } else {
+        throw new ConflictException(
+          'User with the provided email already exists',
+        );
+      }
+    }
   }
 }

@@ -27,25 +27,20 @@ class UserService extends BaseService {
     }
   };
 
-  changeUserInfo =
-    (userId: number, data: UserPatchInfo) => async (dispatch: AppDispatch) => {
-      const token = authService.isAuthenticated(dispatch);
-      if (!token) return;
-      dispatch(userInfoRequest());
-      try {
-        const response = await userApi.userInfoPatchRequest(
-          token,
-          userId,
-          data
-        );
-        dispatch(userInfoSuccess(response));
-      } catch (error) {
-        super.errorHandler(error, (err) => {
-          dispatch(userInfoFailed(err));
-          authService.deauthIfShould(err, dispatch);
-        });
-      }
-    };
+  changeUserInfo = (data: UserPatchInfo) => async (dispatch: AppDispatch) => {
+    const token = authService.isAuthenticated(dispatch);
+    if (!token) return;
+    dispatch(userInfoRequest());
+    try {
+      const response = await userApi.userInfoPatchRequest(token, data);
+      dispatch(userInfoSuccess(response));
+    } catch (error) {
+      super.errorHandler(error, (err) => {
+        dispatch(userInfoFailed(err));
+        authService.deauthIfShould(err, dispatch);
+      });
+    }
+  };
 }
 const userService = new UserService();
 export default userService;
