@@ -8,12 +8,16 @@ type OptionType = {
 export type SelectChangeEvent = MouseEvent | KeyboardEvent | FocusEvent | null;
 
 interface ListOrderPanelProps {
+  defaultValueItemsPerPage: string;
+  defaultValueOrderBy: string;
   optionsItemsPerPage: OptionType[];
   optionsOrderBy: OptionType[];
   onChangeItemsPerPage: (value: string) => void;
   onChangeOrderBy: (value: string) => void;
 }
 export default function ListOrderPanel({
+  defaultValueItemsPerPage,
+  defaultValueOrderBy,
   optionsItemsPerPage,
   optionsOrderBy,
   onChangeItemsPerPage,
@@ -23,12 +27,14 @@ export default function ListOrderPanel({
     <BoxStyled>
       <Select
         placeholder="Items per page"
-        onChange={(_, value) => onChangeItemsPerPage(value as string)}>
+        onChange={(_, value) => onChangeItemsPerPage(value as string)}
+        defaultValue={defaultValueItemsPerPage}>
         <Options options={optionsItemsPerPage} />
       </Select>
       <Select
         placeholder="Order by"
-        onChange={(_, value) => onChangeOrderBy(value as string)}>
+        onChange={(_, value) => onChangeOrderBy(value as string)}
+        defaultValue={defaultValueOrderBy}>
         <Options options={optionsOrderBy} />
       </Select>
     </BoxStyled>

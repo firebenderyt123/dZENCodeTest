@@ -28,6 +28,8 @@ export default function CommentOrderPanel() {
 
   return (
     <ListOrderPanel
+      defaultValueItemsPerPage="25"
+      defaultValueOrderBy="createdAt_DESC"
       optionsItemsPerPage={itemsPerPageOptions}
       optionsOrderBy={orderByOptions}
       onChangeItemsPerPage={onChangeItemsPerPage}
