@@ -6,14 +6,14 @@ import CommentComponent, { ListStyled } from "../Comment";
 
 interface CommentsListProps {
   commentsState: CommentsState;
-  getComments: (props: GetCommentsProps) => void;
+  getComments: (props: Partial<GetCommentsProps>) => void;
 }
 
 export default function CommentsList({
   commentsState,
   getComments,
 }: CommentsListProps) {
-  const { pending, data, error } = commentsState;
+  const { pending, data, error, params } = commentsState;
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -27,23 +27,26 @@ export default function CommentsList({
   }, [currentPage]);
 
   return (
-    <>
-      <ListStyled>
-        {data?.comments.map((comment) => (
-          <CommentComponent
-            key={comment.id}
-            comment={comment}></CommentComponent>
-        ))}
-      </ListStyled>
-      <Pagination
-        count={data?.total.pages || currentPage}
-        variant="outlined"
-        shape="rounded"
-        page={currentPage}
-        onChange={handlePageChange}
-        showFirstButton
-        showLastButton
-      />
-    </>
+    data &&
+    params && (
+      <>
+        <ListStyled>
+          {data.comments.map((comment) => (
+            <CommentComponent
+              key={comment.id}
+              comment={comment}></CommentComponent>
+          ))}
+        </ListStyled>
+        <Pagination
+          count={data.total.pages}
+          variant="outlined"
+          shape="rounded"
+          page={params.page}
+          onChange={handlePageChange}
+          showFirstButton
+          showLastButton
+        />
+      </>
+    )
   );
 }

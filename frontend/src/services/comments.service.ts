@@ -16,14 +16,10 @@ import {
 import BaseService from "./base.service";
 import cookiesService from "./cookies.service";
 import commentsWebSocketService from "./comments-websocket.service";
+import { CommentsResponse } from "@/api/comments/comments-response.interface";
 
 class CommentsService extends BaseService {
-  getComments({
-    page = 1,
-    limit = 25,
-    orderBy = "createdAt",
-    order = "DESC",
-  }: GetCommentsProps) {
+  getComments({ page, limit, orderBy, order }: GetCommentsProps) {
     return async (dispatch: AppDispatch) => {
       dispatch(getCommentsRequest());
       try {
@@ -33,7 +29,17 @@ class CommentsService extends BaseService {
           orderBy,
           order,
         });
-        dispatch(getCommentsSuccess(data));
+        dispatch(
+          getCommentsSuccess({
+            commentsData: data,
+            params: {
+              page,
+              limit,
+              orderBy,
+              order,
+            },
+          })
+        );
       } catch (error) {
         super.errorHandler(error, (err) => dispatch(getCommentsFailed(err)));
       }
@@ -104,5 +110,5 @@ class CommentsService extends BaseService {
 const commentsService = new CommentsService();
 export default commentsService;
 
-export type GetCommentsProps = Partial<CommentsGetRequestProps>;
+export type GetCommentsProps = CommentsGetRequestProps;
 export type CreateCommentProps = CommentsCreateRequestProps;

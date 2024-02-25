@@ -61,7 +61,6 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
     </ListStyled>
   );
 
-  console.log(attachments);
   const attachmentsBlock = !!attachments.length && (
     <AttachmentsPreviewBox>
       {attachments.map(({ fileId, file }) => (

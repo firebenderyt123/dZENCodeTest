@@ -3,6 +3,7 @@ import CommentsList from "@/components/CommentsList";
 import CommentBox from "@/components/CommentBox";
 import { useComments } from "@/contexts/CommentsContext";
 import { useCommentForm } from "@/contexts/CommentFormContext";
+import CommentOrderPanel from "../CommentsOrderPanel";
 
 export default function CommentsPageContent() {
   const comments = useComments();
@@ -29,6 +30,7 @@ export default function CommentsPageContent() {
             commentDraftState={commentForm.commentDraftState}
             onSubmitHandler={commentForm.createComment}
           />
+          <CommentOrderPanel />
           <CommentsList
             commentsState={comments.commentsState}
             getComments={comments.getComments}></CommentsList>

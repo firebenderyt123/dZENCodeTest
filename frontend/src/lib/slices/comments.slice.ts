@@ -6,7 +6,7 @@ import { ErrorData } from "@/interfaces/error.interface";
 export interface CommentsState {
   pending: boolean;
   data: CommentsResponse | null;
-  commentsPerPage: number;
+  params: Params;
   total: {
     pages: number;
     comments: number;
@@ -17,7 +17,12 @@ export interface CommentsState {
 const initialState: CommentsState = {
   pending: false,
   data: null,
-  commentsPerPage: 25,
+  params: {
+    page: 1,
+    limit: 25,
+    orderBy: "createdAt",
+    order: "DESC",
+  },
   total: {
     pages: 0,
     comments: 0,
@@ -33,9 +38,18 @@ const commentsSlice = createSlice({
       state.pending = true;
       state.error = null;
     },
-    getCommentsSuccess: (state, action: PayloadAction<CommentsResponse>) => {
+    getCommentsSuccess: (
+      state,
+      action: PayloadAction<CommentsWithPageParams>
+    ) => {
+      const data = action.payload.commentsData;
+      const params = action.payload.params;
       state.pending = false;
-      state.data = action.payload;
+      state.data = data;
+      state.params = {
+        ...params,
+        page: params.page <= data.total.pages ? params.page : data.total.pages,
+      };
       state.error = null;
     },
     getCommentsFailed: (state, action: PayloadAction<ErrorData>) => {
@@ -48,10 +62,10 @@ const commentsSlice = createSlice({
         const { parent, ...comment } = action.payload;
         state.data.comments = parent
           ? insertCommentIntoReplies(state.data.comments, parent.id, comment)
-          : [comment, ...state.data.comments];
+          : [comment, ...state.data.comments.slice(0, -1)];
         state.total = {
           comments: state.total.comments + 1,
-          pages: Math.ceil((state.total.comments + 1) / state.commentsPerPage),
+          pages: Math.ceil((state.total.comments + 1) / state.params.limit),
         };
       }
     },
@@ -90,4 +104,15 @@ const insertCommentIntoReplies = (
     newComments.push(recursiveInsert(commentTree));
   }
   return newComments;
+};
+
+type Params = {
+  page: number;
+  limit: number;
+  orderBy: "createdAt" | "username" | "email";
+  order: "ASC" | "DESC";
+};
+type CommentsWithPageParams = {
+  commentsData: CommentsResponse;
+  params: Params;
 };
