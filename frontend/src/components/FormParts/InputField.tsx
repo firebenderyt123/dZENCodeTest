@@ -1,11 +1,12 @@
 import {
   FormControl,
   FormHelperText,
-  FormLabel,
   Input,
   InputProps,
+  styled,
 } from "@mui/joy";
 import { ForwardedRef, forwardRef } from "react";
+import FormLabel from "./FormLabel";
 
 interface InputFieldProps {
   label: string;
@@ -19,8 +20,13 @@ function InputField(
     <FormControl>
       <FormLabel>{label}</FormLabel>
       <Input {...props} ref={ref} />
-      <FormHelperText>{helperText || ""}</FormHelperText>
+      <FormHelperTextStyled>{helperText || " "}</FormHelperTextStyled>
     </FormControl>
   );
 }
 export default forwardRef(InputField);
+
+const FormHelperTextStyled = styled(FormHelperText)(({ theme }) => ({
+  color: theme.palette.danger[400],
+  margin: 0,
+}));

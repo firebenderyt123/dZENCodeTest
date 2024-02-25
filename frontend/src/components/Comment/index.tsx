@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ForwardedRef, RefObject, forwardRef, useRef } from "react";
 import {
   Avatar,
@@ -40,7 +41,15 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
 
   const userInfo = (
     <InlineBox>
-      <BoldText>{user.username}</BoldText>
+      <BoldText>
+        {user.siteUrl ? (
+          <LinkStyled href={user.siteUrl} target="_blank" rel="nofollow">
+            {user.username}
+          </LinkStyled>
+        ) : (
+          user.username
+        )}
+      </BoldText>
       {formatDateForComments(createdAt)}
     </InlineBox>
   );
@@ -98,6 +107,10 @@ export const ListStyled = styled(List)(() => ({
 
 const ListItemStyled = styled(ListItem)(() => ({
   flexDirection: "column",
+  paddingInline: 0,
+  "& li": {
+    paddingLeft: "1rem",
+  },
 }));
 
 const InlineBox = styled(Box)(() => ({
@@ -112,6 +125,7 @@ const InlineBox = styled(Box)(() => ({
 const AvatarStyled = styled(Avatar)(() => ({
   border: "0.1875rem solid #fff",
   borderRadius: "100%",
+  minWidth: "40px",
 }));
 
 const ParentTextBlock = styled(Typography)(() => ({
@@ -127,10 +141,16 @@ const ParentTextBlock = styled(Typography)(() => ({
 
 const BoldText = styled(Typography)(() => ({
   fontWeight: 700,
+  textTransform: "capitalize",
 }));
 
 const CommentText = styled(BoxInnerHtml)(() => ({
   width: "100%",
   padding: "0.5rem 0 0",
   overflow: "hidden",
+}));
+
+const LinkStyled = styled(Link)(() => ({
+  textDecoration: "none",
+  color: "inherit",
 }));

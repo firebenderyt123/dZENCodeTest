@@ -13,6 +13,7 @@ import CommentBox from "../CommentBox";
 import UserInfo from "../UserInfo";
 import { useUser } from "@/contexts/UserContext";
 import { useCommentForm } from "@/contexts/CommentFormContext";
+import { Box, styled } from "@mui/joy";
 
 export default function CommentCreateForm() {
   const commentForm = useCommentForm();
@@ -37,10 +38,23 @@ export default function CommentCreateForm() {
     });
   };
 
-  return (
-    <div>
+  return user?.state.user ? (
+    <ContainerFormStyled>
       <UserInfo form={changeUserForm} />
       <CommentBox form={commentBoxForm} submitCallback={commentFormSubmit} />
-    </div>
+    </ContainerFormStyled>
+  ) : (
+    <BoxStyled>Please Sign-In to write the comments..</BoxStyled>
   );
 }
+
+const ContainerFormStyled = styled("div")(() => ({
+  margin: "1rem 0",
+}));
+
+const BoxStyled = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.divider,
+  padding: "1rem",
+  margin: "1rem 0",
+  borderRadius: "0.3125rem",
+}));

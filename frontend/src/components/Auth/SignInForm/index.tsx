@@ -1,6 +1,6 @@
 import { Button, Typography, Container } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
-import FormField from "@/components/FormFields/FormField";
+import FormField from "@/components/FormParts/FormField";
 import { useAuth } from "@/contexts/AuthContext";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SignInSchema, signInSchema } from "@/schemas/sign-in.schema";

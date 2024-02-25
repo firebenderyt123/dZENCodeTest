@@ -1,11 +1,5 @@
 import { useCallback, useRef } from "react";
-import {
-  FormControl,
-  FormLabel,
-  styled,
-  FormHelperText,
-  TextareaProps,
-} from "@mui/joy";
+import { FormControl, styled, FormHelperText, TextareaProps } from "@mui/joy";
 import { SubmitHandler, UseFormReturn } from "react-hook-form";
 import htmlTagsService, { AllowedTags } from "@/services/html-tags.service";
 import { CreateCommentSchema } from "@/schemas/create-comment.shema";
@@ -16,6 +10,7 @@ import { useCommentForm } from "@/contexts/CommentFormContext";
 import AttachmentsPreviewPanel from "../AttachmentsPreviewPanel";
 import Recaptcha, { ReCAPTCHA } from "../Recaptcha";
 import { errorNotify } from "@/utils/notifications.utils";
+import FormLabel from "../FormParts/FormLabel";
 
 interface WithCommentBoxProps {
   form: UseFormReturn<CreateCommentSchema, any, CreateCommentSchema>;
@@ -124,7 +119,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
           {commentError && (
             <FormHelperTextStyled>{commentError}</FormHelperTextStyled>
           )}
-          <Recaptcha ref={captchaRef} />
+          <RecaptchaStyled ref={captchaRef} />
         </FormControl>
       </form>
     );
@@ -132,8 +127,13 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
 };
 export default withCommentBox(InnerCommentBox);
 
+const RecaptchaStyled = styled(Recaptcha)(() => ({
+  marginTop: "0.5rem",
+}));
+
 const FormHelperTextStyled = styled(FormHelperText)(({ theme }) => ({
   backgroundColor: theme.palette.danger[400],
   color: theme.palette.common.white,
   padding: "0.625rem 0.75rem",
+  borderRadius: "0.3125rem",
 }));

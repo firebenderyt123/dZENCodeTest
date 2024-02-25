@@ -15,7 +15,7 @@ const initialState: UserState = {
 };
 
 const userSlice = createSlice({
-  name: "auth",
+  name: "user",
   initialState,
   reducers: {
     userInfoRequest: (state) => {
@@ -33,7 +33,7 @@ const userSlice = createSlice({
       state.error = action.payload;
     },
     userLogout: (state) => {
-      state = initialState;
+      state.user = null;
     },
   },
 });
