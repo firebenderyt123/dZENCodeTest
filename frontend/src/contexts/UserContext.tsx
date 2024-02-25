@@ -20,10 +20,15 @@ export default function UserProvider({ children }: UserProviderProps) {
 
   const updateUserInfo = (data: UpdateUserData) => {
     const username =
-      state.user?.username !== data.username ? data.username : undefined;
-    const email = state.user?.email !== data.email ? data.email : undefined;
+      state.user?.username !== data.username?.toLowerCase()
+        ? data.username
+        : undefined;
+    const email =
+      state.user?.email !== data.email?.toLowerCase() ? data.email : undefined;
     const siteUrl =
-      state.user?.siteUrl !== data.siteUrl ? data.siteUrl : undefined;
+      state.user?.siteUrl !== data.siteUrl?.toLowerCase()
+        ? data.siteUrl
+        : undefined;
     dispatch(userService.changeUserInfo({ username, email, siteUrl }));
   };
 
