@@ -34,9 +34,9 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
   };
 
   const avatar = (
-    <ListItemAvatar>
+    <ListItemAvatarStyled>
       <AvatarStyled alt="Anonymous" src="/images/avatar.webp" />
-    </ListItemAvatar>
+    </ListItemAvatarStyled>
   );
 
   const userInfo = (
@@ -102,7 +102,6 @@ export default CommentComponent;
 export const ListStyled = styled(List)(() => ({
   width: "100%",
   minWidth: 280,
-  bgcolor: "#fff",
 }));
 
 const ListItemStyled = styled(ListItem)(() => ({
@@ -113,19 +112,22 @@ const ListItemStyled = styled(ListItem)(() => ({
   },
 }));
 
-const InlineBox = styled(Box)(() => ({
+const InlineBox = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  backgroundColor: "#f5f6f7",
+  backgroundColor: theme.palette.grey[100],
   padding: "0.3125rem",
   width: "100%",
   gap: "0.625rem",
 }));
 
+const ListItemAvatarStyled = styled(ListItemAvatar)(() => ({
+  minWidth: 40,
+}));
+
 const AvatarStyled = styled(Avatar)(() => ({
   border: "0.1875rem solid #fff",
   borderRadius: "100%",
-  minWidth: "40px",
 }));
 
 const ParentTextBlock = styled(Typography)(() => ({
