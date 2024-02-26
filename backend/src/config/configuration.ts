@@ -1,11 +1,12 @@
 export default () => ({
+  NODE_ENV: process.env.NODE_ENV,
   port: parseInt(process.env.APP_PORT, 10) || 8000,
   database: {
-    host: process.env.DATABASE_HOST,
-    port: parseInt(process.env.DATABASE_PORT, 10) || 5432,
-    name: process.env.DATABASE_NAME,
-    user: process.env.DATABASE_USER,
-    password: process.env.DATABASE_PASSWD,
+    host: process.env.POSTGRES_HOST || 'localhost',
+    port: parseInt(process.env.POSTGRES_PORT, 10) || 5432,
+    name: process.env.POSTGRES_DB,
+    user: process.env.POSTGRES_USER,
+    password: process.env.POSTGRES_PASSWORD,
   },
   jwt: {
     secret: process.env.JWT_SECRET,
@@ -22,6 +23,5 @@ export default () => ({
   },
   recaptcha: {
     secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY,
-    debug: /^true$/.test(process.env.GOOGLE_RECAPTCHA_DEBUG),
   },
 });

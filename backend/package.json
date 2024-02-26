@@ -6,9 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "typeorm": "npm run build && npx typeorm -d dist/database/migrate.js",
-    "migration:run": "npm run typeorm migration:run",
-    "schema:drop": "npm run typeorm schema:drop",
+    "typeorm": "yarn run build && npx typeorm -d dist/database/migrate.js",
+    "migration:run": "yarn run typeorm migration:run",
+    "schema:drop": "yarn run typeorm schema:drop",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

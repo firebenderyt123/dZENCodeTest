@@ -13,14 +13,17 @@ import './config/configuration';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      envFilePath: ['.env.development'],
+      envFilePath:
+        configuration().NODE_ENV !== 'production'
+          ? '.env.development'
+          : '.env.production',
     }),
     GoogleRecaptchaModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         secretKey: configService.get('recaptcha.secretKey'),
         response: (req) => req.headers.recaptcha,
-        skipIf: process.env.NODE_ENV !== 'production',
-        debug: configService.get('recaptcha.debug'),
+        skipIf: configService.get('NODE_ENV') !== 'production',
+        debug: configService.get('NODE_ENV') !== 'production',
       }),
       inject: [ConfigService],
     }),
