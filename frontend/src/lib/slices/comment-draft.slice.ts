@@ -3,13 +3,13 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 export interface CommentDraftState {
   pending: boolean;
-  commentText: string;
+  replyToCommentId: number | null;
   error: ErrorData | null;
 }
 
 const initialState: CommentDraftState = {
   pending: false,
-  commentText: "",
+  replyToCommentId: null,
   error: null,
 };
 
@@ -23,12 +23,15 @@ const commentDraftSlice = createSlice({
     },
     createCommentSuccess: (state) => {
       state.pending = false;
-      state.commentText = "";
+      state.replyToCommentId = null;
       state.error = null;
     },
     createCommentFailed: (state, action: PayloadAction<ErrorData>) => {
       state.pending = false;
       state.error = action.payload;
+    },
+    replyToComment: (state, action: PayloadAction<number | null>) => {
+      state.replyToCommentId = action.payload;
     },
   },
 });
@@ -37,5 +40,6 @@ export const {
   createCommentRequest,
   createCommentSuccess,
   createCommentFailed,
+  replyToComment,
 } = commentDraftSlice.actions;
 export default commentDraftSlice.reducer;

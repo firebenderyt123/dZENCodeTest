@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { FormControl, styled, FormHelperText, TextareaProps } from "@mui/joy";
 import { SubmitHandler, UseFormReturn } from "react-hook-form";
 import htmlTagsService, { AllowedTags } from "@/services/html-tags.service";
@@ -28,6 +28,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
       setValue,
       trigger,
       watch,
+      reset,
       formState: { errors },
     } = form;
     const { ref, ...commentProps } = register("text");
@@ -36,10 +37,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
     const commentText = watch("text", "");
 
     const commentError: string =
-      errors?.text?.message ||
-      commentForm?.state.error?.message ||
-      commentForm?.uploadError ||
-      "";
+      errors?.text?.message || commentForm?.uploadError || "";
 
     const attachmentPreviews = commentForm && (
       <AttachmentsPreviewPanel
@@ -97,6 +95,12 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
         }
       });
     };
+
+    useEffect(() => {
+      if (commentForm?.state.error === null) {
+        reset();
+      }
+    }, [commentForm?.state, reset]);
 
     return (
       <form onSubmit={handleSubmit(submitHandler)}>

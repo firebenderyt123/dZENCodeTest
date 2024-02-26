@@ -1,6 +1,5 @@
 import { ForwardedRef, forwardRef, useCallback, useState } from "react";
 import { Box, Textarea, styled, TextareaProps } from "@mui/joy";
-
 import { AllowedTags } from "@/services/html-tags.service";
 import BoxInnerHtml from "../BoxInnerHtml";
 import CommentBoxBottomPanel from "./CommentBoxBottomPanel";

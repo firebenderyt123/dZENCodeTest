@@ -13,9 +13,9 @@ import CommentBox from "../CommentBox";
 import UserInfo from "../UserInfo";
 import { useUser } from "@/contexts/UserContext";
 import { useCommentForm } from "@/contexts/CommentFormContext";
-import { Box, styled } from "@mui/joy";
+import { Box, BoxProps, styled } from "@mui/joy";
 
-export default function CommentCreateForm() {
+export default function CommentCreateForm(props: BoxProps) {
   const commentForm = useCommentForm();
   const user = useUser();
 
@@ -39,7 +39,7 @@ export default function CommentCreateForm() {
   };
 
   return user?.state.user ? (
-    <ContainerFormStyled>
+    <ContainerFormStyled {...props}>
       <UserInfo form={changeUserForm} />
       <CommentBox form={commentBoxForm} submitCallback={commentFormSubmit} />
     </ContainerFormStyled>
@@ -48,7 +48,7 @@ export default function CommentCreateForm() {
   );
 }
 
-const ContainerFormStyled = styled("div")(() => ({
+const ContainerFormStyled = styled(Box)(() => ({
   margin: "1rem 0",
 }));
 

@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import commentsService, { GetCommentsProps } from "@/services/comments.service";
 
 interface CommentsContextType {
-  commentsState: CommentsState;
+  state: CommentsState;
   getComments: (props: Partial<GetCommentsProps>) => void;
   onCommentPublished: () => void;
   offCommentPublished: () => void;
@@ -19,7 +19,7 @@ interface CommentsProviderProps {
 
 export default function CommentsProvider({ children }: CommentsProviderProps) {
   const dispatch = useAppDispatch();
-  const commentsState = useAppSelector((reducers) => reducers.comments);
+  const state = useAppSelector((reducers) => reducers.comments);
 
   const getComments = useCallback(
     (props: Partial<GetCommentsProps>) => {
@@ -28,7 +28,7 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
         limit: stateLimit,
         orderBy: stateOrderBy,
         order: stateOrder,
-      } = commentsState.params;
+      } = state.params;
       const { page, limit, orderBy, order } = props;
       dispatch(
         commentsService.getComments({
@@ -39,7 +39,7 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
         })
       );
     },
-    [commentsState.params, dispatch]
+    [state.params, dispatch]
   );
 
   const onCommentPublished = useCallback(() => {
@@ -53,7 +53,7 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
   return (
     <CommentsContext.Provider
       value={{
-        commentsState,
+        state,
         getComments,
         onCommentPublished,
         offCommentPublished,

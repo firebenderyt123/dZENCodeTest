@@ -1,12 +1,17 @@
 import {
-  MouseEvent,
+  Dispatch,
   ReactNode,
+  SetStateAction,
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from "react";
-import { CommentDraftState } from "@/lib/slices/comment-draft.slice";
+import {
+  CommentDraftState,
+  replyToComment,
+} from "@/lib/slices/comment-draft.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import commentsService, {
   CreateCommentProps,
@@ -17,6 +22,7 @@ interface CommentFormContextType {
   files: MyFile[];
   uploadError: string;
   createComment: (data: CreateCommentProps, captcha: string) => void;
+  setReplyCommentId: (commentId: number | null) => void;
   uploadFile: (file: File[]) => void;
   removeFile: (file: MyFile) => void;
 }
@@ -42,11 +48,17 @@ export default function CommentFormProvider({
   const state = useAppSelector((reducers) => reducers.commentDraft);
 
   const createComment = useCallback(
-    (data: CreateCommentProps, captcha: string) => {
+    (data: Omit<CreateCommentProps, "parentId">, captcha: string) => {
       const commentFiles = files.map((item) => item.data);
-      dispatch(commentsService.createComment(data, commentFiles, captcha));
+      const commentData = {
+        ...data,
+        parentId: state.replyToCommentId || undefined,
+      };
+      dispatch(
+        commentsService.createComment(commentData, commentFiles, captcha)
+      );
     },
-    [dispatch, files]
+    [dispatch, files, state.replyToCommentId]
   );
 
   const uploadFile = useCallback(
@@ -78,6 +90,14 @@ export default function CommentFormProvider({
     setFiles((prev) => [...prev.filter((f) => f !== file)]);
   }, []);
 
+  const setReplyCommentId = useCallback(
+    (commentId: number | null) => {
+      if (state.replyToCommentId !== commentId)
+        dispatch(replyToComment(commentId));
+    },
+    [dispatch, state.replyToCommentId]
+  );
+
   return (
     <CommentFormContext.Provider
       value={{
@@ -85,6 +105,7 @@ export default function CommentFormProvider({
         files,
         uploadError,
         createComment,
+        setReplyCommentId,
         uploadFile,
         removeFile,
       }}>

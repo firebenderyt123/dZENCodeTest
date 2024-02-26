@@ -10,7 +10,7 @@ export default function CommentsPageContent() {
   const commentForm = useCommentForm();
 
   useEffect(() => {
-    if (!comments?.commentsState.data && !comments?.commentsState.error)
+    if (!comments?.state.data && !comments?.state.error)
       comments?.getComments({});
   }, [comments]);
 
@@ -26,10 +26,10 @@ export default function CommentsPageContent() {
     <>
       {comments && commentForm && (
         <>
-          <CommentCreateForm />
+          {commentForm.state.replyToCommentId === null && <CommentCreateForm />}
           <CommentOrderPanel />
           <CommentsList
-            commentsState={comments.commentsState}
+            commentsState={comments.state}
             getComments={comments.getComments}></CommentsList>
         </>
       )}

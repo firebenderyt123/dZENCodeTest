@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ForwardedRef, RefObject, forwardRef, useRef } from "react";
+import { ForwardedRef, RefObject, forwardRef, useRef, useState } from "react";
 import {
   Avatar,
   Box,
@@ -9,11 +9,15 @@ import {
   Typography,
   styled,
 } from "@mui/material";
+import ReplyIcon from "@mui/icons-material/Reply";
 import { formatDateForComments } from "@/utils/date-format.utils";
 import { Comment } from "@/interfaces/comment.interface";
 import BoxInnerHtml from "../BoxInnerHtml";
 import { AttachmentsPreviewBox } from "../AttachmentsPreviewPanel";
 import CommentAttachment from "./CommentAttachment";
+import { IconButton } from "@mui/joy";
+import { useCommentForm } from "@/contexts/CommentFormContext";
+import CommentCreateForm from "../CommentCreateForm";
 
 interface ComponentProps {
   comment: Comment;
@@ -24,6 +28,7 @@ type Ref = ForwardedRef<HTMLLIElement>;
 function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
   const { id, text, createdAt, user, replies, attachments } = comment;
 
+  const commentForm = useCommentForm();
   const currRef = useRef<HTMLLIElement>(null);
 
   const handleClick = () => {
@@ -54,8 +59,21 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
     </InlineBox>
   );
 
+  const replyButton = commentForm && (
+    <IconButton
+      onClick={() =>
+        commentForm.setReplyCommentId(
+          commentForm?.state.replyToCommentId !== id ? id : null
+        )
+      }>
+      <ReplyIcon />
+    </IconButton>
+  );
+
   const parentTextBlock = parentCommentText && (
-    <ParentTextBlock onClick={handleClick}>{parentCommentText}</ParentTextBlock>
+    <ParentTextBlock onClick={handleClick}>
+      <CommentText html={parentCommentText} />
+    </ParentTextBlock>
   );
 
   const repliesBlock = !!replies.length && (
@@ -84,16 +102,24 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
   );
 
   return (
-    <ListItemStyled ref={currRef} id={`comment-${id}`}>
-      <InlineBox>
-        {avatar}
-        {userInfo}
-      </InlineBox>
-      {parentTextBlock}
-      <CommentText html={text} />
-      {attachmentsBlock}
-      {repliesBlock}
-    </ListItemStyled>
+    commentForm && (
+      <>
+        <ListItemStyled ref={currRef} id={`comment-${id}`}>
+          <InlineBox>
+            {avatar}
+            {userInfo}
+            {replyButton}
+          </InlineBox>
+          {parentTextBlock}
+          <CommentText html={text} />
+          {attachmentsBlock}
+          {commentForm.state.replyToCommentId === id && (
+            <CommentCreateFormStyled />
+          )}
+          {repliesBlock}
+        </ListItemStyled>
+      </>
+    )
   );
 }
 const CommentComponent = forwardRef(Component);
@@ -155,4 +181,8 @@ const CommentText = styled(BoxInnerHtml)(() => ({
 const LinkStyled = styled(Link)(() => ({
   textDecoration: "none",
   color: "inherit",
+}));
+
+const CommentCreateFormStyled = styled(CommentCreateForm)(() => ({
+  width: "100%",
 }));
