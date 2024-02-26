@@ -29,6 +29,7 @@ ENV NODE_ENV production
 USER node
 
 COPY package.json .
+COPY public ./public
 
 COPY --from=deps ${WORKDIR}/node_modules ./node_modules
 COPY --from=build ${WORKDIR}/.next ./.next

@@ -1,0 +1,13 @@
+{
+  "name": "worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start:backend": "cd backend && docker compose up -d",
+    "start:frontend": "cd frontend && docker compose up -d",
+    "stop:backend": "cd backend && docker compose down",
+    "stop:frontend": "cd frontend && docker compose down",
+    "start": "npm run start:backend && npm run start:frontend",
+    "stop": "npm run stop:backend && npm run stop:frontend"
+  }
+}
