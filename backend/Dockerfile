@@ -34,9 +34,7 @@ COPY --from=deps ${WORKDIR}/node_modules ./node_modules
 COPY --from=deps ${WORKDIR}/package.json .
 
 COPY --from=build ${WORKDIR}/dist ./dist
-COPY --from=build ${WORKDIR}/nest-cli.json .
-COPY --from=build ${WORKDIR}/tsconfig.json .
 
 EXPOSE 8000
 
-CMD yarn start:prod
+CMD yarn migration:run && yarn start:prod

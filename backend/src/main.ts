@@ -22,6 +22,6 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   const port = configService.get('port');
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();
