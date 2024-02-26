@@ -2,14 +2,14 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    apiRoot: "http://localhost:8000/api/v1",
+    apiRoot: process.env.API_ROOT,
     apiComments: "/comments",
     apiCommentsAttachments: "/comments/attachments",
     signIn: "/auth/sign-in",
     signUp: "/auth/sign-up",
     users: "/users",
-    wsRoot: "ws://localhost:8000",
-    googleRecaptchaPublicKey: "6LcycH4pAAAAAJ0r0zKDCBBwvNTGhixAZjx1SyMB",
+    wsRoot: process.env.WS_ROOT,
+    googleRecaptchaPublicKey: process.env.GOOGLE_RECAPTCHA_PUBLIC_KEY,
   },
   images: {
     disableStaticImages: true,
@@ -17,7 +17,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "firebenderyt.blob.core.windows.net",
+        hostname: process.env.BLOB_HOSTNAME,
         port: "",
         pathname: "/**",
       },
