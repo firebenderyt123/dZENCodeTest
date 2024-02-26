@@ -7,6 +7,7 @@ import configuration from './config/configuration';
 import { websocketModules } from './websocket';
 import { routes, modules } from './routes';
 import './config/configuration';
+import { QueueModule } from './queue/bull.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import './config/configuration';
       }),
       inject: [ConfigService],
     }),
+    QueueModule,
     RouterModule.register(routes),
     ...modules,
     ...websocketModules,
