@@ -4,8 +4,11 @@ import { useComments } from "@/contexts/CommentsContext";
 import { useCommentForm } from "@/contexts/CommentFormContext";
 import CommentOrderPanel from "../CommentsOrderPanel";
 import CommentCreateForm from "../CommentCreateForm";
+import { useAppDispatch } from "@/lib/hooks";
+import commentsService from "@/services/comments.service";
 
 export default function CommentsPageContent() {
+  const dispatch = useAppDispatch();
   const comments = useComments();
   const commentForm = useCommentForm();
 
@@ -15,12 +18,15 @@ export default function CommentsPageContent() {
   }, [comments]);
 
   useEffect(() => {
-    comments?.onCommentPublished();
+    dispatch(commentsService.onCommentPublished());
+    if (commentForm?.state.pending)
+      dispatch(commentsService.onCommentCreateError());
 
     return () => {
-      comments?.offCommentPublished();
+      commentsService.offCommentPublished();
+      commentsService.offCommentCreateError();
     };
-  }, [comments]);
+  }, [commentForm?.state.pending, dispatch]);
 
   return (
     <>

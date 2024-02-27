@@ -1,3 +1,3 @@
 export enum QUEUE {
-  USERS = 'users',
+  COMMENTS = 'comments',
 }

@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { AUTH_EVENTS } from '../enums/auth.enum';
 
 @Injectable()
-export class EventEmitterService {
+export class AuthEventEmitterService {
   constructor(private readonly eventEmitter: EventEmitter2) {}
 
-  async emitEvent(eventName: string, data: any) {
-    await this.eventEmitter.emitAsync(eventName, data);
+  async notAuthenticated() {
+    await this.eventEmitter.emitAsync(AUTH_EVENTS.AUTH_FAILED);
   }
 }

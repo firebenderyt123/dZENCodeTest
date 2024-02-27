@@ -4,10 +4,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
 import configuration from './config/configuration';
-import { websocketModules } from './websocket';
 import { routes, modules } from './routes';
 import './config/configuration';
-import { QueueModule } from './queue/bull.module';
+import { ConfigureModule } from './queue/config.module';
 
 @Module({
   imports: [
@@ -41,10 +40,9 @@ import { QueueModule } from './queue/bull.module';
       }),
       inject: [ConfigService],
     }),
-    QueueModule,
+    ConfigureModule,
     RouterModule.register(routes),
     ...modules,
-    ...websocketModules,
   ],
 })
 export class AppModule {}

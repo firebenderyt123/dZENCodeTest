@@ -1,16 +1,23 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { QUEUE } from './queue.enums';
-import { modules } from './modules';
+import { CommentsModule } from 'src/app/comments/modules/comments.module';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     BullModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         redis: {
           host: configService.get('redis.host'),
           port: configService.get('redis.port'),
+        },
+        defaultJobOptions: {
+          removeOnComplete: 1000,
+          removeOnFail: 5000,
+          attempts: 3,
         },
       }),
       inject: [ConfigService],
@@ -20,7 +27,7 @@ import { modules } from './modules';
         name: QUEUE[key],
       }),
     ),
-    ...modules,
+    CommentsModule,
   ],
 })
-export class QueueModule {}
+export class ConfigureModule {}
