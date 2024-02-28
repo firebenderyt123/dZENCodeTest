@@ -1,27 +1,24 @@
 import {
   PipeTransform,
   Injectable,
-  BadRequestException,
   HttpStatus,
   ParseFilePipeBuilder,
 } from '@nestjs/common';
-import { FileUpload } from '../interfaces/file-upload.interface';
+import { FileInput } from 'src/app/files/interfaces/file-input.interface';
 
 @Injectable()
 export class ParseFilePipe implements PipeTransform {
-  async transform(files: FileUpload[] | undefined): Promise<FileUpload[]> {
-    if (!files || !Array.isArray(files)) {
-      throw new BadRequestException('Invalid files provided');
-    }
+  async transform(files: FileInput[] | undefined): Promise<FileInput[]> {
+    if (!files.length) return [];
 
-    const processedFiles: FileUpload[] = [];
+    const processedFiles: FileInput[] = [];
     for await (const file of files) {
       const result = await new ParseFilePipeBuilder()
         .addFileTypeValidator({
           fileType: /(jpg|jpeg|gif|png|text\/plain)$/i,
         })
         .addMaxSizeValidator({
-          maxSize: this.getMaxSizeForFileType(file.mimetype),
+          maxSize: this.getMaxSizeForFileType(file.type),
         })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -29,7 +26,7 @@ export class ParseFilePipe implements PipeTransform {
         .transform(file);
 
       if (!result) {
-        throw new BadRequestException('Invalid file type or size');
+        throw new Error('Invalid file type or size');
       }
 
       processedFiles.push(file);
