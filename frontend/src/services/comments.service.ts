@@ -15,9 +15,9 @@ import {
 } from "@/lib/slices/comment-draft.slice";
 import BaseService from "./base.service";
 import cookiesService from "./cookies.service";
-import commentsWebSocketService from "./comments-websocket.service";
-import authService from "./auth.service";
+import commentsWebSocketService from "./websocket/comments/comments-websocket.service";
 import { removeInvalidFiles } from "@/utils/files.utils";
+import { errorNotify } from "@/utils/notifications.utils";
 
 class CommentsService extends BaseService {
   getComments({ page, limit, orderBy, order }: GetCommentsProps) {
@@ -56,30 +56,20 @@ class CommentsService extends BaseService {
   ) {
     return async (dispatch: AppDispatch) => {
       dispatch(createCommentRequest());
-      try {
-        const token: string = cookiesService.getToken();
-        const formData = new FormData();
-        formData.append(
-          "commentData",
-          new Blob([JSON.stringify(commentData)], { type: "application/json" })
-        );
-        files.forEach((file) => {
-          formData.append("files", file);
-        });
-        await commentsApi.commentsCreateRequest(token, formData, captcha);
-        dispatch(createCommentSuccess());
-      } catch (error) {
-        super.errorHandler(error, (err) => {
-          dispatch(createCommentFailed(err));
-          authService.deauthIfShould(err, dispatch);
-        });
-      }
+      const token: string = cookiesService.getToken();
+      await commentsWebSocketService.emitCreateComment(
+        token,
+        commentData,
+        files,
+        captcha
+      );
     };
   }
 
   onCommentPublished() {
     return async (dispatch: AppDispatch) => {
       commentsWebSocketService.onCommentPublished((comment) => {
+        dispatch(createCommentSuccess());
         dispatch(insertComment(comment));
       });
     };
@@ -87,6 +77,18 @@ class CommentsService extends BaseService {
 
   offCommentPublished(): void {
     commentsWebSocketService.offCommentPublished();
+  }
+
+  onCommentCreateError() {
+    return async (dispatch: AppDispatch) => {
+      commentsWebSocketService.onCommentCreateError((id, message) => {
+        dispatch(createCommentFailed(message));
+        errorNotify(message);
+      });
+    };
+  }
+  offCommentCreateError(): void {
+    commentsWebSocketService.offCommentCreateError();
   }
 
   removeInvalidAttachments(files: File[]): [File[], Set<string>] {

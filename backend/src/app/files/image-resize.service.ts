@@ -10,6 +10,7 @@ export class ImageResizeService {
     maxHeight: number,
   ): Promise<ImageUpload> {
     const metadata = await sharp(image.buffer).metadata();
+
     if (!metadata.width || !metadata.height) return image;
 
     if (metadata.width > maxWidth || metadata.height > maxHeight) {

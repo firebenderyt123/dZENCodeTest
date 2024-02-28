@@ -72,7 +72,7 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
 
   const parentTextBlock = parentCommentText && (
     <ParentTextBlock onClick={handleClick}>
-      <CommentText html={parentCommentText} />
+      <CommentText html={parentCommentText} component="span" />
     </ParentTextBlock>
   );
 
@@ -111,7 +111,7 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
             {replyButton}
           </InlineBox>
           {parentTextBlock}
-          <CommentText html={text} />
+          <CommentText html={text} component="p" />
           {attachmentsBlock}
           {commentForm.state.replyToCommentId === id && (
             <CommentCreateFormStyled />
@@ -176,6 +176,7 @@ const CommentText = styled(BoxInnerHtml)(() => ({
   width: "100%",
   padding: "0.5rem 0 0",
   overflow: "hidden",
+  overflowWrap: "break-word",
 }));
 
 const LinkStyled = styled(Link)(() => ({
