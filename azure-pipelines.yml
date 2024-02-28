@@ -1,0 +1,85 @@
+trigger:
+- master
+
+variables:
+
+  azureSubscription: '423ee4dd-f7fa-432e-bfb8-9c0049a1810b'
+
+  webAppName: 'dzencode-backend'
+
+  environmentName: 'dzencode-backend'
+
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: Build stage
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '18.x'
+      displayName: 'Install Node.js'
+
+    - script: |
+        cd backend
+        yarn install --frozen-lockfile --production
+        yarn global add @nestjs/cli
+        yarn add sharp --ignore-engines
+        yarn run build
+        yarn migration:run
+      displayName: 'npm install, build and test'
+
+    - task: DownloadSecureFile@1
+      name: "dotenvStaging"
+      inputs:
+        secureFile: '.env.production'
+      displayName: "Download .env.production"
+
+    - task: CopyFiles@2
+      inputs:
+        sourceFolder: "$(Agent.TempDirectory)"
+        contents: ".env.production"
+        targetFolder: "$(System.DefaultWorkingDirectory)"
+      displayName: "Import .env.production"
+
+    - task: ArchiveFiles@2
+      displayName: 'Archive files'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/backend'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+        replaceExistingArchive: true
+
+    - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+      artifact: drop
+
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    environment: $(environmentName)
+    pool:
+      vmImage: $(vmImageName)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebApp@1
+            displayName: 'Azure Web App Deploy: dzencode-backend'
+            inputs:
+              azureSubscription: $(azureSubscription)
+              appType: webAppLinux
+              appName: $(webAppName)
+              runtimeStack: 'NODE|18-lts'
+              package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
+              startUpCommand: 'yarn run start:prod'
