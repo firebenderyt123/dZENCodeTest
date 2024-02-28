@@ -3,7 +3,7 @@ trigger:
 
 variables:
 
-  azureSubscription: '423ee4dd-f7fa-432e-bfb8-9c0049a1810b'
+  azureSubscription: '4a50d123-4152-49ed-b8b9-df618c4a7060'
 
   webAppName: 'dzencode-backend'
 
