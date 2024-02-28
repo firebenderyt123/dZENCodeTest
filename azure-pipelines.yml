@@ -43,7 +43,7 @@ stages:
       inputs:
         sourceFolder: "$(Agent.TempDirectory)"
         contents: ".env.production"
-        targetFolder: "$(System.DefaultWorkingDirectory)"
+        targetFolder: "$(System.DefaultWorkingDirectory)/backend"
       displayName: "Import .env.production"
 
     - task: ArchiveFiles@2
