@@ -29,7 +29,6 @@ stages:
     - script: |
         cd backend
         yarn install --frozen-lockfile --production
-        yarn global add @nestjs/cli
         yarn add sharp --ignore-engines
         yarn run build
       displayName: 'npm install, build and test'
