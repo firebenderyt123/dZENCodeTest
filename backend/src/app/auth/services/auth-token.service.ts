@@ -9,10 +9,6 @@ import { JwtPayload } from '../interfaces/jwt-payload.interface';
 export class AuthTokenService {
   constructor(private jwtService: JwtService) {}
 
-  async verifyAsync(token: string) {
-    return this.jwtService.verifyAsync<JwtPayload>(token);
-  }
-
   getTokenPayload(req: FastifyRequest): JwtPayload {
     const token = this.extractTokenFromHeader(req);
     const payload = this.jwtService.decode<JwtPayload>(token);

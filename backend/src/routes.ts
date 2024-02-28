@@ -1,6 +1,6 @@
 import { Routes } from '@nestjs/core';
 import { AuthModule } from './app/auth/modules/auth.module';
-import { CommentsModule } from './app/comments/modules/comments.module';
+import { CommentsModule } from './app/comments/comments.module';
 import { UsersModule } from './app/users/modules/users.module';
 
 export const routes: Routes = [
