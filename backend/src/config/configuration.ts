@@ -1,6 +1,6 @@
 export default () => ({
   NODE_ENV: process.env.NODE_ENV,
-  port: parseInt(process.env.APP_PORT, 10) || 8080,
+  port: parseInt(process.env.APP_PORT, 10) || 8000,
   database: {
     host: process.env.POSTGRES_HOST || 'localhost',
     port: parseInt(process.env.POSTGRES_PORT, 10) || 5432,
