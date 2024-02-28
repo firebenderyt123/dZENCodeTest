@@ -46,8 +46,8 @@ First, run the development server:
 2.  Clone the repository and change directory to **dZENCodeTest**:
 
 ```bash
-    git clone https://github.com/firebenderyt123/dZENCodeTest
-    cd dZENCodeTest
+git clone https://github.com/firebenderyt123/dZENCodeTest
+cd dZENCodeTest
 ```
 
 ### Configurating ⚙️
@@ -133,27 +133,19 @@ First, run the development server:
 2.  **To build and run** docker containers (frontend and backend), you need to write **one** of the following commands:
 
 ```bash
-
-    npm run start
-
+npm run start
 ```
 
 ```bash
-
-    yarn start
-
+yarn start
 ```
 
 ```bash
-
-    pnpm start
-
+pnpm start
 ```
 
 ```bash
-
-    bun start
-
+bun start
 ```
 
 3. Once the script is successfully executed, you will be able to connect to your application from a browser at the address you have prescribed in the env file. The default is [http://localhost:3000](http://localhost:3000)
