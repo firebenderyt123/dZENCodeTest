@@ -32,7 +32,6 @@ stages:
         yarn global add @nestjs/cli
         yarn add sharp --ignore-engines
         yarn run build
-        yarn migration:run
       displayName: 'npm install, build and test'
 
     - task: DownloadSecureFile@1
@@ -82,4 +81,4 @@ stages:
               appName: $(webAppName)
               runtimeStack: 'NODE|18-lts'
               package: $(Pipeline.Workspace)/drop/$(Build.BuildId).zip
-              startUpCommand: 'yarn run start:prod'
+              startUpCommand: 'yarn migration:run && yarn run start:prod'
