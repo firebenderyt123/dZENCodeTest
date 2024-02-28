@@ -6,8 +6,6 @@ import commentsService, { GetCommentsProps } from "@/services/comments.service";
 interface CommentsContextType {
   state: CommentsState;
   getComments: (props: Partial<GetCommentsProps>) => void;
-  onCommentPublished: () => void;
-  offCommentPublished: () => void;
 }
 
 const CommentsContext = createContext<CommentsContextType | null>(null);
@@ -42,21 +40,11 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
     [state.params, dispatch]
   );
 
-  const onCommentPublished = useCallback(() => {
-    dispatch(commentsService.onCommentPublished());
-  }, [dispatch]);
-
-  const offCommentPublished = useCallback(() => {
-    commentsService.offCommentPublished();
-  }, []);
-
   return (
     <CommentsContext.Provider
       value={{
         state,
         getComments,
-        onCommentPublished,
-        offCommentPublished,
       }}>
       {children}
     </CommentsContext.Provider>
