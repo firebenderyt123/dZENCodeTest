@@ -7,7 +7,7 @@ variables:
 
   webAppName: 'dzencode-backend'
 
-  environmentName: 'dzencode-backend'
+  environmentName: 'production'
 
   vmImageName: 'ubuntu-latest'
 
