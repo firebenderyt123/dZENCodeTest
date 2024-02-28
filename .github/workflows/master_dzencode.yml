@@ -31,7 +31,8 @@ jobs:
       with:
         push: true
         tags: dzencodecontainer.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_3d1f33afb8f144cdb52e0c8ae6daf472 }}/dzencode-backend:${{ github.sha }}
-        file: ./backend/Dockerfile
+        file: ./Dockerfile
+        context: ./backend
 
   deploy:
     runs-on: ubuntu-latest
