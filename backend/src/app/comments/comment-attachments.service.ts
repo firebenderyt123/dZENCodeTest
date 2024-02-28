@@ -1,9 +1,9 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { FilesService } from '../../files/files.service';
-import { CommentAttachment } from '../entities/comment-attachment.entity';
-import { FileInput } from 'src/app/files/interfaces/file-input.interface';
+import { FilesService } from '../files/files.service';
+import { CommentAttachment } from './comment-attachment.entity';
+import { FileUpload } from '../files/interfaces/file-upload.interface';
 
 @Injectable()
 export class CommentAttachmentsService {
@@ -15,15 +15,15 @@ export class CommentAttachmentsService {
 
   async saveAttachments(
     commentId: number,
-    files: FileInput[],
+    files: FileUpload[],
   ): Promise<CommentAttachment[]> {
-    const savedFiles = await this.filesService.saveFiles(files);
-    const savedAttachments: CommentAttachment[] = [];
-
     const manager = this.commentAttachmentRepository.manager;
     const queryRunner = manager.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
+
+    const savedFiles = await this.filesService.saveFiles(files);
+    const savedAttachments: CommentAttachment[] = [];
     try {
       for (const file of savedFiles) {
         savedAttachments.push(

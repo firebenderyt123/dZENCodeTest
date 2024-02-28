@@ -26,7 +26,7 @@ export class UsersProfileController {
   async patchProfile(
     @Req() req: FastifyRequest,
     @Body() data: PatchUserDto,
-  ): Promise<any> {
+  ): Promise<User> {
     const { id } = this.authTokenService.getTokenPayload(req);
     const user = await this.usersProfileService.patchUser(id, data);
     return user;
