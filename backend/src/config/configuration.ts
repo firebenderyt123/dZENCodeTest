@@ -7,10 +7,17 @@ export default () => ({
     name: process.env.POSTGRES_DB,
     user: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
+    ssl: process.env.NODE_ENV !== 'development' && {
+      rejectUnauthorized: false,
+    },
   },
   redis: {
     host: process.env.REDIS_HOST,
     port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASSWORD,
+    tls: process.env.NODE_ENV !== 'development' && {
+      rejectUnauthorized: false,
+    },
   },
   jwt: {
     secret: process.env.JWT_SECRET,
