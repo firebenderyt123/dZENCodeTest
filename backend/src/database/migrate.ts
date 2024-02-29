@@ -18,4 +18,7 @@ export const dataSource = new DataSource({
   password: process.env.POSTGRES_PASSWORD,
   migrations: migrations,
   synchronize: false,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });

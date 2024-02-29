@@ -37,6 +37,9 @@ import { ConfigureModule } from './queue/config.module';
         password: configService.get('database.password'),
         autoLoadEntities: true,
         synchronize: false,
+        ssl: {
+          rejectUnauthorized: false,
+        },
       }),
       inject: [ConfigService],
     }),
