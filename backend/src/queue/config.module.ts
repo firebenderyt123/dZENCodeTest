@@ -1,21 +1,28 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { QUEUE } from './queue.enums';
 import { CommentsModule } from 'src/app/comments/modules/comments.module';
 
 @Module({
   imports: [
+    CacheModule.register({
+      isGlobal: true,
+      useFactory: (configService: ConfigService) => {
+        return {
+          store: redisStore,
+          ...configService.get('redis'),
+        };
+      },
+      inject: [ConfigService],
+    }),
     EventEmitterModule.forRoot(),
     BullModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
-        redis: {
-          host: configService.get('redis.host'),
-          port: configService.get('redis.port'),
-          password: configService.get('redis.password'),
-          tls: configService.get('redis.tls'),
-        },
+        redis: configService.get('redis'),
         defaultJobOptions: {
           removeOnComplete: 1000,
           removeOnFail: 5000,
@@ -24,10 +31,10 @@ import { CommentsModule } from 'src/app/comments/modules/comments.module';
       }),
       inject: [ConfigService],
     }),
-    ...Object.keys(QUEUE).map((key) =>
-      BullModule.registerQueue({
+    BullModule.registerQueueAsync(
+      ...Object.keys(QUEUE).map((key) => ({
         name: QUEUE[key],
-      }),
+      })),
     ),
     CommentsModule,
   ],

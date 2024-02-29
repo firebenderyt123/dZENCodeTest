@@ -13,10 +13,9 @@ import { ConfigureModule } from './queue/config.module';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      envFilePath:
-        configuration().NODE_ENV !== 'production'
-          ? '.env.development'
-          : '.env.production',
+      envFilePath: !configuration().NODE_ENV.includes('production')
+        ? '.env.development'
+        : '.env.production',
     }),
     GoogleRecaptchaModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
