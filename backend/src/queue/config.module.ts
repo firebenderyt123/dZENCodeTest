@@ -1,31 +1,56 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
-import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-redis-store';
+import { CacheModule, CacheStore } from '@nestjs/cache-manager';
+import type { RedisClientOptions } from 'redis';
+import { redisStore } from 'cache-manager-redis-store';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { QUEUE } from './queue.enums';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
+import configuration from 'src/config/configuration';
+import { getEnvFile } from 'src/utils/environment.utils';
 import { CommentsModule } from 'src/app/comments/modules/comments.module';
+import { QUEUE } from './queue.enums';
 
 @Module({
   imports: [
-    CacheModule.register({
+    ConfigModule.forRoot({
       isGlobal: true,
-      useFactory: (configService: ConfigService) => {
+      load: [configuration],
+      envFilePath: getEnvFile(),
+    }),
+    CacheModule.registerAsync<RedisClientOptions>({
+      isGlobal: true,
+      useFactory: async (configService: ConfigService) => {
+        const store = await redisStore({
+          database: 1,
+          socket: {
+            host: configService.get('redis.host'),
+            port: +configService.get('redis.port'),
+          },
+          password: configService.get('redis.password'),
+          ttl: configService.get('cache.ttl'),
+        });
         return {
-          store: redisStore,
-          ...configService.get('redis'),
+          store: store as unknown as CacheStore,
         };
       },
       inject: [ConfigService],
     }),
     EventEmitterModule.forRoot(),
+    GoogleRecaptchaModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        ...configService.get('recaptcha'),
+        response: (req) => req.headers.recaptcha,
+      }),
+      inject: [ConfigService],
+    }),
     BullModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         redis: configService.get('redis'),
         defaultJobOptions: {
           removeOnComplete: 1000,
-          removeOnFail: 5000,
+          removeOnFail: 4000,
           attempts: 3,
         },
       }),
@@ -36,6 +61,20 @@ import { CommentsModule } from 'src/app/comments/modules/comments.module';
         name: QUEUE[key],
       })),
     ),
+    TypeOrmModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('database.host'),
+        port: configService.get('database.port'),
+        database: configService.get('database.name'),
+        username: configService.get('database.user'),
+        password: configService.get('database.password'),
+        autoLoadEntities: true,
+        synchronize: false,
+        ssl: configService.get('database.ssl'),
+      }),
+      inject: [ConfigService],
+    }),
     CommentsModule,
   ],
 })
