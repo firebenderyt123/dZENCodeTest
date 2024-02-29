@@ -4,9 +4,9 @@ import { Repository } from 'typeorm';
 import { randomBytes } from 'crypto';
 import { AzureBlobService } from '../azure/azure-blob.service';
 import { File } from './file.entity';
-import { FileUpload } from './interfaces/file-upload.interface';
 import { ImageResizeService } from './image-resize.service';
 import { ImageUpload } from './interfaces/image-upload.interface';
+import { FileInput } from 'src/app/files/interfaces/file-input.interface';
 
 @Injectable()
 export class FilesService {
@@ -19,15 +19,16 @@ export class FilesService {
     private imageResizeService: ImageResizeService,
   ) {}
 
-  async saveFiles(files: FileUpload[]) {
-    const filesToUpload: FileUpload[] = [];
-    for (const file of files) {
+  async saveFiles(files: FileInput[]) {
+    const filesToUpload: FileInput[] = files.filter(async (file) => {
       const isImage = this.isFileImage(file);
 
       if (isImage) {
-        filesToUpload.push(await this.resizeImage(file as ImageUpload));
+        return await this.resizeImage(file as ImageUpload);
       }
-    }
+      return false;
+    });
+
     return await this.saveFilesToDB(filesToUpload);
   }
 
@@ -44,8 +45,8 @@ export class FilesService {
     await this.filesRepository.delete(id);
   }
 
-  private isFileImage(file: FileUpload): boolean {
-    return this.allowedImageTypes.includes(file.mimetype);
+  private isFileImage(file: FileInput): boolean {
+    return this.allowedImageTypes.includes(file.type);
   }
 
   private async resizeImage(
@@ -60,13 +61,13 @@ export class FilesService {
     );
   }
 
-  private async uploadToAzure(file: FileUpload): Promise<{
+  private async uploadToAzure(file: FileInput): Promise<{
     containerName: 'files' | 'images';
     blobName: string;
     fileUrl: string;
   }> {
-    const { originalname, buffer } = file;
-    const extension = originalname.split('.').pop();
+    const { name, buffer } = file;
+    const extension = name.split('.').pop();
     const newFileName = randomBytes(16).toString('hex') + '.' + extension;
 
     const containerName = extension === 'txt' ? 'files' : 'images';
@@ -89,7 +90,7 @@ export class FilesService {
     return { containerName, blobName, fileUrl };
   }
 
-  private async saveFilesToDB(files: FileUpload[]): Promise<File[]> {
+  private async saveFilesToDB(files: FileInput[]): Promise<File[]> {
     const queryRunner =
       this.filesRepository.manager.connection.createQueryRunner();
     await queryRunner.connect();
@@ -100,8 +101,8 @@ export class FilesService {
       for (const file of files) {
         const uploadedFile = await this.uploadToAzure(file);
         savedFiles.push(await queryRunner.manager.save(File, uploadedFile));
-        await queryRunner.commitTransaction();
       }
+      await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

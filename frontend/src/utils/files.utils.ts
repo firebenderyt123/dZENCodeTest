@@ -1,3 +1,5 @@
+import { FileToSend } from "@/services/websocket/comments/interfaces/file-send.interface";
+
 export function removeInvalidFiles(files: File[]): [File[], Set<string>] {
   const errors = new Set<string>();
   const newFilesArray = files.filter((file) => {
@@ -20,4 +22,17 @@ export function removeInvalidFiles(files: File[]): [File[], Set<string>] {
     }
   });
   return [newFilesArray, errors];
+}
+
+export async function createFilesToSend(files: File[]) {
+  const filesToSend: FileToSend[] = [];
+  for (const file of files) {
+    filesToSend.push({
+      name: file.name,
+      buffer: await file.arrayBuffer(),
+      size: file.size,
+      type: file.type,
+    });
+  }
+  return filesToSend;
 }

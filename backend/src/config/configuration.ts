@@ -8,6 +8,10 @@ export default () => ({
     user: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
   },
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+  },
   jwt: {
     secret: process.env.JWT_SECRET,
     expiresIn: process.env.JWT_EXPIRATION_TIME,
