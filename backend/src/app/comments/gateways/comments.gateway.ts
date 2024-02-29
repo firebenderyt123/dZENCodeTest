@@ -1,5 +1,6 @@
 import { Injectable, UseGuards } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -37,12 +38,15 @@ export class CommentsGateway
 
   @UseGuards(JwtWebSocketAuthGuard, RecaptchaWebSocketGuard)
   @SubscribeMessage(COMMENTS_JOBS.CREATE_COMMENT)
-  async onCommentCreate(@MessageBody() body: CommentsCreate) {
-    console.log(body);
+  async onCommentCreate(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: CommentsCreate,
+  ) {
     await this.commentsQueueService.createCommentJob(
       COMMENTS_JOBS.CREATE_COMMENT,
       body,
     );
+    client.disconnect();
   }
 
   commentPublishedBroadcast(comment: CommentCreated) {

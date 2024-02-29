@@ -11,7 +11,6 @@ export class CommentsQueueService {
   ) {}
 
   async createCommentJob(event: string, data: CommentsCreate) {
-    console.log(event, data);
     await this.commentsQueue.add(event, data);
   }
 }

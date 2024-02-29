@@ -3,10 +3,9 @@ import { migrations } from './migrations';
 import { config } from 'dotenv';
 
 config({
-  path:
-    process.env.NODE_ENV !== 'production'
-      ? '.env.development'
-      : '.env.production',
+  path: !process.env.NODE_ENV.includes('production')
+    ? '.env.development'
+    : '.env.production',
 });
 
 export const dataSource = new DataSource({
@@ -18,7 +17,7 @@ export const dataSource = new DataSource({
   password: process.env.POSTGRES_PASSWORD,
   migrations: migrations,
   synchronize: false,
-  ssl: process.env.NODE_ENV !== 'development' && {
+  ssl: process.env.NODE_ENV.includes('production') && {
     rejectUnauthorized: false,
   },
 });

@@ -1,3 +1,11 @@
+import { config } from 'dotenv';
+
+config({
+  path: !process.env.NODE_ENV.includes('production')
+    ? '.env.development'
+    : '.env.production',
+});
+
 export default () => ({
   NODE_ENV: process.env.NODE_ENV,
   port: parseInt(process.env.APP_PORT, 10) || 8000,
@@ -7,7 +15,7 @@ export default () => ({
     name: process.env.POSTGRES_DB,
     user: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
-    ssl: process.env.NODE_ENV !== 'development' && {
+    ssl: process.env.NODE_ENV.includes('production') && {
       rejectUnauthorized: false,
     },
   },
@@ -15,7 +23,7 @@ export default () => ({
     host: process.env.REDIS_HOST,
     port: process.env.REDIS_PORT,
     password: process.env.REDIS_PASSWORD,
-    tls: process.env.NODE_ENV !== 'development' && {
+    tls: process.env.NODE_ENV.includes('production') && {
       rejectUnauthorized: false,
     },
   },
