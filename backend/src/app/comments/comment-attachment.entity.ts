@@ -5,8 +5,8 @@ import {
   OneToOne,
   PrimaryColumn,
 } from 'typeorm';
-import { File } from '../../files/file.entity';
-import { Comment } from './comment.entity';
+import { File } from '../files/file.entity';
+import { Comment } from '../comments/comment.entity';
 
 @Entity('comment_attachments')
 export class CommentAttachment {
