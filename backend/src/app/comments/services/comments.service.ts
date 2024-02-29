@@ -1,13 +1,13 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, FindOptionsOrder, IsNull, Repository } from 'typeorm';
-import { UsersProfileService } from '../users/services/users-profile.service';
-import { Comment } from './comment.entity';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { FileUpload } from '../files/interfaces/file-upload.interface';
+import { UsersProfileService } from '../../users/services/users-profile.service';
+import { Comment } from '../entities/comment.entity';
+import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentAttachmentsService } from './comment-attachments.service';
-import { CommentCreated } from './interfaces/comment-created.interface';
-import { CommentList } from './interfaces/comment-list';
+import { CommentCreated } from '../interfaces/comment-created.interface';
+import { CommentList } from '../interfaces/comment-list';
+import { FileInput } from 'src/app/files/interfaces/file-input.interface';
 
 @Injectable()
 export class CommentsService {
@@ -21,7 +21,7 @@ export class CommentsService {
   async create(
     userId: number,
     commentData: CreateCommentDto,
-    files: FileUpload[],
+    files: FileInput[],
   ): Promise<CommentCreated> {
     const { parentId, text } = commentData;
 
