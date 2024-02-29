@@ -38,6 +38,7 @@ export class CommentsGateway
   @UseGuards(JwtWebSocketAuthGuard, RecaptchaWebSocketGuard)
   @SubscribeMessage(COMMENTS_JOBS.CREATE_COMMENT)
   async onCommentCreate(@MessageBody() body: CommentsCreate) {
+    console.log(body);
     await this.commentsQueueService.createCommentJob(
       COMMENTS_JOBS.CREATE_COMMENT,
       body,

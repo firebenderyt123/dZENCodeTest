@@ -21,8 +21,9 @@ export class RecaptchaWebSocketGuard implements CanActivate {
     }
 
     try {
-      const verificationResult =
-        await this.recaptchaValidator.validate(captcha);
+      const verificationResult = await this.recaptchaValidator.validate({
+        response: captcha,
+      });
       if (verificationResult.success) {
         return true;
       }
