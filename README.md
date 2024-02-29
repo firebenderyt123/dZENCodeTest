@@ -54,61 +54,44 @@ cd dZENCodeTest
 
 1.  To configure the **frontend** of application for a production environment, you will need to go to the frontend directory and create an _.env.production_ file based on _.env-example_ and specify the required parameters. Here are the parameters you need to rename and specify:
 
-> **BLOB_HOSTNAME**: This parameter is used to specify the host
-> where media files (images and text files) are stored. You must to use [Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs)
->
-> **API_ROOT**: This parameter is used to specify the root URL of your
-> application's API. This is the address of your server where
-> the application's backend code is deployed. For example, if your
-> server is deployed on localhost and listening on port 8000, the URL
-> would be http://localhost:8000/api/v1.
->
-> **WS_ROOT**: This parameter is used to configure a WebSocket
-> connection for real-time communication. For example, if your
-> backend deployed on localhost and is listening on port 8000,
-> the URL would be ws://localhost:8000.
->
-> **GOOGLE_RECAPTCHA_PUBLIC_KEY**: This parameter is used to specify the
-> reCAPTCHA public key if your application uses this service to protect
-> against spam and bots. Get this key from the official [Google reCAPTCHA](https://www.google.com/recaptcha/about/)
-> website. **_You must to use reCAPTCHA v2_**
+> **BLOB_HOSTNAME**: This parameter is used to specify the host where media files (images and text files) are stored. You must to use [Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs)
+
+> **API_ROOT**: This parameter is used to specify the root URL of your application's API. This is the address of your server where the application's backend code is deployed. For example, if your server is deployed on localhost and listening on port 8000, the URL would be http://localhost:8000/api/v1.
+
+> **WS_ROOT**: This parameter is used to configure a WebSocket connection for real-time communication. For example, if your backend deployed on localhost and is listening on port 8000, the URL would be ws://localhost:8000.
+
+> **GOOGLE_RECAPTCHA_PUBLIC_KEY**: This parameter is used to specify the reCAPTCHA public key if your application uses this service to protect against spam and bots. Get this key from the official [Google reCAPTCHA](https://www.google.com/recaptcha/about/) website. **_You must to use reCAPTCHA v2_**
 
 2. To configure the **backend** of your application, you need to go to the backend directory
    and create an _.env.production_ file based on _.env-example_ and specify the following parameters:
 
-> **POSTGRES_HOST**: The host on which the PostgreSQL database is deployed.
-> This is usually localhost if the database is deployed locally.
->
-> **POSTGRES_PORT**: The port on which PostgreSQL listens for connections.
-> The default is 5432.
->
-> **POSTGRES_DB**: The name of the PostgreSQL database to which your
-> application will connect.
->
+> **POSTGRES_HOST**: The host on which the PostgreSQL database is deployed. This is usually localhost if the database is deployed locally.
+
+> **POSTGRES_PORT**: The port on which PostgreSQL listens for connections. The default is 5432.
+
+> **POSTGRES_DB**: The name of the PostgreSQL database to which your application will connect.
+
 > **POSTGRES_USER**: The PostgreSQL user who has access to the database.
->
-> **POSTGRES_PASSWORD**: The password of the PostgreSQL user to access the
-> database.
->
-> **JWT_SECRET**: The secret key for signing and verifying JWT tokens used
-> for user authentication. Simply generate a long string of different characters
->
-> **JWT_EXPIRATION_TIME**: The lifetime of the JWT token, specified in
-> seconds such time format ("1h" for one hour, "7d" for seven days, etc.).
->
-> **CORS_ORIGIN**: The allowed source for CORS requests. This is the address
-> of your frontend application that will be accessing the backend.
-> Typically, this is http://localhost:3000.
->
-> **AZURE_STORAGE_ACCOUNT_NAME**: The Azure Blob storage account name
-> for Azure Blob Storage.
->
-> **AZURE_STORAGE_ACCOUNT_KEY**: [The Azure Blob Storage account key](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage?tabs=azure-portal) required
-> for authentication when accessing the storage.
->
-> **GOOGLE_RECAPTCHA_SECRET_KEY**: [The secret key for reCAPTCHA](https://cloud.google.com/recaptcha-enterprise/docs/create-key-website) verification
-> if your application uses this service to protect against spam and
-> bots.
+
+> **POSTGRES_PASSWORD**: The password of the PostgreSQL user to access the database.
+
+> **REDIS_HOST**: The host on which the Redis server is deployed. This variable specifies the hostname or IP address where the Redis server is running. If Redis is deployed locally, you can set this to `localhost`.
+
+> **REDIS_PORT**: The port on which the Redis server listens for connections. The default port for Redis is 6379. If your Redis server is configured to use a different port, specify it here.
+
+> **REDIS_PASSWORD**: The password required to authenticate and access the Redis server. If your Redis server is password-protected, you should provide the password here. If no password is set, leave this variable empty.
+
+> **JWT_SECRET**: The secret key for signing and verifying JWT tokens used for user authentication. Simply generate a long string of different characters
+
+> **JWT_EXPIRATION_TIME**: The lifetime of the JWT token, specified in seconds such time format ("1h" for one hour, "7d" for seven days, etc.).
+
+> **CORS_ORIGIN**: The allowed source for CORS requests. This is the address of your frontend application that will be accessing the backend. Typically, this is http://localhost:3000.
+
+> **AZURE_STORAGE_ACCOUNT_NAME**: The Azure Blob storage account name for Azure Blob Storage.
+
+> **AZURE_STORAGE_ACCOUNT_KEY**: [The Azure Blob Storage account key](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage?tabs=azure-portal) required for authentication when accessing the storage.
+
+> **GOOGLE_RECAPTCHA_SECRET_KEY**: [The secret key for reCAPTCHA](https://cloud.google.com/recaptcha-enterprise/docs/create-key-website) verification if your application uses this service to protect against spam and bots.
 
 ### Build and Run the App 🔨
 
