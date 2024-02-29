@@ -14,6 +14,7 @@ import UserInfo from "../UserInfo";
 import { useUser } from "@/contexts/UserContext";
 import { useCommentForm } from "@/contexts/CommentFormContext";
 import { Box, BoxProps, styled } from "@mui/joy";
+import { useCallback } from "react";
 
 export default function CommentCreateForm(props: BoxProps) {
   const commentForm = useCommentForm();
@@ -28,15 +29,18 @@ export default function CommentCreateForm(props: BoxProps) {
     resolver: yupResolver<ChangeUserInfoSchema>(changeUserInfoSchema),
   });
 
-  const commentFormSubmit = (data: CreateCommentProps, captcha: string) => {
-    changeUserForm.trigger().then((isValid) => {
-      if (!isValid) return;
+  const commentFormSubmit = useCallback(
+    (data: CreateCommentProps, captcha: string) => {
+      changeUserForm.trigger().then((isValid) => {
+        if (!isValid) return;
 
-      const userData = changeUserForm.getValues();
-      user?.updateUserInfo(userData);
-      commentForm?.createComment(data, captcha);
-    });
-  };
+        const userData = changeUserForm.getValues();
+        user?.updateUserInfo(userData);
+        commentForm?.createComment(data, captcha);
+      });
+    },
+    [changeUserForm, commentForm, user]
+  );
 
   return user?.state.user ? (
     <ContainerFormStyled {...props}>
