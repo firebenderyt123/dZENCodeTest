@@ -14,9 +14,7 @@ import { CommentsModule } from 'src/app/comments/modules/comments.module';
           host: configService.get('redis.host'),
           port: configService.get('redis.port'),
           password: configService.get('redis.password'),
-          tls: {
-            rejectUnauthorized: false,
-          },
+          tls: configService.get('redis.tls'),
         },
         defaultJobOptions: {
           removeOnComplete: 1000,
