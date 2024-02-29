@@ -14,6 +14,7 @@ export default abstract class BaseService {
       } else newMessage = error.message;
       callback({ message: newMessage, statusCode: error.statusCode });
     } else {
+      console.log(error);
       const errorMessage = "Oops.. Server error :(";
       this.showError(errorMessage);
       callback({ message: errorMessage, statusCode: 500 });
