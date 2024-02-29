@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { COMMENTS_EVENTS } from '../enums/comments.enum';
+import { COMMENTS_EVENTS } from '../enums/comments-events.enum';
 import { CommentCreated } from 'src/app/comments/interfaces/comment-created.interface';
 
 @Injectable()

@@ -74,7 +74,6 @@ class CommentsService extends BaseService {
       });
     };
   }
-
   offCommentPublished(): void {
     commentsWebSocketService.offCommentPublished();
   }

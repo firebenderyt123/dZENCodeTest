@@ -2,7 +2,7 @@ import { OnQueueFailed, Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
 import { QUEUE } from '../../../queue/queue.enums';
 import { CommentsEventEmitterService } from '../services/comments-emitter.service';
-import { COMMENTS_JOBS } from '../enums/comments.enum';
+import { COMMENTS_JOBS } from '../enums/comments-jobs.enum';
 import { CommentsService } from 'src/app/comments/services/comments.service';
 import { getValidFiles, isValidationError } from 'src/utils/validate.utils';
 import { CreateCommentDto } from 'src/app/comments/dto/create-comment.dto';

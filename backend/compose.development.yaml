@@ -1,7 +1,9 @@
 services:
   server:
     env_file:
-      - .env.production
+      - .env.development
+    environment:
+      - NODE_ENV=development
     build:
       context: .
     ports:
@@ -11,7 +13,9 @@ services:
         condition: service_healthy
   db:
     env_file:
-      - .env.production
+      - .env.development
+    environment:
+      - NODE_ENV=development
     image: postgres
     restart: always
     expose:
@@ -26,7 +30,9 @@ services:
 
   redis:
     env_file:
-      - '.env.production'
+      - '.env.development'
+    environment:
+      - NODE_ENV=development
     image: redis:latest
     restart: always
     ports:

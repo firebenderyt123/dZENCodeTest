@@ -1,5 +1,6 @@
 import { Injectable, UseGuards } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -10,7 +11,8 @@ import {
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { CommentCreated } from 'src/app/comments/interfaces/comment-created.interface';
-import { COMMENTS_EVENTS, COMMENTS_JOBS } from '../enums/comments.enum';
+import { COMMENTS_EVENTS } from '../enums/comments-events.enum';
+import { COMMENTS_JOBS } from '../enums/comments-jobs.enum';
 import { WS_NAMESPACE } from '../../../queue/websocket.enums';
 import { CommentsCreate } from '../interfaces/comment-create.interface';
 import { JwtWebSocketAuthGuard } from 'src/app/auth/guards/jwt-websocket-auth.guard';
@@ -37,14 +39,15 @@ export class CommentsGateway
 
   @UseGuards(JwtWebSocketAuthGuard, RecaptchaWebSocketGuard)
   @SubscribeMessage(COMMENTS_JOBS.CREATE_COMMENT)
-  async onCommentCreate(@MessageBody() body: CommentsCreate) {
-    await this.commentsQueueService.createCommentJob(
-      COMMENTS_JOBS.CREATE_COMMENT,
-      body,
-    );
+  async onCommentCreate(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: CommentsCreate,
+  ) {
+    await this.commentsQueueService.createCommentJob(body);
+    client.disconnect();
   }
 
-  commentPublishedBroadcast(comment: CommentCreated) {
+  commentCreationSuccess(comment: CommentCreated) {
     this.server.emit(COMMENTS_EVENTS.COMMENT_CREATED, comment);
   }
 

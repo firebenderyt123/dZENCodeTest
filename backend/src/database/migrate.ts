@@ -1,12 +1,10 @@
 import { DataSource } from 'typeorm';
 import { migrations } from './migrations';
 import { config } from 'dotenv';
+import { getEnvFile, parseBoolean } from 'src/utils/environment.utils';
 
 config({
-  path:
-    process.env.NODE_ENV !== 'production'
-      ? '.env.development'
-      : '.env.production',
+  path: getEnvFile(),
 });
 
 export const dataSource = new DataSource({
@@ -18,4 +16,7 @@ export const dataSource = new DataSource({
   password: process.env.POSTGRES_PASSWORD,
   migrations: migrations,
   synchronize: false,
+  ssl: parseBoolean(process.env.POSTGRES_SSL) && {
+    rejectUnauthorized: false,
+  },
 });

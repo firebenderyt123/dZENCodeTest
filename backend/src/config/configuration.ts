@@ -1,5 +1,6 @@
+import { isProd, parseBoolean } from 'src/utils/environment.utils';
+
 export default () => ({
-  NODE_ENV: process.env.NODE_ENV,
   port: parseInt(process.env.APP_PORT, 10) || 8000,
   database: {
     host: process.env.POSTGRES_HOST || 'localhost',
@@ -7,10 +8,21 @@ export default () => ({
     name: process.env.POSTGRES_DB,
     user: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
+    ssl: parseBoolean(process.env.POSTGRES_SSL) && {
+      rejectUnauthorized: false,
+    },
+  },
+  cache: {
+    ttl: parseInt(process.env.CACHE_TTL, 10) || 5000,
+    max: parseInt(process.env.CACHE_MAX, 10) || 120000,
   },
   redis: {
     host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
+    port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+    password: process.env.REDIS_PASSWORD,
+    tls: parseBoolean(process.env.REDIS_TLS) && {
+      rejectUnauthorized: false,
+    },
   },
   jwt: {
     secret: process.env.JWT_SECRET,
@@ -27,5 +39,7 @@ export default () => ({
   },
   recaptcha: {
     secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY,
+    skipIf: !isProd(),
+    debug: !isProd(),
   },
 });

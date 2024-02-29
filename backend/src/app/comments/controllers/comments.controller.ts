@@ -17,6 +17,7 @@ import { AuthTokenService } from '../../auth/services/auth-token.service';
 import { CommentAttachmentsService } from '../services/comment-attachments.service';
 import { CommentList } from '../interfaces/comment-list';
 import { GetCommentsListDto } from '../dto/get-comments-list.dto';
+import { CommentsCacheService } from '../services/comments-cache.service';
 
 @Controller()
 export class CommentsController {
@@ -24,14 +25,16 @@ export class CommentsController {
     private readonly authTokenService: AuthTokenService,
     private readonly commentsService: CommentsService,
     private readonly commentAttachmentsService: CommentAttachmentsService,
+    private readonly cacheService: CommentsCacheService,
   ) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getList(
-    @Query() getcommentsListParams: GetCommentsListDto,
-  ): Promise<CommentList> {
-    const { page, limit, order, orderBy } = getcommentsListParams;
+  async getList(@Query() params: GetCommentsListDto): Promise<CommentList> {
+    const { page, limit, order, orderBy } = params;
+
+    const commentsList = await this.cacheService.getCommentsList(params);
+    if (commentsList) return commentsList;
 
     const obj = {
       [orderBy]: order.toUpperCase(),
@@ -42,7 +45,13 @@ export class CommentsController {
             user: obj,
           }
         : obj;
-    return await this.commentsService.find(page, limit, orderObj);
+    const newCommentsList = await this.commentsService.find(
+      page,
+      limit,
+      orderObj,
+    );
+    await this.cacheService.setCommentsList(params, newCommentsList);
+    return newCommentsList;
   }
 
   @UseGuards(JwtAuthGuard)
