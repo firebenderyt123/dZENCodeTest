@@ -14,7 +14,7 @@ export class Comment {
   user: CommentAuthor;
 
   @Field()
-  createdAt: Date;
+  createdAt: string;
 
   @Field(() => [Comment], { defaultValue: [] })
   replies: Comment[];
