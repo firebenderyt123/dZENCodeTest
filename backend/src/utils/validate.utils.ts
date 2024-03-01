@@ -1,4 +1,4 @@
-import { ClassConstructor, plainToClass } from 'class-transformer';
+import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { validateOrReject } from 'class-validator';
 import {
   FileInput,
@@ -9,7 +9,7 @@ export async function isValidationError(
   dto: ClassConstructor<object>,
   data: object,
 ): Promise<Error | null> {
-  const dtoToValidate = plainToClass(dto, data);
+  const dtoToValidate = plainToInstance(dto, data);
   try {
     await validateOrReject(dtoToValidate);
   } catch (errors) {

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { COMMENTS_EVENTS } from '../enums/comments-events.enum';
-import { CommentCreated } from 'src/app/comments/interfaces/comment-created.interface';
+import { NewComment } from '../models/new-comment.model';
 
 @Injectable()
 export class CommentsEventEmitterService {
   constructor(private readonly eventEmitter: EventEmitter2) {}
 
-  async emitCreatedComment(data: CommentCreated) {
+  async emitCreatedComment(data: NewComment) {
     await this.eventEmitter.emitAsync(COMMENTS_EVENTS.COMMENT_CREATED, data);
   }
 

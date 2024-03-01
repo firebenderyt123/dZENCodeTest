@@ -37,6 +37,9 @@ export default () => ({
       accountKey: process.env.AZURE_STORAGE_ACCOUNT_KEY,
     },
   },
+  graphql: {
+    graphiql: !isProd(),
+  },
   recaptcha: {
     secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY,
     skipIf: !isProd(),

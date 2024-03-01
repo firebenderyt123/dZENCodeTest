@@ -1,23 +1,23 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
-import { CommentList } from '../interfaces/comment-list';
 import { COMMENTS_CACHE } from '../enums/comments-cache.enum';
-import { GetCommentsListDto } from '../dto/get-comments-list.dto';
 import { getSpecialKey } from 'src/utils/cache.utils';
 import { RedisCacheService } from 'src/interfaces/redis-cache-service.interface';
+import { GetCommentListArgs } from '../dto/get-comment-list.dto';
+import { CommentList } from '../models/comment-list.model';
 
 @Injectable()
 export class CommentsCacheService {
   constructor(@Inject(CACHE_MANAGER) private cacheService: RedisCacheService) {}
 
-  async getCommentsList(props: GetCommentsListDto): Promise<CommentList> {
+  async getCommentsList(props: GetCommentListArgs): Promise<CommentList> {
     const key = getSpecialKey(COMMENTS_CACHE.COMMENTS_LIST, props);
     const data = await this.cacheService.get<CommentList>(key);
     return data;
   }
 
   async setCommentsList(
-    props: GetCommentsListDto,
+    props: GetCommentListArgs,
     value: CommentList,
     ttl?: number,
   ): Promise<void> {

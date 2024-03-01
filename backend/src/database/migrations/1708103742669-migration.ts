@@ -55,11 +55,10 @@ export class Migration1708103742669 implements MigrationInterface {
     // COMMENT_ATTACHMENTS
     await queryRunner.query(`
         CREATE TABLE IF NOT EXISTS comment_attachments (
+            file_id INT PRIMARY KEY,
             comment_id INT NOT NULL,
-            file_id INT NOT NULL,
-            PRIMARY KEY (comment_id, file_id),
-            FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
             FOREIGN KEY (file_id) REFERENCES files(id) ON DELETE CASCADE,
+            FOREIGN KEY (comment_id) REFERENCES comments(id) ON DELETE CASCADE,
             UNIQUE(file_id)
         );
     `);

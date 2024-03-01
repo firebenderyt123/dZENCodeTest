@@ -9,8 +9,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
 import configuration from 'src/config/configuration';
 import { getEnvFile } from 'src/utils/environment.utils';
-import { CommentsModule } from 'src/app/comments/modules/comments.module';
-import { QUEUE } from './queue.enums';
+import { GraphQLModule } from '@nestjs/graphql';
+import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
+import { modules } from 'src/routes';
 
 @Module({
   imports: [
@@ -45,6 +46,13 @@ import { QUEUE } from './queue.enums';
       }),
       inject: [ConfigService],
     }),
+    GraphQLModule.forRoot<MercuriusDriverConfig>({
+      driver: MercuriusDriver,
+      include: modules,
+      useGlobalPrefix: true,
+      autoSchemaFile: 'src/schema.gql',
+      graphiql: true,
+    }),
     BullModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         redis: configService.get('redis'),
@@ -56,11 +64,6 @@ import { QUEUE } from './queue.enums';
       }),
       inject: [ConfigService],
     }),
-    BullModule.registerQueueAsync(
-      ...Object.keys(QUEUE).map((key) => ({
-        name: QUEUE[key],
-      })),
-    ),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
@@ -75,7 +78,6 @@ import { QUEUE } from './queue.enums';
       }),
       inject: [ConfigService],
     }),
-    CommentsModule,
   ],
 })
 export class ConfigureModule {}

@@ -1,13 +1,15 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions, FindOptionsOrder, IsNull, Repository } from 'typeorm';
+import { plainToInstance } from 'class-transformer';
 import { UsersProfileService } from '../../users/services/users-profile.service';
-import { Comment } from '../entities/comment.entity';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentAttachmentsService } from './comment-attachments.service';
-import { CommentCreated } from '../interfaces/comment-created.interface';
-import { CommentList } from '../interfaces/comment-list';
 import { FileInput } from 'src/app/files/interfaces/file-input.interface';
+import { CommentList } from '../models/comment-list.model';
+import { NewComment } from '../models/new-comment.model';
+import { Comment as CommentModel } from '../models/comment.model';
+import { Comment } from '../entities/comment.entity';
 
 @Injectable()
 export class CommentsService {
@@ -22,7 +24,7 @@ export class CommentsService {
     userId: number,
     commentData: CreateCommentDto,
     files: FileInput[],
-  ): Promise<CommentCreated> {
+  ): Promise<NewComment> {
     const { parentId, text } = commentData;
 
     const comment = new Comment();
@@ -47,10 +49,8 @@ export class CommentsService {
       replies: [],
       attachments: savedAttachments.map(({ fileId, file }) => ({
         fileId,
-        file: {
-          containerName: file.containerName,
-          fileUrl: file.fileUrl,
-        },
+        containerName: file.containerName,
+        fileUrl: file.fileUrl,
       })),
     };
     return response;
@@ -91,12 +91,21 @@ export class CommentsService {
       }),
     );
 
+    const commentList = allComments.map((comment) => ({
+      ...comment,
+      attachments: [
+        ...comment.attachments.map((attach) => ({
+          fileId: attach.fileId,
+          containerName: attach.file.containerName,
+          fileUrl: attach.file.fileUrl,
+        })),
+      ],
+    }));
+
     return {
-      comments: allComments,
-      total: {
-        pages: Math.ceil(totalComments / limit),
-        comments: totalComments,
-      },
+      comments: plainToInstance(CommentModel, commentList),
+      totalPages: Math.ceil(totalComments / limit),
+      totalComments: totalComments,
     };
   }
 

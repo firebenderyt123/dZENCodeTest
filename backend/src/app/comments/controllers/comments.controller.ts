@@ -3,11 +3,9 @@ import {
   BadRequestException,
   Controller,
   Delete,
-  Get,
   HttpCode,
   HttpStatus,
   Param,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -15,8 +13,7 @@ import { CommentsService } from '../services/comments.service';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { AuthTokenService } from '../../auth/services/auth-token.service';
 import { CommentAttachmentsService } from '../services/comment-attachments.service';
-import { CommentList } from '../interfaces/comment-list';
-import { GetCommentsListDto } from '../dto/get-comments-list.dto';
+
 import { CommentsCacheService } from '../services/comments-cache.service';
 
 @Controller()
@@ -28,31 +25,31 @@ export class CommentsController {
     private readonly cacheService: CommentsCacheService,
   ) {}
 
-  @Get()
-  @HttpCode(HttpStatus.OK)
-  async getList(@Query() params: GetCommentsListDto): Promise<CommentList> {
-    const { page, limit, order, orderBy } = params;
+  // @Get()
+  // @HttpCode(HttpStatus.OK)
+  // async getList(@Query() params: GetCommentsListDto): Promise<CommentList> {
+  //   const { page, limit, order, orderBy } = params;
 
-    const commentsList = await this.cacheService.getCommentsList(params);
-    if (commentsList) return commentsList;
+  //   const commentsList = await this.cacheService.getCommentsList(params);
+  //   if (commentsList) return commentsList;
 
-    const obj = {
-      [orderBy]: order.toUpperCase(),
-    };
-    const orderObj =
-      orderBy === 'username' || orderBy === 'email'
-        ? {
-            user: obj,
-          }
-        : obj;
-    const newCommentsList = await this.commentsService.find(
-      page,
-      limit,
-      orderObj,
-    );
-    await this.cacheService.setCommentsList(params, newCommentsList);
-    return newCommentsList;
-  }
+  //   const obj = {
+  //     [orderBy]: order.toUpperCase(),
+  //   };
+  //   const orderObj =
+  //     orderBy === 'username' || orderBy === 'email'
+  //       ? {
+  //           user: obj,
+  //         }
+  //       : obj;
+  //   const newCommentsList = await this.commentsService.find(
+  //     page,
+  //     limit,
+  //     orderObj,
+  //   );
+  //   await this.cacheService.setCommentsList(params, newCommentsList);
+  //   return newCommentsList;
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')

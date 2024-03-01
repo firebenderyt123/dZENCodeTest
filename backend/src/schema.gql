@@ -1,0 +1,40 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type CommentAuthor {
+  id: Int!
+  username: String!
+  email: String!
+  siteUrl: String
+}
+
+type CommentAttachment {
+  fileId: Int!
+  containerName: String!
+  fileUrl: String!
+}
+
+type Comment {
+  id: Int!
+  text: String!
+  user: CommentAuthor!
+  createdAt: DateTime!
+  replies: [Comment!]!
+  attachments: [CommentAttachment!]!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type CommentList {
+  comments: [Comment!]!
+  totalPages: Int!
+  totalComments: Int!
+}
+
+type Query {
+  getComments(page: Int! = 1, limit: Int! = 25, orderBy: String! = "createdAt", order: String! = "DESC"): CommentList!
+}

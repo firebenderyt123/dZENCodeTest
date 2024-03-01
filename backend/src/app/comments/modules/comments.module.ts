@@ -9,13 +9,14 @@ import { FilesModule } from '../../files/files.module';
 import { CommentAttachmentsService } from '../services/comment-attachments.service';
 import { CommentAttachment } from '../entities/comment-attachment.entity';
 import { CommentsEventEmitterService } from '../services/comments-emitter.service';
-import { CommentsEventListenerService } from '../services/comments-listener.service';
-import { CommentsGateway } from '../gateways/comments.gateway';
+// import { CommentsEventListenerService } from '../services/comments-listener.service';
+// import { CommentsGateway } from '../gateways/comments.gateway';
 import { CommentsQueueService } from '../services/comments-queue.service';
 import { CommentsQueueProcessor } from '../processors/comments-queue.processor';
 import { BullModule } from '@nestjs/bull';
 import { QUEUE } from 'src/queue/queue.enums';
 import { CommentsCacheService } from '../services/comments-cache.service';
+import { CommentsResolver } from '../resolvers/comments.resolver';
 
 @Module({
   imports: [
@@ -33,12 +34,13 @@ import { CommentsCacheService } from '../services/comments-cache.service';
     CommentsService,
     CommentAttachmentsService,
     CommentsEventEmitterService,
-    CommentsEventListenerService,
-    CommentsGateway,
+    // CommentsEventListenerService,
+    // CommentsGateway,
     CommentsQueueService,
     CommentsQueueProcessor,
     CommentsCacheService,
+    CommentsResolver,
   ],
-  exports: [CommentsService],
+  exports: [CommentsService, CommentsResolver],
 })
 export class CommentsModule {}
