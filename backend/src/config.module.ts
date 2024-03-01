@@ -51,7 +51,6 @@ import { modules } from 'src/routes';
       include: modules,
       useGlobalPrefix: true,
       autoSchemaFile: 'src/schema.gql',
-      graphiql: true,
     }),
     BullModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({

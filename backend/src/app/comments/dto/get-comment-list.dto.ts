@@ -1,5 +1,5 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql';
-import { Max, Min } from 'class-validator';
+import { IsIn, Max, Min } from 'class-validator';
 
 @ArgsType()
 export class GetCommentListArgs {
@@ -13,8 +13,10 @@ export class GetCommentListArgs {
   readonly limit: number = 25;
 
   @Field(() => String, { defaultValue: 'createdAt' })
+  @IsIn(['username', 'email', 'createdAt'])
   readonly orderBy: 'username' | 'email' | 'createdAt' = 'createdAt';
 
   @Field(() => String, { defaultValue: 'DESC' })
-  readonly order: 'ASC' | 'DESC' | 'asc' | 'desc' = 'DESC';
+  @IsIn(['ASC', 'DESC'])
+  readonly order: 'ASC' | 'DESC' = 'DESC';
 }
