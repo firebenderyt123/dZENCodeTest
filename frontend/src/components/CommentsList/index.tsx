@@ -13,7 +13,7 @@ export default function CommentsList({
   commentsState,
   getComments,
 }: CommentsListProps) {
-  const { pending, data, error, params } = commentsState;
+  const { pending, comments, total, error, params } = commentsState;
 
   const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -27,18 +27,17 @@ export default function CommentsList({
   }, [currentPage]);
 
   return (
-    data &&
-    params && (
+    comments && (
       <>
         <ListStyled>
-          {data.comments.map((comment) => (
+          {comments.map((comment) => (
             <CommentComponent
               key={comment.id}
               comment={comment}></CommentComponent>
           ))}
         </ListStyled>
         <Pagination
-          count={data.total.pages}
+          count={total.pages}
           variant="outlined"
           shape="rounded"
           page={params.page}

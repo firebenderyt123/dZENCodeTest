@@ -6,3 +6,5 @@ export const API_PATH = {
   SIGN_UP: process.env.signUp as string,
   USERS: process.env.users as string,
 };
+
+export const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT;

@@ -18,15 +18,12 @@ export class Comment {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Comment, (comment) => comment.replies, {
+  @ManyToOne(() => Comment, (comment) => comment.id, {
     nullable: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'parent_comment_id' })
   parent: Comment | null;
-
-  @OneToMany(() => Comment, (comment) => comment.parent, { cascade: true })
-  replies: Comment[];
 
   @OneToMany(() => CommentAttachment, (attachment) => attachment.comment, {
     cascade: true,

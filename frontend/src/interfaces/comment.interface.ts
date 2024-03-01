@@ -1,28 +1,21 @@
 import { User } from "@/interfaces/user.interface";
 
-export interface CommentCreated extends Comment {
-  parent: CommentParent | null;
-}
-
 export interface Comment {
   id: number;
   text: string;
   user: User;
   createdAt: string;
-  replies: Comment[];
-  attachments: Attachment[];
+  parent: CommentParent;
+  attachments: CommentAttachment[];
 }
 
 interface CommentParent {
   id: number;
   text: string;
-  createdAt: string;
 }
 
-interface Attachment {
+export interface CommentAttachment {
   fileId: number;
-  file: {
-    containerName: "images" | "files";
-    fileUrl: string;
-  };
+  containerName: "images" | "files";
+  fileUrl: string;
 }

@@ -15,12 +15,17 @@ type CommentAttachment {
   fileUrl: String!
 }
 
+type ParentComment {
+  id: Int!
+  text: String!
+}
+
 type Comment {
   id: Int!
   text: String!
   user: CommentAuthor!
   createdAt: String!
-  replies: [Comment!]!
+  parent: ParentComment
   attachments: [CommentAttachment!]!
 }
 

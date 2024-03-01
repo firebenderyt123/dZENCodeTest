@@ -1,13 +1,18 @@
+import { flatMap } from 'lodash';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, FindOptionsOrder, IsNull, Repository } from 'typeorm';
-import { plainToInstance } from 'class-transformer';
+import {
+  FindOneOptions,
+  FindOptionsOrder,
+  In,
+  IsNull,
+  Repository,
+} from 'typeorm';
 import { UsersProfileService } from '../../users/services/users-profile.service';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { CommentAttachmentsService } from './comment-attachments.service';
 import { FileInput } from 'src/app/files/interfaces/file-input.interface';
 import { CommentList } from '../models/comment-list.model';
-import { NewComment } from '../models/new-comment.model';
 import { Comment as CommentModel } from '../models/comment.model';
 import { Comment } from '../entities/comment.entity';
 
@@ -24,7 +29,7 @@ export class CommentsService {
     userId: number,
     commentData: CreateCommentDto,
     files: FileInput[],
-  ): Promise<NewComment> {
+  ): Promise<CommentModel> {
     const { parentId, text } = commentData;
 
     const comment = new Comment();
@@ -46,8 +51,8 @@ export class CommentsService {
       );
     const response = {
       ...savedComment,
-      replies: [],
-      attachments: savedAttachments.map(({ fileId, file }) => ({
+      createdAt: savedComment.createdAt.toISOString(),
+      attachments: flatMap(savedAttachments, ({ fileId, file }) => ({
         fileId,
         containerName: file.containerName,
         fileUrl: file.fileUrl,
@@ -70,40 +75,12 @@ export class CommentsService {
         relations: ['user', 'attachments', 'attachments.file'],
       });
 
-    const allComments = await Promise.all(
-      rootComments.map(async (comment) => {
-        const children = await this.getAllCommentsWithChildren({
-          where: { parent: { id: comment.id } },
-          order,
-          relations: ['user', 'attachments', 'attachments.file'],
-          select: {
-            attachments: {
-              fileId: true,
-              file: {
-                containerName: true,
-                fileUrl: true,
-              },
-            },
-          },
-        });
-        comment.replies = children;
-        return comment;
-      }),
-    );
-
-    const commentList = allComments.map((comment) => ({
-      ...comment,
-      attachments: [
-        ...comment.attachments.map((attach) => ({
-          fileId: attach.fileId,
-          containerName: attach.file.containerName,
-          fileUrl: attach.file.fileUrl,
-        })),
-      ],
-    }));
+    const comments = this.commentEntityToCommentModel(rootComments);
+    const parentIds = flatMap(comments, (comment) => comment.id);
+    const replies = await this.getAllReplies(parentIds);
 
     return {
-      comments: plainToInstance(CommentModel, commentList),
+      comments: [...comments, ...replies],
       totalPages: Math.ceil(totalComments / limit),
       totalComments: totalComments,
     };
@@ -129,27 +106,32 @@ export class CommentsService {
     });
   }
 
-  private async getAllCommentsWithChildren(
-    options: FindOneOptions<Comment>,
-  ): Promise<Comment[]> {
-    const comments = await this.commentRepository.find(options);
+  private async getAllReplies(parentIds: number[]): Promise<CommentModel[]> {
+    const repliesList = await this.commentRepository.find({
+      where: { parent: In(parentIds) },
+      relations: ['user', 'parent', 'attachments', 'attachments.file'],
+    });
+    const newReplies = this.commentEntityToCommentModel(repliesList);
+    const newParentIds = flatMap(newReplies, (reply) => reply.id);
+    if (!newParentIds.length) return newReplies;
+    return [...newReplies, ...(await this.getAllReplies(newParentIds))];
+  }
 
-    if (comments.length === 0) {
-      return [];
-    }
-
-    const commentsWithChildren = await Promise.all(
-      comments.map(async (comment) => {
-        const children = await this.getAllCommentsWithChildren({
-          ...options,
-          where: { parent: { id: comment.id } },
-        });
-        comment.replies = children;
-        return comment;
+  private commentEntityToCommentModel(comments: Comment[]): CommentModel[] {
+    const newComments = flatMap(
+      comments,
+      ({ parent, createdAt, attachments, ...restReply }) => ({
+        ...restReply,
+        createdAt: createdAt.toISOString(),
+        parent: parent ? { id: parent.id, text: parent.text } : null,
+        attachments: flatMap(attachments, ({ fileId, file }) => ({
+          fileId,
+          containerName: file.containerName,
+          fileUrl: file.fileUrl,
+        })),
       }),
     );
-
-    return commentsWithChildren;
+    return newComments;
   }
 
   async getCommentWithSpecialParamsById(

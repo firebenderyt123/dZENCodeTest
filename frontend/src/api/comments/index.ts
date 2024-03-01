@@ -1,18 +1,20 @@
 import BaseApi from "../base";
 import { API_PATH } from "../config";
-import { CommentsResponse } from "./comments-response.interface";
-import { CommentsGetRequestProps } from "./comments-get.interface";
+import { CommentsResponse } from "./interfaces/comments-response.interface";
+import { COMMENT_REQUEST_METHOD } from "./enums/comments-requests.enum";
+import { getCommentsQuery } from "./graphql/get-comments.query";
+import { GetCommentsProps } from "./interfaces/get-comments.interface";
 import { Comment } from "@/interfaces/comment.interface";
 
 class CommentsApi extends BaseApi {
   async commentsGetRequest(
-    params: CommentsGetRequestProps
+    params: GetCommentsProps
   ): Promise<CommentsResponse> {
-    const response = await super.getRequest<CommentsResponse>(
-      API_PATH.ROOT + API_PATH.COMMENTS,
-      { params }
+    const response = await super.graphQlRequest<CommentsResponse>(
+      getCommentsQuery,
+      params
     );
-    return response.data;
+    return response[COMMENT_REQUEST_METHOD.GET_COMMENTS];
   }
 
   async commentsCreateRequest(
@@ -23,7 +25,7 @@ class CommentsApi extends BaseApi {
     const response = await super.postFormDataAuthorizedRequest<
       FormData,
       Comment
-    >(token, API_PATH.ROOT + API_PATH.COMMENTS, formData, captcha);
+    >(token, formData, captcha);
     return response.data;
   }
 }

@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    apiRoot: process.env.API_ROOT,
+    graphQlEndpoint: process.env.GRAPHQL_ENDPOINT,
     apiComments: "/comments",
     apiCommentsAttachments: "/comments/attachments",
     signIn: "/auth/sign-in",

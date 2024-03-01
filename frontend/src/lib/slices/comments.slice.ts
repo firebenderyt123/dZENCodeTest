@@ -1,11 +1,13 @@
+import _ from "lodash";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { CommentsResponse } from "@/api/comments/comments-response.interface";
-import { Comment, CommentCreated } from "@/interfaces/comment.interface";
+import { CommentsResponse } from "@/api/comments/interfaces/comments-response.interface";
+import { Comment } from "@/interfaces/comment.interface";
 import { ErrorData } from "@/interfaces/error.interface";
+import { CommentTree } from "../interfaces/comment-tree";
 
 export interface CommentsState {
   pending: boolean;
-  data: CommentsResponse | null;
+  comments: CommentTree[] | null;
   params: Params;
   total: {
     pages: number;
@@ -16,7 +18,7 @@ export interface CommentsState {
 
 const initialState: CommentsState = {
   pending: false,
-  data: null,
+  comments: null,
   params: {
     page: 1,
     limit: 25,
@@ -45,24 +47,28 @@ const commentsSlice = createSlice({
       const data = action.payload.commentsData;
       const params = action.payload.params;
       state.pending = false;
-      state.data = data;
+      state.comments = data.comments;
       state.params = {
         ...params,
-        page: params.page <= data.total.pages ? params.page : data.total.pages,
+        page: params.page <= data.totalPages ? params.page : data.totalPages,
+      };
+      state.total = {
+        pages: data.totalPages,
+        comments: data.totalComments,
       };
       state.error = null;
     },
     getCommentsFailed: (state, action: PayloadAction<ErrorData>) => {
       state.pending = false;
-      state.data = null;
+      state.comments = null;
       state.error = action.payload;
     },
-    insertComment: (state, action: PayloadAction<CommentCreated>) => {
-      if (state.data) {
+    insertComment: (state, action: PayloadAction<Comment>) => {
+      if (state.comments) {
         const { parent, ...comment } = action.payload;
-        state.data.comments = parent
-          ? insertCommentIntoReplies(state.data.comments, parent.id, comment)
-          : [comment, ...state.data.comments.slice(0, -1)];
+        state.comments = parent
+          ? insertCommentIntoReplies(state.comments, parent.id, comment)
+          : [comment, ...state.comments.slice(0, -1)];
         state.total = {
           comments: state.total.comments + 1,
           pages: Math.ceil((state.total.comments + 1) / state.params.limit),
@@ -79,6 +85,21 @@ export const {
   insertComment,
 } = commentsSlice.actions;
 export default commentsSlice.reducer;
+
+const commentArraysToTree = (
+  comments: Comment[],
+  replies: Comment[]
+): CommentTree[] => {
+  const trees = _.flatMap(comments, ({ parent, ...restComment }) => ({
+    replies: [] as CommentTree[],
+    ...restComment,
+  }));
+  _.forEach(replies, (reply) => {});
+
+  const replyTree = replies.map((reply) => ({
+    ...reply,
+  }));
+};
 
 const insertCommentIntoReplies = (
   commentTrees: Comment[],

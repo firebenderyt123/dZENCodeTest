@@ -1,4 +1,4 @@
-export interface CommentsGetRequestProps {
+export interface GetCommentsProps {
   page: number;
   limit: number;
   orderBy: "username" | "email" | "createdAt";

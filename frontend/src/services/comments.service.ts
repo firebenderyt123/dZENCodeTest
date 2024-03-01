@@ -1,5 +1,5 @@
-import { CommentsGetRequestProps } from "@/api/comments/comments-get.interface";
-import { CommentsCreateRequestProps } from "@/api/comments/comments-create.interface";
+import { CommentsGetRequestProps } from "@/api/comments/interfaces/get-comments.interface";
+import { CommentsCreateRequestProps } from "@/api/comments/interfaces/comments-create.interface";
 import commentsApi from "@/api/comments";
 import { AppDispatch } from "@/lib/store";
 import {
