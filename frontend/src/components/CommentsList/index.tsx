@@ -24,7 +24,7 @@ export default function CommentsList({
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);
+  }, [comments]);
 
   return (
     comments && (

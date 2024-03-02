@@ -9,7 +9,8 @@ interface CommentsContextType {
 }
 
 const CommentsContext = createContext<CommentsContextType | null>(null);
-export const useComments = () => useContext(CommentsContext);
+export const useComments = () =>
+  useContext(CommentsContext) as CommentsContextType;
 
 interface CommentsProviderProps {
   children: ReactNode;

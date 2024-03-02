@@ -13,9 +13,8 @@ export default function CommentsPageContent() {
   const commentForm = useCommentForm();
 
   useEffect(() => {
-    if (!comments?.state.data && !comments?.state.error)
-      comments?.getComments({});
-  }, [comments]);
+    comments.getComments({});
+  }, []);
 
   useEffect(() => {
     dispatch(commentsService.onCommentPublished());
@@ -30,7 +29,7 @@ export default function CommentsPageContent() {
 
   return (
     <>
-      {comments && commentForm && (
+      {commentForm && (
         <>
           {commentForm.state.replyToCommentId === null && <CommentCreateForm />}
           <CommentOrderPanel />

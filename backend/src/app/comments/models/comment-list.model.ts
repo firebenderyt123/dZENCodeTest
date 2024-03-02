@@ -6,6 +6,9 @@ export class CommentList {
   @Field(() => [Comment])
   comments: Comment[];
 
+  @Field(() => [Int])
+  commentsLength: number[];
+
   @Field(() => Int)
   totalPages: number;
 

@@ -1,4 +1,4 @@
-import { flatMap } from 'lodash';
+import { flatMap, dropRight } from 'lodash';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -77,10 +77,11 @@ export class CommentsService {
 
     const comments = this.commentEntityToCommentModel(rootComments);
     const parentIds = flatMap(comments, (comment) => comment.id);
-    const replies = await this.getAllReplies(parentIds);
+    const [replies, repliesLength] = await this.getAllReplies(parentIds);
 
     return {
       comments: [...comments, ...replies],
+      commentsLength: [comments.length, ...dropRight(repliesLength)],
       totalPages: Math.ceil(totalComments / limit),
       totalComments: totalComments,
     };
@@ -106,15 +107,21 @@ export class CommentsService {
     });
   }
 
-  private async getAllReplies(parentIds: number[]): Promise<CommentModel[]> {
+  private async getAllReplies(
+    parentIds: number[],
+  ): Promise<[CommentModel[], number[]]> {
     const repliesList = await this.commentRepository.find({
       where: { parent: In(parentIds) },
       relations: ['user', 'parent', 'attachments', 'attachments.file'],
     });
     const newReplies = this.commentEntityToCommentModel(repliesList);
     const newParentIds = flatMap(newReplies, (reply) => reply.id);
-    if (!newParentIds.length) return newReplies;
-    return [...newReplies, ...(await this.getAllReplies(newParentIds))];
+    if (!newParentIds.length) return [newReplies, [newReplies.length]];
+    const [replies, repliesLength] = await this.getAllReplies(newParentIds);
+    return [
+      [...newReplies, ...replies],
+      [newReplies.length, ...repliesLength],
+    ];
   }
 
   private commentEntityToCommentModel(comments: Comment[]): CommentModel[] {

@@ -1,4 +1,4 @@
-import _ from "lodash";
+import { chunk, drop, filter, flatMap } from "lodash";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { CommentsResponse } from "@/api/comments/interfaces/comments-response.interface";
 import { Comment } from "@/interfaces/comment.interface";
@@ -47,7 +47,7 @@ const commentsSlice = createSlice({
       const data = action.payload.commentsData;
       const params = action.payload.params;
       state.pending = false;
-      state.comments = data.comments;
+      state.comments = commentArraysToTree(data.comments, data.commentsLength);
       state.params = {
         ...params,
         page: params.page <= data.totalPages ? params.page : data.totalPages,
@@ -66,9 +66,9 @@ const commentsSlice = createSlice({
     insertComment: (state, action: PayloadAction<Comment>) => {
       if (state.comments) {
         const { parent, ...comment } = action.payload;
-        state.comments = parent
-          ? insertCommentIntoReplies(state.comments, parent.id, comment)
-          : [comment, ...state.comments.slice(0, -1)];
+        // state.comments = parent
+        //   ? insertCommentIntoReplies(state.comments, parent.id, comment)
+        //   : [comment, ...state.comments.slice(0, -1)];
         state.total = {
           comments: state.total.comments + 1,
           pages: Math.ceil((state.total.comments + 1) / state.params.limit),
@@ -88,44 +88,53 @@ export default commentsSlice.reducer;
 
 const commentArraysToTree = (
   comments: Comment[],
-  replies: Comment[]
+  commentsLength: number[]
 ): CommentTree[] => {
-  const trees = _.flatMap(comments, ({ parent, ...restComment }) => ({
-    replies: [] as CommentTree[],
-    ...restComment,
-  }));
-  _.forEach(replies, (reply) => {});
-
-  const replyTree = replies.map((reply) => ({
-    ...reply,
-  }));
-};
-
-const insertCommentIntoReplies = (
-  commentTrees: Comment[],
-  parentId: number,
-  newComment: Comment
-): Comment[] => {
-  const recursiveInsert = (comment: Comment): Comment => {
-    if (comment.id === parentId) {
-      return {
-        ...comment,
-        replies: [newComment, ...comment.replies],
-      };
-    }
-    const updatedReplies = comment.replies.map(recursiveInsert);
-    return {
+  if (commentsLength.length < 2) {
+    return flatMap(comments, (comment) => ({
+      replies: [],
       ...comment,
-      replies: updatedReplies,
-    };
-  };
-
-  const newComments = [];
-  for (const commentTree of commentTrees) {
-    newComments.push(recursiveInsert(commentTree));
+    }));
   }
-  return newComments;
+
+  const [parentComments, replies] = chunk(comments, commentsLength[0]);
+  const subTrees = commentArraysToTree(replies, drop(commentsLength));
+
+  const tree = flatMap(parentComments, (parentComment) => ({
+    replies: filter(
+      subTrees,
+      (comment) => comment.parent.id === parentComment.id
+    ),
+    ...parentComment,
+  }));
+  return tree;
 };
+
+// const insertCommentIntoReplies = (
+//   commentTrees: Comment[],
+//   parentId: number,
+//   newComment: Comment
+// ): Comment[] => {
+//   const recursiveInsert = (comment: Comment): Comment => {
+//     if (comment.id === parentId) {
+//       return {
+//         ...comment,
+//         replies: [newComment, ...comment.replies],
+//       };
+//     }
+//     const updatedReplies = comment.replies.map(recursiveInsert);
+//     return {
+//       ...comment,
+//       replies: updatedReplies,
+//     };
+//   };
+
+//   const newComments = [];
+//   for (const commentTree of commentTrees) {
+//     newComments.push(recursiveInsert(commentTree));
+//   }
+//   return newComments;
+// };
 
 type Params = {
   page: number;

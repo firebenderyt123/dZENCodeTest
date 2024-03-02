@@ -9,7 +9,7 @@ export interface Comment {
   attachments: CommentAttachment[];
 }
 
-interface CommentParent {
+export interface CommentParent {
   id: number;
   text: string;
 }

@@ -31,6 +31,7 @@ type Comment {
 
 type CommentList {
   comments: [Comment!]!
+  commentsLength: [Int!]!
   totalPages: Int!
   totalComments: Int!
 }

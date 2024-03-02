@@ -1,4 +1,7 @@
-import { CommentAttachment } from "@/interfaces/comment.interface";
+import {
+  CommentAttachment,
+  CommentParent,
+} from "@/interfaces/comment.interface";
 import { User } from "@/interfaces/user.interface";
 
 export interface CommentTree {
@@ -6,6 +9,7 @@ export interface CommentTree {
   text: string;
   user: User;
   createdAt: string;
+  parent: CommentParent;
   replies: CommentTree[];
   attachments: CommentAttachment[];
 }

@@ -12,6 +12,12 @@ export const getCommentsQuery = {
     siteUrl
   }
   
+  fragment AttachmentFields on CommentAttachment {
+    fileId
+    containerName
+    fileUrl
+  }
+  
   fragment CommentFields on Comment {
     id
     text
@@ -23,9 +29,7 @@ export const getCommentsQuery = {
     }
     createdAt
     attachments {
-      fileId
-      containerName
-      fileUrl
+      ...AttachmentFields
     }
   }
   
@@ -34,6 +38,7 @@ export const getCommentsQuery = {
       comments {
         ...CommentFields
       }
+      commentsLength
       totalPages
       totalComments
     }
