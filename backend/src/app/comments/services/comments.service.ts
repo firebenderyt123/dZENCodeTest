@@ -9,7 +9,7 @@ import {
   Repository,
 } from 'typeorm';
 import { UsersProfileService } from '../../users/services/users-profile.service';
-import { CreateCommentDto } from '../dto/create-comment.dto';
+import { CreateCommentArgs } from '../dto/create-comment.dto';
 import { CommentAttachmentsService } from './comment-attachments.service';
 import { FileInput } from 'src/app/files/interfaces/file-input.interface';
 import { CommentList } from '../models/comment-list.model';
@@ -27,7 +27,7 @@ export class CommentsService {
 
   async create(
     userId: number,
-    commentData: CreateCommentDto,
+    commentData: CreateCommentArgs,
     files: FileInput[],
   ): Promise<CommentModel> {
     const { parentId, text } = commentData;

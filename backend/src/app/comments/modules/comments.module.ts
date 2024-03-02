@@ -14,14 +14,14 @@ import { CommentsEventEmitterService } from '../services/comments-emitter.servic
 import { CommentsQueueService } from '../services/comments-queue.service';
 import { CommentsQueueProcessor } from '../processors/comments-queue.processor';
 import { BullModule } from '@nestjs/bull';
-import { QUEUE } from 'src/queue/queue.enums';
+import { NAMESPACE } from 'src/queue/queue.enums';
 import { CommentsCacheService } from '../services/comments-cache.service';
 import { CommentsResolver } from '../resolvers/comments.resolver';
 
 @Module({
   imports: [
     BullModule.registerQueue({
-      name: QUEUE.COMMENTS,
+      name: NAMESPACE.COMMENTS,
     }),
     AuthModule,
     FilesModule,

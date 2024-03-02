@@ -1,26 +1,21 @@
-import {
-  IsDefined,
-  IsNumber,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { ArgsType, Field, Int } from '@nestjs/graphql';
+import { MaxLength, MinLength } from 'class-validator';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { CleanTextHTML } from 'src/decorators/clean-text.decorator';
 import { TrimLowercase } from 'src/decorators/trim-lowercase.decorator';
 
-export class CreateCommentDto {
-  @IsNumber({}, { message: 'Parent comment id should be a number' })
-  @IsOptional()
-  parentId?: number;
+@ArgsType()
+export class CreateCommentArgs {
+  @Field(() => Int, { nullable: true })
+  parentId: number | null;
 
-  @IsDefined({ message: 'Text is required' })
-  @MinLength(20, { message: 'Text should be at least 20 characters long' })
-  @MaxLength(4096, {
-    message: 'Text should be less than 4096 characters long',
-  })
-  @IsString({ message: 'Text should be a string' })
+  @Field(() => String)
+  @MinLength(20)
+  @MaxLength(4096)
   @TrimLowercase()
   @CleanTextHTML()
   text: string;
+
+  @Field(() => [GraphQLUpload])
+  files: FileUpload[];
 }

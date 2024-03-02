@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
+    isProduction: process.env.NODE_ENV !== "development",
     graphQlEndpoint: process.env.GRAPHQL_ENDPOINT,
     apiComments: "/comments",
     apiCommentsAttachments: "/comments/attachments",

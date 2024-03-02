@@ -15,7 +15,7 @@ async function bootstrap() {
       logger: true,
     }),
   );
-  app.useGlobalPipes(new GlobalValidationPipe());
+  // app.useGlobalPipes(new GlobalValidationPipe());
 
   const configService = app.get(ConfigService);
 

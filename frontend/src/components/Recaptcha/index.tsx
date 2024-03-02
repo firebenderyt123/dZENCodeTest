@@ -6,11 +6,13 @@ interface RecaptchaProps {}
 
 function Recaptcha(props: RecaptchaProps, ref: ForwardedRef<Captcha>) {
   return (
-    <Captcha
-      {...props}
-      sitekey={process.env.googleRecaptchaPublicKey || " "}
-      ref={ref}
-    />
+    process.env.isProduction && (
+      <Captcha
+        {...props}
+        sitekey={process.env.googleRecaptchaPublicKey || " "}
+        ref={ref}
+      />
+    )
   );
 }
 export default forwardRef(Recaptcha);

@@ -1,8 +1,12 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { GraphQLUpload, FileUpload } from 'graphql-upload-ts';
 import { CommentsService } from '../services/comments.service';
 import { GetCommentListArgs } from '../dto/get-comment-list.dto';
 import { CommentList } from '../models/comment-list.model';
 import { CommentsCacheService } from '../services/comments-cache.service';
+import { CreateCommentArgs } from '../dto/create-comment.dto';
+
+// const pubSub = new PubSub();
 
 @Resolver('Comments')
 export class CommentsResolver {
@@ -10,6 +14,15 @@ export class CommentsResolver {
     private readonly cacheService: CommentsCacheService,
     private readonly commentsService: CommentsService,
   ) {}
+
+  @Mutation(() => Number)
+  async addComment(@Args() data: CreateCommentArgs) {
+    console.log(data);
+    // const newComment = this.commentsService.addComment({ id: postId, comment });
+    // pubSub.publish('commentAdded', { commentAdded: newComment });
+    // return newComment;r
+    return 1;
+  }
 
   @Query(() => CommentList)
   async getComments(@Args() params: GetCommentListArgs) {
@@ -19,14 +32,10 @@ export class CommentsResolver {
     if (commentList) return commentList;
 
     const obj = {
-      [orderBy]: order.toUpperCase(),
+      [orderBy]: order,
     };
     const orderObj =
-      orderBy === 'username' || orderBy === 'email'
-        ? {
-            user: obj,
-          }
-        : obj;
+      orderBy === 'username' || orderBy === 'email' ? { user: obj } : obj;
     const newCommentList = await this.commentsService.find(
       page,
       limit,

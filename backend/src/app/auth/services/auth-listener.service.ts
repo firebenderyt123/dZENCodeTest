@@ -1,14 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AUTH_EVENTS } from '../enums/auth.enum';
-import { AuthGateway } from '../gateways/auth.gateway';
+import { AuthResponse } from '../models/auth-response.model';
+import { PubSub } from 'graphql-subscriptions';
+
+const pubSub = new PubSub();
 
 @Injectable()
 export class AuthEventListenerService {
-  constructor(private readonly authGateway: AuthGateway) {}
+  constructor() {}
+
+  @OnEvent(AUTH_EVENTS.AUTH_REGISTER_SUCCESS)
+  onRegistrationSuccess(auth: AuthResponse) {
+    pubSub.publish(AUTH_EVENTS.AUTH_REGISTER_SUCCESS, auth);
+  }
 
   @OnEvent(AUTH_EVENTS.AUTH_FAILED)
-  onAuthFailed() {
-    this.authGateway.authFailed('Not authenticated');
-  }
+  onAuthFailed() {}
 }

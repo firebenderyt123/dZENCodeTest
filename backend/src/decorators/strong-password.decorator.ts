@@ -12,7 +12,7 @@ export function IsStrongPassword(validationOptions?: ValidationOptions) {
         validate(value) {
           if (!value) return false;
           const passwordRegex =
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]+$/;
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,32}$/;
           return typeof value === 'string' && passwordRegex.test(value);
         },
         defaultMessage(args) {

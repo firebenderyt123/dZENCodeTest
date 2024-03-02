@@ -24,6 +24,7 @@ import { modules } from 'src/routes';
       isGlobal: true,
       useFactory: async (configService: ConfigService) => {
         const store = await redisStore({
+          name: 'cache',
           database: 1,
           socket: {
             host: configService.get('redis.host'),
@@ -51,6 +52,7 @@ import { modules } from 'src/routes';
       include: modules,
       useGlobalPrefix: true,
       autoSchemaFile: 'src/schema.gql',
+      subscription: true,
     }),
     BullModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({

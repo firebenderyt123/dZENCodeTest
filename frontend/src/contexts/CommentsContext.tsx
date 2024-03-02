@@ -2,6 +2,8 @@ import { ReactNode, createContext, useCallback, useContext } from "react";
 import { CommentsState } from "@/lib/slices/comments.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import commentsService, { GetCommentsProps } from "@/services/comments.service";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { getCommentsQuery } from "@/api/comments/graphql/getcomments.query";
 
 interface CommentsContextType {
   state: CommentsState;
@@ -20,6 +22,9 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
   const dispatch = useAppDispatch();
   const state = useAppSelector((reducers) => reducers.comments);
 
+  const [getCommentsFunc, resp] = useLazyQuery(getCommentsQuery);
+  console.log(resp);
+
   const getComments = useCallback(
     (props: Partial<GetCommentsProps>) => {
       const {
@@ -29,14 +34,22 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
         order: stateOrder,
       } = state.params;
       const { page, limit, orderBy, order } = props;
-      dispatch(
-        commentsService.getComments({
+      getCommentsFunc({
+        variables: {
           page: page || statePage,
           limit: limit || stateLimit,
           orderBy: orderBy || stateOrderBy,
           order: order || stateOrder,
-        })
-      );
+        },
+      });
+      // dispatch(
+      //   commentsService.getComments({
+      //     page: page || statePage,
+      //     limit: limit || stateLimit,
+      //     orderBy: orderBy || stateOrderBy,
+      //     order: order || stateOrder,
+      //   })
+      // );
     },
     [state.params, dispatch]
   );

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '../../users/entities/user.entity';
 import { UsersProfileService } from '../../users/services/users-profile.service';
-import { RegisterUserDto } from '../dto/register-user.dto';
+import { RegisterUserArgs } from '../dto/register-user.dto';
 import { Auth } from '../interfaces/auth.interface';
 import { AuthTokenService } from './auth-token.service';
 
@@ -12,7 +12,7 @@ export class AuthUserService {
     private usersProfileService: UsersProfileService,
   ) {}
 
-  async signUp(userData: RegisterUserDto): Promise<Auth> {
+  async signUp(userData: RegisterUserArgs): Promise<Auth> {
     const { siteUrl, password, ...restData } = userData;
     const user = await this.usersProfileService.create(
       { ...restData, siteUrl: siteUrl || null },

@@ -1,3 +1,5 @@
-export enum QUEUE {
+export enum NAMESPACE {
+  AUTH = 'auth',
   COMMENTS = 'comments',
+  USERS = 'users',
 }

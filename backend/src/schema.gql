@@ -2,6 +2,18 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type User {
+  id: Int!
+  username: String!
+  email: String!
+  siteUrl: String
+}
+
+type AuthResponse {
+  accessToken: String!
+  user: User!
+}
+
 type CommentAuthor {
   id: Int!
   username: String!
@@ -38,4 +50,16 @@ type CommentList {
 
 type Query {
   getComments(page: Int! = 1, limit: Int! = 25, orderBy: String! = "createdAt", order: String! = "DESC"): CommentList!
+}
+
+type Mutation {
+  addComment(parentId: Int, text: String!, files: [Upload!]!): Float!
+  registerUser(username: String!, email: String!, siteUrl: String = null, password: String!): Boolean!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+type Subscription {
+  userRegisterSuccess: AuthResponse!
 }
