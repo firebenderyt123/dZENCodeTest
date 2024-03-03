@@ -2,8 +2,8 @@ import { FastifyRequest } from 'fastify';
 import { Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { User } from '../../users/entities/user.entity';
-import { Auth } from '../interfaces/auth.interface';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
+import { AuthResponse } from '../models/auth-response.model';
 
 @Injectable()
 export class AuthTokenService {
@@ -19,7 +19,7 @@ export class AuthTokenService {
     return payload;
   }
 
-  async getAuth(user: User, options?: JwtSignOptions): Promise<Auth> {
+  async getAuth(user: User, options?: JwtSignOptions): Promise<AuthResponse> {
     return {
       accessToken: await this.jwtService.signAsync({ id: user.id }, options),
       user,

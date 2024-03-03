@@ -1,7 +1,7 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { COMMENTS_CACHE } from '../enums/comments-cache.enum';
-import { getSpecialKey } from 'src/utils/cache.utils';
+import { getSpecialKey } from 'src/lib/utils/cache.utils';
 import { RedisCacheService } from 'src/interfaces/redis-cache-service.interface';
 import { GetCommentListArgs } from '../dto/get-comment-list.dto';
 import { CommentList } from '../models/comment-list.model';

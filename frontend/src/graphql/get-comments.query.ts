@@ -1,23 +1,25 @@
-export const getCommentsQuery = {
-  operationName: "GetComments",
-  query: `fragment ParentCommentFields on ParentComment {
+import { gql } from "@apollo/client";
+
+export const GET_COMMENTS_QUERY_NAME = "getComments";
+export const GET_COMMENTS_QUERY = gql`
+  fragment ParentCommentFields on ParentComment {
     id
     text
   }
-  
+
   fragment UserFields on CommentAuthor {
     id
     username
     email
     siteUrl
   }
-  
+
   fragment AttachmentFields on CommentAttachment {
     fileId
     containerName
     fileUrl
   }
-  
+
   fragment CommentFields on Comment {
     id
     text
@@ -32,7 +34,7 @@ export const getCommentsQuery = {
       ...AttachmentFields
     }
   }
-  
+
   query GetComments($page: Int, $limit: Int, $orderBy: String, $order: String) {
     getComments(page: $page, limit: $limit, orderBy: $orderBy, order: $order) {
       comments {
@@ -42,5 +44,5 @@ export const getCommentsQuery = {
       totalPages
       totalComments
     }
-  }`,
-};
+  }
+`;

@@ -1,3 +1,3 @@
-export enum COMMENTS_JOBS {
+export enum JOBS {
   CREATE_COMMENT = 'comments:create',
 }

@@ -1,7 +1,7 @@
 import { FastifyRequest } from 'fastify';
 import { Body, Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
 import { AuthTokenService } from 'src/app/auth/services/auth-token.service';
-import { UsersProfileService } from '../services/users-profile.service';
+import { UsersProfileService } from '../services/users.service';
 import { JwtAuthGuard } from 'src/app/auth/guards/jwt-auth.guard';
 import { User } from '../entities/user.entity';
 import { PatchUserDto } from '../dto/patch-user.dto';

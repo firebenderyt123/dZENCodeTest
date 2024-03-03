@@ -8,7 +8,7 @@ import {
   IsNull,
   Repository,
 } from 'typeorm';
-import { UsersProfileService } from '../../users/services/users-profile.service';
+import { UsersProfileService } from '../../users/services/users.service';
 import { CreateCommentArgs } from '../dto/create-comment.dto';
 import { CommentAttachmentsService } from './comment-attachments.service';
 import { FileInput } from 'src/app/files/interfaces/file-input.interface';

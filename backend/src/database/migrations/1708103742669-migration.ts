@@ -9,19 +9,10 @@ export class Migration1708103742669 implements MigrationInterface {
             username VARCHAR(50) NOT NULL,
             email VARCHAR(100) NOT NULL,
             site_url VARCHAR(255),
+            password_hash VARCHAR(255) NOT NULL,
             UNIQUE (id),
             UNIQUE (email),
             UNIQUE (username)
-        )
-    `);
-
-    // SECRET_INFO
-    await queryRunner.query(`
-        CREATE TABLE IF NOT EXISTS secret_info (
-            user_id SERIAL PRIMARY KEY,
-            password_hash VARCHAR(255) NOT NULL,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-            UNIQUE (user_id)
         )
     `);
 
@@ -73,9 +64,6 @@ export class Migration1708103742669 implements MigrationInterface {
     `);
     await queryRunner.query(`
         DROP TABLE IF EXISTS files
-    `);
-    await queryRunner.query(`
-        DROP TABLE IF EXISTS secret_info
     `);
     await queryRunner.query(`
         DROP TABLE IF EXISTS users

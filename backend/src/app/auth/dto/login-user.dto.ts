@@ -1,0 +1,17 @@
+import { IsEmail, MaxLength } from 'class-validator';
+import { IsStrongPassword } from 'src/decorators/strong-password.decorator';
+import { TrimLowercase } from 'src/decorators/trim-lowercase.decorator';
+import { ArgsType, Field } from '@nestjs/graphql';
+
+@ArgsType()
+export class LoginUserArgs {
+  @Field()
+  @IsEmail()
+  @MaxLength(100)
+  @TrimLowercase()
+  email: string;
+
+  @Field()
+  @IsStrongPassword()
+  password: string;
+}

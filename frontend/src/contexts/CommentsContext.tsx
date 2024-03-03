@@ -1,9 +1,23 @@
-import { ReactNode, createContext, useCallback, useContext } from "react";
-import { CommentsState } from "@/lib/slices/comments.slice";
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import {
+  CommentsState,
+  getCommentsFailed,
+  getCommentsSuccess,
+} from "@/lib/slices/comments.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import commentsService, { GetCommentsProps } from "@/services/comments.service";
-import { useLazyQuery, useQuery } from "@apollo/client";
-import { getCommentsQuery } from "@/api/comments/graphql/getcomments.query";
+import { GetCommentsProps } from "@/services/comments.service";
+import { useLazyQuery } from "@apollo/client";
+import {
+  GET_COMMENTS_QUERY,
+  GET_COMMENTS_QUERY_NAME,
+} from "@/graphql/get-comments.query";
 
 interface CommentsContextType {
   state: CommentsState;
@@ -21,9 +35,9 @@ interface CommentsProviderProps {
 export default function CommentsProvider({ children }: CommentsProviderProps) {
   const dispatch = useAppDispatch();
   const state = useAppSelector((reducers) => reducers.comments);
+  const [tempParams, setTempParams] = useState<GetCommentsProps | null>(null);
 
-  const [getCommentsFunc, resp] = useLazyQuery(getCommentsQuery);
-  console.log(resp);
+  const [getCommentsFunc, comments] = useLazyQuery(GET_COMMENTS_QUERY);
 
   const getComments = useCallback(
     (props: Partial<GetCommentsProps>) => {
@@ -34,25 +48,32 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
         order: stateOrder,
       } = state.params;
       const { page, limit, orderBy, order } = props;
+      const variables = {
+        page: page || statePage,
+        limit: limit || stateLimit,
+        orderBy: orderBy || stateOrderBy,
+        order: order || stateOrder,
+      };
       getCommentsFunc({
-        variables: {
-          page: page || statePage,
-          limit: limit || stateLimit,
-          orderBy: orderBy || stateOrderBy,
-          order: order || stateOrder,
-        },
+        variables,
       });
-      // dispatch(
-      //   commentsService.getComments({
-      //     page: page || statePage,
-      //     limit: limit || stateLimit,
-      //     orderBy: orderBy || stateOrderBy,
-      //     order: order || stateOrder,
-      //   })
-      // );
+      setTempParams(variables);
     },
-    [state.params, dispatch]
+    [getCommentsFunc, state.params]
   );
+
+  useEffect(() => {
+    if (comments.data) {
+      dispatch(
+        getCommentsSuccess({
+          commentsData: comments.data[GET_COMMENTS_QUERY_NAME],
+          params: tempParams,
+        })
+      );
+    } else if (comments.error) {
+      // dispatch(getCommentsFailed("Error"));
+    }
+  }, [comments.data, comments.error, dispatch, tempParams]);
 
   return (
     <CommentsContext.Provider

@@ -20,35 +20,6 @@ import { removeInvalidFiles } from "@/utils/files.utils";
 import { errorNotify } from "@/utils/notifications.utils";
 
 class CommentsService extends BaseService {
-  getComments({ page, limit, orderBy, order }: GetCommentsProps) {
-    return async (dispatch: AppDispatch) => {
-      dispatch(getCommentsRequest());
-      try {
-        const data = await commentsApi.commentsGetRequest({
-          page,
-          limit,
-          orderBy,
-          order,
-        });
-        dispatch(
-          getCommentsSuccess({
-            commentsData: data,
-            params: {
-              page,
-              limit,
-              orderBy,
-              order,
-            },
-          })
-        );
-      } catch (error) {
-        super.errorHandler(error, (err) => {
-          dispatch(getCommentsFailed(err));
-        });
-      }
-    };
-  }
-
   createComment(
     commentData: CreateCommentProps,
     files: File[],

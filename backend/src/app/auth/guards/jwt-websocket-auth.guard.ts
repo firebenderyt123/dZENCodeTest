@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthTokenService } from '../services/auth-token.service';
-import { AuthEventEmitterService } from 'src/app/auth/services/auth-emitter.service';
+// import { AuthEventEmitterService } from 'src/app/auth/services/auth-emitter.service';
 
 @Injectable()
 export class JwtWebSocketAuthGuard
@@ -10,7 +10,7 @@ export class JwtWebSocketAuthGuard
 {
   constructor(
     private readonly authTokenService: AuthTokenService,
-    private readonly authEventEmitterService: AuthEventEmitterService,
+    // private readonly authEventEmitterService: AuthEventEmitterService,
   ) {
     super();
   }
@@ -20,7 +20,7 @@ export class JwtWebSocketAuthGuard
     const { token } = client.handshake.auth;
 
     if (!token) {
-      this.authEventEmitterService.notAuthenticated();
+      // this.authEventEmitterService.notAuthenticated();
       return false;
     }
 
@@ -29,7 +29,7 @@ export class JwtWebSocketAuthGuard
       context.switchToWs().getData().token = { userId: payload.id };
       return true;
     } catch (error) {
-      this.authEventEmitterService.notAuthenticated();
+      // this.authEventEmitterService.notAuthenticated();
       return false;
     }
   }

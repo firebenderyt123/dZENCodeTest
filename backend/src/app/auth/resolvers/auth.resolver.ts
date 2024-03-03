@@ -1,25 +1,33 @@
-import { Args, Mutation, Resolver, Subscription } from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { RegisterUserArgs } from '../dto/register-user.dto';
 import { NAMESPACE } from 'src/queue/queue.enums';
-import { AuthQueueService } from '../services/auth-queue.service';
 import { AuthResponse } from '../models/auth-response.model';
-import { AUTH_EVENTS } from '../enums/auth.enum';
-import { PubSub } from 'graphql-subscriptions';
-
-const pubSub = new PubSub();
+import { ClientProxy } from '@nestjs/microservices';
+import { Inject } from '@nestjs/common';
+import { firstValueFrom } from 'rxjs';
+import { getDataOrThrowError } from 'src/lib/utils/app-error.utils';
+import { LoginUserArgs } from '../dto/login-user.dto';
+import { RABBIT_CLIENT_NAME } from 'src/rabbitmq.enum';
+import { AUTH_MESSAGES } from '../enums/auth-messages.enum';
 
 @Resolver(NAMESPACE.AUTH)
 export class AuthResolver {
-  constructor(private readonly authQueue: AuthQueueService) {}
+  constructor(@Inject(RABBIT_CLIENT_NAME.AUTH) private client: ClientProxy) {}
 
-  @Mutation(() => Boolean)
+  @Mutation(() => AuthResponse)
   async registerUser(@Args() data: RegisterUserArgs) {
-    await this.authQueue.registerUserJob(data);
-    return true;
+    const authData = this.client.send(
+      { cmd: AUTH_MESSAGES.REGISTER_USER },
+      data,
+    );
+    const result = await firstValueFrom(authData);
+    return getDataOrThrowError<AuthResponse>(result);
   }
 
-  @Subscription(() => AuthResponse)
-  async userRegisterSuccess() {
-    return pubSub.asyncIterator(AUTH_EVENTS.AUTH_REGISTER_SUCCESS);
+  @Mutation(() => AuthResponse)
+  async loginUser(@Args() data: LoginUserArgs) {
+    const authData = this.client.send({ cmd: AUTH_MESSAGES.LOGIN_USER }, data);
+    const result = await firstValueFrom(authData);
+    return getDataOrThrowError<AuthResponse>(result);
   }
 }

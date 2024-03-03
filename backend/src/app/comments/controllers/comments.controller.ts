@@ -14,7 +14,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { AuthTokenService } from '../../auth/services/auth-token.service';
 import { CommentAttachmentsService } from '../services/comment-attachments.service';
 
-import { CommentsCacheService } from '../services/comments-cache.service';
+// import { CommentsCacheService } from '../services/comments-cache.service';
 
 @Controller()
 export class CommentsController {
@@ -22,7 +22,7 @@ export class CommentsController {
     private readonly authTokenService: AuthTokenService,
     private readonly commentsService: CommentsService,
     private readonly commentAttachmentsService: CommentAttachmentsService,
-    private readonly cacheService: CommentsCacheService,
+    // private readonly cacheService: CommentsCacheService,
   ) {}
 
   // @Get()

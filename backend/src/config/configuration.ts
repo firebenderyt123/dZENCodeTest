@@ -1,4 +1,4 @@
-import { isProd, parseBoolean } from 'src/utils/environment.utils';
+import { isProd, parseBoolean } from 'src/lib/utils/environment.utils';
 
 export default () => ({
   port: parseInt(process.env.APP_PORT, 10) || 8000,
@@ -15,6 +15,10 @@ export default () => ({
   cache: {
     ttl: parseInt(process.env.CACHE_TTL, 10) || 5000,
     max: parseInt(process.env.CACHE_MAX, 10) || 120000,
+  },
+  rabbitmq: {
+    urls: [process.env.RABBITMQ_URL],
+    queueDurable: parseBoolean(process.env.RABBITMQ_QUEUE_DURABLE),
   },
   redis: {
     host: process.env.REDIS_HOST,

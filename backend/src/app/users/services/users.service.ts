@@ -1,31 +1,35 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
-import { UsersSecretInfoService } from './users-secret-info.service';
-
-type CreateUser = Omit<User, 'id'>;
+import {
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+} from 'src/lib/models/app-error.model';
+import { RegisterUserArgs } from 'src/app/auth/dto/register-user.dto';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class UsersProfileService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private usersSecretInfoService: UsersSecretInfoService,
   ) {}
 
-  async create(userData: CreateUser, password: string): Promise<User> {
-    const { username, email, siteUrl } = userData;
+  async create(userData: RegisterUserArgs): Promise<User> {
+    const { username, email, siteUrl, password } = userData;
 
     await this.checkDuplicateCredentials(username, email);
 
-    const user = this.usersRepository.create({ username, email, siteUrl });
+    const passwordHash = this.hashPassword(password);
+    const user = this.usersRepository.create({
+      username,
+      email,
+      siteUrl,
+      passwordHash,
+    });
     const newUser = await this.usersRepository.save(user);
-    await this.usersSecretInfoService.savePassword(newUser.id, password);
     return newUser;
   }
 
@@ -34,14 +38,13 @@ export class UsersProfileService {
     const user = await this.usersRepository.findOneBy({ id });
 
     if (!user) {
-      throw new NotFoundException('User with provided id was not found!');
+      throw new NotFoundError('User with provided id was not found!');
     }
 
     if (username || email) {
       await this.checkDuplicateCredentials(username, email);
     }
 
-    Object.assign(user, userData);
     const patchedUser = await this.usersRepository.save(user);
     return patchedUser;
   }
@@ -59,18 +62,18 @@ export class UsersProfileService {
   async searchByEmailAndPassword(
     email: string,
     password: string,
-  ): Promise<User | null> {
-    const passwordHash = this.usersSecretInfoService.hashPassword(password);
+  ): Promise<User> {
+    const passwordHash = this.hashPassword(password);
 
-    const query = this.usersSecretInfoService
-      .createQueryBuilder('secretInfo')
-      .innerJoinAndSelect('secretInfo.user', 'user')
-      .where('user.email = :email', { email })
-      .andWhere('secretInfo.passwordHash = :passwordHash', { passwordHash });
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      relations: ['password_hash', 'secretInfo.password_hash'],
+    });
 
-    const secretInfo = await query.getOne();
-
-    return secretInfo ? secretInfo.user : null;
+    if (!user || passwordHash !== user.passwordHash) {
+      throw new UnauthorizedError('Invalid email or password');
+    }
+    return user;
   }
 
   private async checkDuplicateCredentials(username: string, email: string) {
@@ -80,14 +83,16 @@ export class UsersProfileService {
 
     if (existingUser) {
       if (existingUser.username === username) {
-        throw new ConflictException(
+        throw new ConflictError(
           'User with the provided username already exists',
         );
       } else {
-        throw new ConflictException(
-          'User with the provided email already exists',
-        );
+        throw new ConflictError('User with the provided email already exists');
       }
     }
+  }
+
+  private hashPassword(password: string): string {
+    return createHash('md5').update(password).digest('hex');
   }
 }

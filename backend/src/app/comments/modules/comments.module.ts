@@ -4,19 +4,19 @@ import { CommentsController } from '../controllers/comments.controller';
 import { CommentsService } from '../services/comments.service';
 import { Comment } from '../entities/comment.entity';
 import { AuthModule } from '../../auth/modules/auth.module';
-import { UsersProfileModule } from '../../users/modules/users-profile.module';
 import { FilesModule } from '../../files/files.module';
 import { CommentAttachmentsService } from '../services/comment-attachments.service';
 import { CommentAttachment } from '../entities/comment-attachment.entity';
-import { CommentsEventEmitterService } from '../services/comments-emitter.service';
+// import { CommentsEventEmitterService } from '../services/comments-emitter.service';
 // import { CommentsEventListenerService } from '../services/comments-listener.service';
 // import { CommentsGateway } from '../gateways/comments.gateway';
-import { CommentsQueueService } from '../services/comments-queue.service';
-import { CommentsQueueProcessor } from '../processors/comments-queue.processor';
+import { CommentsQueueService } from '../../queue/queue.service';
+// import { CommentsQueueProcessor } from '../processors/comments-queue.processor';
 import { BullModule } from '@nestjs/bull';
 import { NAMESPACE } from 'src/queue/queue.enums';
-import { CommentsCacheService } from '../services/comments-cache.service';
+// import { CommentsCacheService } from '../services/comments-cache.service';
 import { CommentsResolver } from '../resolvers/comments.resolver';
+import { UsersProfileService } from 'src/app/users/services/users.service';
 
 @Module({
   imports: [
@@ -24,8 +24,8 @@ import { CommentsResolver } from '../resolvers/comments.resolver';
       name: NAMESPACE.COMMENTS,
     }),
     AuthModule,
+    UsersProfileService,
     FilesModule,
-    UsersProfileModule,
     TypeOrmModule.forFeature([Comment]),
     TypeOrmModule.forFeature([CommentAttachment]),
   ],
@@ -33,12 +33,12 @@ import { CommentsResolver } from '../resolvers/comments.resolver';
   providers: [
     CommentsService,
     CommentAttachmentsService,
-    CommentsEventEmitterService,
+    // CommentsEventEmitterService,
     // CommentsEventListenerService,
     // CommentsGateway,
     CommentsQueueService,
-    CommentsQueueProcessor,
-    CommentsCacheService,
+    // CommentsQueueProcessor,
+    // CommentsCacheService,
     CommentsResolver,
   ],
   exports: [CommentsService, CommentsResolver],
