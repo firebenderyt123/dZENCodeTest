@@ -13,7 +13,7 @@ import { CommentAttachment } from '../entities/comment-attachment.entity';
 import { CommentsQueueService } from '../../queue/queue.service';
 // import { CommentsQueueProcessor } from '../processors/comments-queue.processor';
 import { BullModule } from '@nestjs/bull';
-import { NAMESPACE } from 'src/queue/queue.enums';
+import { NAMESPACE } from 'src/lib/enums/resolvers-namespace.enums';
 // import { CommentsCacheService } from '../services/comments-cache.service';
 import { CommentsResolver } from '../resolvers/comments.resolver';
 import { UsersModule } from 'src/app/users/modules/users.module';

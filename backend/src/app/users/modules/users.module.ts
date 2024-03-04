@@ -5,7 +5,7 @@ import { User } from '../entities/user.entity';
 import { UsersService } from '../services/users.service';
 import { UsersResolver } from '../resolvers/users.resolver';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { RABBIT_CLIENT_NAME, RABBIT_QUEUE } from 'src/rabbitmq.enum';
+import { RABBIT_CLIENT_NAME, RABBIT_QUEUE } from 'src/lib/enums/rabbitmq.enum';
 
 @Module({
   imports: [

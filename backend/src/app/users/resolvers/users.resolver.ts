@@ -1,10 +1,10 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { NAMESPACE } from 'src/queue/queue.enums';
+import { NAMESPACE } from 'src/lib/enums/resolvers-namespace.enums';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject, UseGuards } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { getDataOrThrowError } from 'src/lib/utils/app-error.utils';
-import { RABBIT_CLIENT_NAME } from 'src/rabbitmq.enum';
+import { RABBIT_CLIENT_NAME } from 'src/lib/enums/rabbitmq.enum';
 import { User } from '../models/user.model';
 import { USERS_MESSAGES } from '../enums/users-messages.enum';
 import { GqlAuthGuard } from 'src/lib/guards/jwt-gql.guard';

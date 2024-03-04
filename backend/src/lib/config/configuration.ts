@@ -13,8 +13,7 @@ export default () => ({
     },
   },
   cache: {
-    ttl: parseInt(process.env.CACHE_TTL, 10) || 5000,
-    max: parseInt(process.env.CACHE_MAX, 10) || 120000,
+    ttl: parseInt(process.env.CACHE_TTL, 10) || 5,
   },
   rabbitmq: {
     urls: [process.env.RABBITMQ_URL],

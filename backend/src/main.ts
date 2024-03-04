@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { RABBIT_QUEUE } from './rabbitmq.enum';
+import { RABBIT_QUEUE } from './lib/enums/rabbitmq.enum';
 // import '../redis/src/main';
 
 async function bootstrap() {

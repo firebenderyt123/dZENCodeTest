@@ -1,6 +1,6 @@
 import { IsEmail, MaxLength } from 'class-validator';
-import { IsStrongPassword } from 'src/decorators/strong-password.decorator';
-import { TrimLowercase } from 'src/decorators/trim-lowercase.decorator';
+import { IsStrongPassword } from 'src/lib/decorators/strong-password.decorator';
+import { TrimLowercase } from 'src/lib/decorators/trim-lowercase.decorator';
 import { ArgsType, Field } from '@nestjs/graphql';
 
 @ArgsType()

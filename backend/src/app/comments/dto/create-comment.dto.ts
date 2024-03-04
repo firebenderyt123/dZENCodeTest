@@ -1,8 +1,8 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql';
 import { MaxLength, MinLength } from 'class-validator';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
-import { CleanTextHTML } from 'src/decorators/clean-text.decorator';
-import { TrimLowercase } from 'src/decorators/trim-lowercase.decorator';
+import { CleanTextHTML } from 'src/lib/decorators/clean-text.decorator';
+import { TrimLowercase } from 'src/lib/decorators/trim-lowercase.decorator';
 
 @ArgsType()
 export class CreateCommentArgs {

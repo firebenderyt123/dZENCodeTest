@@ -7,7 +7,7 @@ import { redisStore } from 'cache-manager-redis-store';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
-import configuration from 'src/config/configuration';
+import configuration from 'src/lib/config/configuration';
 import { getEnvFile } from 'src/lib/utils/environment.utils';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
