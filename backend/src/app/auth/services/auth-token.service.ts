@@ -1,22 +1,17 @@
-import { FastifyRequest } from 'fastify';
+import { IncomingHttpHeaders } from 'http';
 import { Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { User } from '../../users/models/user.model';
-import { JwtPayload } from '../interfaces/jwt-payload.interface';
+import { JwtPayload } from '../../../lib/interfaces/jwt-payload.interface';
 import { AuthResponse } from '../models/auth-response.model';
 
 @Injectable()
 export class AuthTokenService {
   constructor(private jwtService: JwtService) {}
 
-  async verifyAsync(token: string) {
-    return this.jwtService.verifyAsync<JwtPayload>(token);
-  }
-
-  getTokenPayload(req: FastifyRequest): JwtPayload {
-    const token = this.extractTokenFromHeader(req);
-    const payload = this.jwtService.decode<JwtPayload>(token);
-    return payload;
+  async isAuthenticated(headers: IncomingHttpHeaders): Promise<JwtPayload> {
+    const token = this.extractTokenFromHeaders(headers);
+    return await this.jwtService.verifyAsync<JwtPayload>(token);
   }
 
   async getAuth(user: User, options?: JwtSignOptions): Promise<AuthResponse> {
@@ -26,8 +21,10 @@ export class AuthTokenService {
     };
   }
 
-  extractTokenFromHeader(req: FastifyRequest): string | undefined {
-    const [type, token] = req.headers.authorization?.split(' ') ?? [];
+  private extractTokenFromHeaders(
+    headers: IncomingHttpHeaders,
+  ): string | undefined {
+    const [type, token] = headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }
 }

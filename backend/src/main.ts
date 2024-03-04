@@ -26,29 +26,18 @@ async function bootstrap() {
       port: 6379,
     },
   });
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: configService.get('rabbitmq.urls'),
-      queue: RABBIT_QUEUE.AUTH,
-      queueOptions: {
-        durable: false,
+  Object.keys(RABBIT_QUEUE).forEach((key) => {
+    app.connectMicroservice<MicroserviceOptions>({
+      transport: Transport.RMQ,
+      options: {
+        urls: configService.get('rabbitmq.urls'),
+        queue: RABBIT_QUEUE[key],
+        queueOptions: {
+          durable: configService.get('rabbitmq.queueDurable'),
+        },
       },
-    },
+    });
   });
-  // app.connectMicroservice<MicroserviceOptions>(
-  //   {
-  //     transport: Transport.RMQ,
-  //     options: {
-  //       urls: configService.get('rabbitmq.urls'),
-  //       queueOptions: {
-  //         durable: configService.get('rabbitmq.queueDurable'),
-  //       },
-  //       prefetchCount: 1,
-  //     },
-  //   },
-  //   { inheritAppConfig: true },
-  // );
 
   app.enableCors({ origin: configService.get('cors.origin') });
   app.useWebSocketAdapter(new IoAdapter(app));

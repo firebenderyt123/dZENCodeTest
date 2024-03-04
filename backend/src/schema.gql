@@ -50,6 +50,7 @@ type CommentList {
 
 type Query {
   getComments(page: Int! = 1, limit: Int! = 25, orderBy: String! = "createdAt", order: String! = "DESC"): CommentList!
+  getUser: User!
 }
 
 type Mutation {

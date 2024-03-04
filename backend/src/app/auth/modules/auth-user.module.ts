@@ -11,16 +11,6 @@ import { UsersModule } from 'src/app/users/modules/users.module';
   imports: [
     ClientsModule.register([
       {
-        name: 'MATH_SERVICE',
-        transport: Transport.REDIS,
-        options: {
-          host: 'localhost',
-          port: 6379,
-        },
-      },
-    ]),
-    ClientsModule.register([
-      {
         name: RABBIT_CLIENT_NAME.AUTH,
         transport: Transport.RMQ,
         options: {

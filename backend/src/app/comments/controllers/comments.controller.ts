@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommentsService } from '../services/comments.service';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+// import { JwtAuthGuard } from '../../../lib/guards/jwt-gql.guard';
 import { AuthTokenService } from '../../auth/services/auth-token.service';
 import { CommentAttachmentsService } from '../services/comment-attachments.service';
 
@@ -51,35 +51,35 @@ export class CommentsController {
   //   return newCommentsList;
   // }
 
-  @UseGuards(JwtAuthGuard)
-  @Delete('/:id')
-  @HttpCode(HttpStatus.OK)
-  async remove(
-    @Param('id') commentId: number,
-    @Req() req: FastifyRequest,
-  ): Promise<'ok'> {
-    if (isNaN(commentId)) {
-      throw new BadRequestException(':id must be a number');
-    }
+  // @UseGuards(JwtAuthGuard)
+  // @Delete('/:id')
+  // @HttpCode(HttpStatus.OK)
+  // async remove(
+  //   @Param('id') commentId: number,
+  //   @Req() req: FastifyRequest,
+  // ): Promise<'ok'> {
+  //   if (isNaN(commentId)) {
+  //     throw new BadRequestException(':id must be a number');
+  //   }
 
-    const { id } = this.authTokenService.getTokenPayload(req);
+  //   const { id } = this.authTokenService.isAuthenticated(req.headers);
 
-    await this.commentsService.remove(commentId, id);
-    return 'ok';
-  }
+  //   await this.commentsService.remove(commentId, id);
+  //   return 'ok';
+  // }
 
-  @UseGuards(JwtAuthGuard)
-  @Delete('/attachments/:fileId')
-  async removeCommentAttachment(
-    @Param('fileId') fileId: number,
-    @Req() req: FastifyRequest,
-  ): Promise<'ok'> {
-    if (isNaN(fileId)) {
-      throw new BadRequestException(':id must be a number');
-    }
+  // @UseGuards(JwtAuthGuard)
+  // @Delete('/attachments/:fileId')
+  // async removeCommentAttachment(
+  //   @Param('fileId') fileId: number,
+  //   @Req() req: FastifyRequest,
+  // ): Promise<'ok'> {
+  //   if (isNaN(fileId)) {
+  //     throw new BadRequestException(':id must be a number');
+  //   }
 
-    const { id } = this.authTokenService.getTokenPayload(req);
-    await this.commentAttachmentsService.removeAttachment(id, fileId);
-    return 'ok';
-  }
+  //   const { id } = this.authTokenService.getTokenPayload(req);
+  //   await this.commentAttachmentsService.removeAttachment(id, fileId);
+  //   return 'ok';
+  // }
 }
