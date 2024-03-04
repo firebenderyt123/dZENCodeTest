@@ -1,20 +1,11 @@
-import { FastifyRequest } from 'fastify';
-import {
-  BadRequestException,
-  Controller,
-  Delete,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { CommentsService } from '../services/comments.service';
-// import { JwtAuthGuard } from '../../../lib/guards/jwt-gql.guard';
 import { AuthTokenService } from '../../auth/services/auth-token.service';
 import { CommentAttachmentsService } from '../services/comment-attachments.service';
-
-// import { CommentsCacheService } from '../services/comments-cache.service';
+import { CommentList } from '../models/comment-list.model';
+import { GetCommentListArgs } from '../dto/get-comment-list.dto';
+import { MessagePattern } from '@nestjs/microservices';
+import { COMMENTS_MESSAGES } from '../enums/comments-messages.enum';
 
 @Controller()
 export class CommentsController {
@@ -22,34 +13,16 @@ export class CommentsController {
     private readonly authTokenService: AuthTokenService,
     private readonly commentsService: CommentsService,
     private readonly commentAttachmentsService: CommentAttachmentsService,
-    // private readonly cacheService: CommentsCacheService,
   ) {}
 
-  // @Get()
-  // @HttpCode(HttpStatus.OK)
-  // async getList(@Query() params: GetCommentsListDto): Promise<CommentList> {
-  //   const { page, limit, order, orderBy } = params;
-
-  //   const commentsList = await this.cacheService.getCommentsList(params);
-  //   if (commentsList) return commentsList;
-
-  //   const obj = {
-  //     [orderBy]: order.toUpperCase(),
-  //   };
-  //   const orderObj =
-  //     orderBy === 'username' || orderBy === 'email'
-  //       ? {
-  //           user: obj,
-  //         }
-  //       : obj;
-  //   const newCommentsList = await this.commentsService.find(
-  //     page,
-  //     limit,
-  //     orderObj,
-  //   );
-  //   await this.cacheService.setCommentsList(params, newCommentsList);
-  //   return newCommentsList;
-  // }
+  @MessagePattern({ cmd: COMMENTS_MESSAGES.GET_COMMENTS })
+  async getComments(args: GetCommentListArgs): Promise<CommentList> {
+    try {
+      return await this.commentsService.getComments(args);
+    } catch (error) {
+      throw error;
+    }
+  }
 
   // @UseGuards(JwtAuthGuard)
   // @Delete('/:id')
@@ -65,21 +38,6 @@ export class CommentsController {
   //   const { id } = this.authTokenService.isAuthenticated(req.headers);
 
   //   await this.commentsService.remove(commentId, id);
-  //   return 'ok';
-  // }
-
-  // @UseGuards(JwtAuthGuard)
-  // @Delete('/attachments/:fileId')
-  // async removeCommentAttachment(
-  //   @Param('fileId') fileId: number,
-  //   @Req() req: FastifyRequest,
-  // ): Promise<'ok'> {
-  //   if (isNaN(fileId)) {
-  //     throw new BadRequestException(':id must be a number');
-  //   }
-
-  //   const { id } = this.authTokenService.getTokenPayload(req);
-  //   await this.commentAttachmentsService.removeAttachment(id, fileId);
   //   return 'ok';
   // }
 }

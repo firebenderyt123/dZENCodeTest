@@ -13,7 +13,9 @@ import { PatchUserDto } from '../dto/patch-user.dto';
 
 @Resolver(NAMESPACE.USERS)
 export class UsersResolver {
-  constructor(@Inject(RABBIT_CLIENT_NAME.USER) private client: ClientProxy) {}
+  constructor(
+    @Inject(RABBIT_CLIENT_NAME.USER) private readonly client: ClientProxy,
+  ) {}
 
   @Query(() => User)
   @UseGuards(GqlAuthGuard)

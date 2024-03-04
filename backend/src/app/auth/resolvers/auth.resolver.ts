@@ -12,7 +12,9 @@ import { AUTH_MESSAGES } from '../enums/auth-messages.enum';
 
 @Resolver(NAMESPACE.AUTH)
 export class AuthResolver {
-  constructor(@Inject(RABBIT_CLIENT_NAME.AUTH) private client: ClientProxy) {}
+  constructor(
+    @Inject(RABBIT_CLIENT_NAME.AUTH) private readonly client: ClientProxy,
+  ) {}
 
   @Mutation(() => AuthResponse)
   async registerUser(@Args() data: RegisterUserArgs) {

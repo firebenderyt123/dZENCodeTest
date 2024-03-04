@@ -1,4 +1,4 @@
-import { ArgsType, Field, Int } from '@nestjs/graphql';
+import { ArgsType, Field } from '@nestjs/graphql';
 import { IsEmail, IsOptional, Length, MaxLength } from 'class-validator';
 import { TrimLowercase } from 'src/lib/decorators/trim-lowercase.decorator';
 import { IsValidUsername } from 'src/lib/decorators/username-valid.decorator';
@@ -23,13 +23,4 @@ export class PatchUserDto {
   @MaxLength(255)
   @IsOptional()
   siteUrl?: string;
-}
-
-@ArgsType()
-export class PatchUserWithIdDto {
-  @Field(() => Int)
-  userId: number;
-
-  @Field(() => PatchUserDto)
-  data: PatchUserDto;
 }

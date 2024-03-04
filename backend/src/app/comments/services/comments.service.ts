@@ -1,13 +1,7 @@
 import { flatMap, dropRight } from 'lodash';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  FindOneOptions,
-  FindOptionsOrder,
-  In,
-  IsNull,
-  Repository,
-} from 'typeorm';
+import { FindOptionsOrder, In, IsNull, Repository } from 'typeorm';
 import { UsersService } from '../../users/services/users.service';
 import { CreateCommentArgs } from '../dto/create-comment.dto';
 import { CommentAttachmentsService } from './comment-attachments.service';
@@ -15,6 +9,7 @@ import { FileInput } from 'src/app/files/interfaces/file-input.interface';
 import { CommentList } from '../models/comment-list.model';
 import { Comment as CommentModel } from '../models/comment.model';
 import { Comment } from '../entities/comment.entity';
+import { GetCommentListArgs } from '../dto/get-comment-list.dto';
 
 @Injectable()
 export class CommentsService {
@@ -59,17 +54,14 @@ export class CommentsService {
     return response;
   }
 
-  async find(
-    page: number,
-    limit: number,
-    order?: FindOptionsOrder<Comment>,
-  ): Promise<CommentList> {
+  async getComments(args: GetCommentListArgs): Promise<CommentList> {
+    const { page, limit, orderBy, order } = args;
     const [rootComments, totalComments] =
       await this.commentRepository.findAndCount({
         take: limit,
         skip: (page - 1) * limit,
         where: { parent: IsNull() },
-        order,
+        order: await this.getOrder(orderBy, order),
         relations: ['user', 'attachments', 'attachments.file'],
       });
 
@@ -139,16 +131,19 @@ export class CommentsService {
     return newComments;
   }
 
-  async getCommentWithSpecialParamsById(
-    commentId: number,
-    options?: FindOneOptions<Comment>,
-  ): Promise<Comment | null> {
-    const comment = await this.commentRepository.findOne({
-      ...options,
-      where: { id: commentId },
-      relations: ['user', 'replies', 'attachments', 'attachments.file'],
-    });
-
-    return comment;
+  private async getOrder(
+    orderBy: 'username' | 'email' | 'createdAt',
+    order: 'ASC' | 'DESC',
+  ): Promise<FindOptionsOrder<Comment>> {
+    const obj = {
+      [orderBy]: order.toUpperCase(),
+    };
+    const orderObj =
+      orderBy === 'username' || orderBy === 'email'
+        ? {
+            user: obj,
+          }
+        : obj;
+    return orderObj;
   }
 }

@@ -1,17 +1,19 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { CommentsService } from '../services/comments.service';
 import { GetCommentListArgs } from '../dto/get-comment-list.dto';
 import { CommentList } from '../models/comment-list.model';
-import { CommentsCacheService } from '../services/comments-cache.service';
 import { CreateCommentArgs } from '../dto/create-comment.dto';
+import { NAMESPACE } from 'src/lib/enums/resolvers-namespace.enums';
+import { Inject } from '@nestjs/common';
+import { RABBIT_CLIENT_NAME } from 'src/lib/enums/rabbitmq.enum';
+import { ClientProxy } from '@nestjs/microservices';
+import { COMMENTS_MESSAGES } from '../enums/comments-messages.enum';
+import { firstValueFrom } from 'rxjs';
+import { getDataOrThrowError } from 'src/lib/utils/app-error.utils';
 
-// const pubSub = new PubSub();
-
-@Resolver('Comments')
+@Resolver(NAMESPACE.COMMENTS)
 export class CommentsResolver {
   constructor(
-    // private readonly cacheService: CommentsCacheService,
-    private readonly commentsService: CommentsService,
+    @Inject(RABBIT_CLIENT_NAME.COMMENTS) private readonly client: ClientProxy,
   ) {}
 
   @Mutation(() => Number)
@@ -25,22 +27,11 @@ export class CommentsResolver {
 
   @Query(() => CommentList)
   async getComments(@Args() params: GetCommentListArgs) {
-    const { page, limit, order, orderBy } = params;
-
-    // const commentList = await this.cacheService.getCommentsList(params);
-    // if (commentList) return commentList;
-
-    // const obj = {
-    //   [orderBy]: order,
-    // };
-    // const orderObj =
-    //   orderBy === 'username' || orderBy === 'email' ? { user: obj } : obj;
-    // const newCommentList = await this.commentsService.find(
-    //   page,
-    //   limit,
-    //   orderObj,
-    // );
-    // await this.cacheService.setCommentsList(params, newCommentList);
-    // return newCommentList;
+    const comments = this.client.send(
+      { cmd: COMMENTS_MESSAGES.GET_COMMENTS },
+      params,
+    );
+    const result = await firstValueFrom(comments);
+    return getDataOrThrowError<CommentList>(result);
   }
 }

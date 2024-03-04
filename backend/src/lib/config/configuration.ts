@@ -17,7 +17,7 @@ export default () => ({
   },
   rabbitmq: {
     urls: [process.env.RABBITMQ_URL],
-    queueDurable: parseBoolean(process.env.RABBITMQ_QUEUE_DURABLE),
+    queueDurable: parseBoolean(process.env.RABBITMQ_QUEUE_DURABLE) || false,
   },
   redis: {
     host: process.env.REDIS_HOST,
