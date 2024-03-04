@@ -4,6 +4,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useState,
 } from "react";
 import { AuthState, authRequest, authSuccess } from "@/lib/slices/auth.slice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
@@ -19,66 +20,94 @@ import {
 } from "@/graphql/auth/sign-up.mutation";
 import { AUTH_SUBSCRIPTION } from "@/graphql/auth/auth-response.subscription";
 import { USER_FIELDS_FRAGMENT } from "@/graphql/fragments/user-fields.fragment";
+import {
+  SIGN_IN_MUTATION,
+  SIGN_IN_MUTATION_NAME,
+} from "@/graphql/auth/sign-in.mutation";
+import cookiesService from "@/services/cookies.service";
+import { AuthResponse } from "@/graphql/auth/interfaces/auth.response";
+import { SignUpResponse } from "@/graphql/auth/interfaces/sign-up-response.interface";
+import { SignInResponse } from "@/graphql/auth/interfaces/sign-in-response.interface";
+import { errorNotify } from "@/utils/notifications.utils";
 
 interface AuthContextType {
-  state: SubscriptionResult;
+  state: AuthResponse | null;
   login: (userData: SignInProps) => void;
   register: (userData: SignUpProps) => void;
   logout: () => void;
+  isAuthenticated: () => boolean;
 }
 const AuthContext = createContext<AuthContextType | null>(null);
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext) as AuthContextType;
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const [signUp, auth] = useMutation(SIGN_UP_MUTATION);
-  const state = useSubscription(AUTH_SUBSCRIPTION, {
-    onData: (data) => {
-      console.log(data);
-    },
-  });
+  const [state, setState] = useState<AuthResponse | null>(null);
+  const [signUp, registerData] = useMutation<SignUpResponse>(SIGN_UP_MUTATION);
+  const [signIn, loginData] = useMutation<SignInResponse>(SIGN_IN_MUTATION);
 
-  const login = useCallback((userData: SignInProps) => {
-    // dispatch(authService.loginUser(userData));
-  }, []);
+  const login = useCallback(
+    (userData: SignInProps) => {
+      signIn({
+        variables: userData,
+      });
+    },
+    [signIn]
+  );
 
   const register = useCallback(
     (userData: SignUpProps) => {
       signUp({
         variables: userData,
       });
-      // dispatch(authService.registerUser(userData));
     },
     [signUp]
   );
 
   const logout = useCallback(() => {
-    // dispatch(authService.logout());
+    cookiesService.deleteToken();
   }, []);
 
-  useEffect(() => {
-    signUp({
-      variables: {
-        username: "user3",
-        email: "user3@example.com",
-        password: "Qwerty123!",
-      },
-    });
-  }, [signUp]);
-
-  useEffect(() => {
-    console.log(state);
-    // if (state.data) {
-    //   console.log(state.data[SIGN_UP_MUTATION_NAME]);
-    // } else {
-    //   console.log(state);
-    // }
+  const isAuthenticated = useCallback(() => {
+    return !!(state && state.accessToken);
   }, [state]);
 
+  useEffect(() => {
+    if (loginData.data) {
+      const data = loginData.data[SIGN_IN_MUTATION_NAME];
+      setState(data);
+      cookiesService.setToken(data.accessToken);
+    }
+  }, [loginData.data]);
+
+  useEffect(() => {
+    if (registerData.data) {
+      const data = registerData.data[SIGN_UP_MUTATION_NAME];
+      setState(data);
+      cookiesService.setToken(data.accessToken);
+    }
+  }, [registerData.data]);
+
+  useEffect(() => {
+    if (loginData.error) {
+      if (loginData.error.graphQLErrors[0].extensions.statusCode === 401) {
+        // deauth user if status is 401
+      }
+      errorNotify(loginData.error.message);
+    }
+  }, [loginData.error]);
+
+  useEffect(() => {
+    if (registerData.error) {
+      // errorNotify
+    }
+  }, [registerData.error]);
+
   return (
-    <AuthContext.Provider value={{ state, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ state, login, register, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

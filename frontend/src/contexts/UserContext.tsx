@@ -9,7 +9,7 @@ interface UserContextType {
   updateUserInfo: (userData: UpdateUserData) => void;
 }
 const UserContext = createContext<UserContextType | null>(null);
-export const useUser = () => useContext(UserContext);
+export const useUser = () => useContext(UserContext) as UserContextType;
 
 interface UserProviderProps {
   children: ReactNode;

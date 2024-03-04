@@ -1,7 +1,7 @@
 import { API_PATH } from "../config";
 import { SignInRequestProps } from "./sign-in-request.interface";
 import { SignUpRequestProps } from "./sign-up-request.interface";
-import { AuthResponse } from "./auth-response.interface";
+import { AuthResponse } from "../../graphql/auth/interfaces/sign-in-response.interface";
 import BaseApi from "../base";
 
 class AuthApi extends BaseApi {

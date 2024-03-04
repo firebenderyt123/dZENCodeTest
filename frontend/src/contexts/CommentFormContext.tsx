@@ -28,7 +28,8 @@ interface CommentFormContextType {
 }
 
 const CommentFormContext = createContext<CommentFormContextType | null>(null);
-export const useCommentForm = () => useContext(CommentFormContext);
+export const useCommentForm = () =>
+  useContext(CommentFormContext) as CommentFormContextType;
 
 interface CommentFormProviderProps {
   children: ReactNode;
