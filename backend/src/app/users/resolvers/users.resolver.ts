@@ -1,11 +1,4 @@
-import {
-  Args,
-  Context,
-  GqlContextType,
-  Mutation,
-  Query,
-  Resolver,
-} from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { NAMESPACE } from 'src/queue/queue.enums';
 import { ClientProxy } from '@nestjs/microservices';
 import { Inject, UseGuards } from '@nestjs/common';
@@ -16,6 +9,7 @@ import { User } from '../models/user.model';
 import { USERS_MESSAGES } from '../enums/users-messages.enum';
 import { GqlAuthGuard } from 'src/lib/guards/jwt-gql.guard';
 import { Jwt, JwtPayload } from 'src/lib/decorators/jwt.decorator';
+import { PatchUserDto } from '../dto/patch-user.dto';
 
 @Resolver(NAMESPACE.USERS)
 export class UsersResolver {
@@ -24,7 +18,6 @@ export class UsersResolver {
   @Query(() => User)
   @UseGuards(GqlAuthGuard)
   async getUser(@Jwt() jwtPayload: JwtPayload) {
-    console.log(jwtPayload);
     const userData = this.client.send(
       { cmd: USERS_MESSAGES.GET_PROFILE },
       jwtPayload.id,
@@ -33,10 +26,14 @@ export class UsersResolver {
     return getDataOrThrowError<User>(result);
   }
 
-  //   @Mutation(() => AuthResponse)
-  //   async loginUser(@Args() data: LoginUserArgs) {
-  //     const authData = this.client.send({ cmd: AUTH_MESSAGES.LOGIN_USER }, data);
-  //     const result = await firstValueFrom(authData);
-  //     return getDataOrThrowError<User>(result);
-  //   }
+  @Mutation(() => User)
+  @UseGuards(GqlAuthGuard)
+  async patchUser(@Jwt() jwtPayload: JwtPayload, @Args() data: PatchUserDto) {
+    const userData = this.client.send(
+      { cmd: USERS_MESSAGES.PATCH_PROFILE },
+      { userId: jwtPayload.id, data },
+    );
+    const result = await firstValueFrom(userData);
+    return getDataOrThrowError<User>(result);
+  }
 }

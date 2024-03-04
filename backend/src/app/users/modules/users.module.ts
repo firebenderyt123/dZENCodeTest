@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
-import { UsersProfileController } from '../controllers/users-profile.controller';
-import { AuthTokenModule } from 'src/app/auth/modules/auth-token.module';
+import { UsersController } from '../controllers/users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { UsersService } from '../services/users.service';
@@ -23,10 +22,9 @@ import { RABBIT_CLIENT_NAME, RABBIT_QUEUE } from 'src/rabbitmq.enum';
         },
       },
     ]),
-    AuthTokenModule,
     TypeOrmModule.forFeature([User]),
   ],
-  controllers: [UsersProfileController],
+  controllers: [UsersController],
   providers: [UsersService, UsersResolver],
   exports: [UsersService],
 })

@@ -34,7 +34,16 @@ export class UsersService {
     return newUser;
   }
 
-  async patchUser(id: number, userData: Partial<UserModel>) {
+  async getUser(userId: number): Promise<UserModel> {
+    const user = this.findOneById(userId);
+    if (!user) throw new UnauthorizedError();
+    return user;
+  }
+
+  async patchUser(
+    id: number,
+    userData: Partial<UserModel>,
+  ): Promise<UserModel> {
     const { username, email } = userData;
     const user = await this.usersRepository.findOneBy({ id });
 
@@ -46,7 +55,9 @@ export class UsersService {
       await this.checkDuplicateCredentials(username, email);
     }
 
-    const patchedUser = await this.usersRepository.save(user);
+    const newUser = { ...user, ...userData };
+
+    const patchedUser = await this.usersRepository.save(newUser);
     return patchedUser;
   }
 

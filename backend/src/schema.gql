@@ -55,6 +55,7 @@ type Query {
 
 type Mutation {
   addComment(parentId: Int, text: String!, files: [Upload!]!): Float!
+  patchUser(username: String, email: String, siteUrl: String): User!
   registerUser(username: String!, email: String!, siteUrl: String = null, password: String!): AuthResponse!
   loginUser(email: String!, password: String!): AuthResponse!
 }
