@@ -1,23 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { createHash } from 'crypto';
 import { User } from '../entities/user.entity';
+import { User as UserModel } from '../models/user.model';
 import {
   ConflictError,
   NotFoundError,
   UnauthorizedError,
 } from 'src/lib/models/app-error.model';
 import { RegisterUserArgs } from 'src/app/auth/dto/register-user.dto';
-import { createHash } from 'crypto';
 
 @Injectable()
-export class UsersProfileService {
+export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
 
-  async create(userData: RegisterUserArgs): Promise<User> {
+  async create(userData: RegisterUserArgs): Promise<UserModel> {
     const { username, email, siteUrl, password } = userData;
 
     await this.checkDuplicateCredentials(username, email);
@@ -33,7 +34,7 @@ export class UsersProfileService {
     return newUser;
   }
 
-  async patchUser(id: number, userData: Partial<User>) {
+  async patchUser(id: number, userData: Partial<UserModel>) {
     const { username, email } = userData;
     const user = await this.usersRepository.findOneBy({ id });
 
@@ -49,10 +50,8 @@ export class UsersProfileService {
     return patchedUser;
   }
 
-  async findOneBy(
-    where: FindOptionsWhere<User> | FindOptionsWhere<User>[],
-  ): Promise<User | null> {
-    return await this.usersRepository.findOneBy(where);
+  async findOneById(userId: number): Promise<User> {
+    return await this.usersRepository.findOneBy({ id: userId });
   }
 
   async remove(id: number): Promise<void> {
@@ -62,12 +61,11 @@ export class UsersProfileService {
   async searchByEmailAndPassword(
     email: string,
     password: string,
-  ): Promise<User> {
+  ): Promise<UserModel> {
     const passwordHash = this.hashPassword(password);
 
     const user = await this.usersRepository.findOne({
       where: { email },
-      relations: ['password_hash', 'secretInfo.password_hash'],
     });
 
     if (!user || passwordHash !== user.passwordHash) {

@@ -23,21 +23,7 @@ export class AuthUserController {
     try {
       return await this.authUserService.signIn(data);
     } catch (error) {
-      console.log(error);
       return error;
     }
   }
-
-  // @UseGuards(LocalAuthGuard)
-  // @Post('/sign-in')
-  // @HttpCode(HttpStatus.OK)
-  // async signIn(@Req() req: { user: User }): Promise<Auth> {
-  //   return await this.authUserService.signIn(req.user);
-  // }
-
-  // @Post('/sign-up')
-  // @HttpCode(HttpStatus.CREATED)
-  // async signUp(@Body() userData: RegisterUserArgs): Promise<Auth> {
-  //   return await this.authUserService.signUp(userData);
-  // }
 }

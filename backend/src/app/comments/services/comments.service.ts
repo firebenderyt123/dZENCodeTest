@@ -8,7 +8,7 @@ import {
   IsNull,
   Repository,
 } from 'typeorm';
-import { UsersProfileService } from '../../users/services/users.service';
+import { UsersService } from '../../users/services/users.service';
 import { CreateCommentArgs } from '../dto/create-comment.dto';
 import { CommentAttachmentsService } from './comment-attachments.service';
 import { FileInput } from 'src/app/files/interfaces/file-input.interface';
@@ -22,7 +22,7 @@ export class CommentsService {
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
     private commentAttachmentsService: CommentAttachmentsService,
-    private usersProfileService: UsersProfileService,
+    private usersService: UsersService,
   ) {}
 
   async create(
@@ -38,9 +38,7 @@ export class CommentsService {
           id: parentId,
         })
       : null;
-    comment.user = await this.usersProfileService.findOneBy({
-      id: userId,
-    });
+    comment.user = await this.usersService.findOneById(userId);
     comment.text = text;
 
     const savedComment = await this.commentRepository.save(comment);

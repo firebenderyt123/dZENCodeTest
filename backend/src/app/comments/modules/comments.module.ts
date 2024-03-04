@@ -16,7 +16,7 @@ import { BullModule } from '@nestjs/bull';
 import { NAMESPACE } from 'src/queue/queue.enums';
 // import { CommentsCacheService } from '../services/comments-cache.service';
 import { CommentsResolver } from '../resolvers/comments.resolver';
-import { UsersProfileService } from 'src/app/users/services/users.service';
+import { UsersModule } from 'src/app/users/modules/users.module';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { UsersProfileService } from 'src/app/users/services/users.service';
       name: NAMESPACE.COMMENTS,
     }),
     AuthModule,
-    UsersProfileService,
+    UsersModule,
     FilesModule,
     TypeOrmModule.forFeature([Comment]),
     TypeOrmModule.forFeature([CommentAttachment]),

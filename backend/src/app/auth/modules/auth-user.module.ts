@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AuthUserService } from '../services/auth-user.service';
 import { AuthTokenModule } from './auth-token.module';
-import { LocalStrategy } from '../strategies/local.strategy';
 import { AuthResolver } from '../resolvers/auth.resolver';
 import { AuthUserController } from '../controllers/auth-user.controller';
 import { RABBIT_CLIENT_NAME, RABBIT_QUEUE } from 'src/rabbitmq.enum';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { UsersModule } from 'src/app/users/modules/users.module';
 
 @Module({
   imports: [
@@ -33,9 +33,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       },
     ]),
     AuthTokenModule,
+    UsersModule,
   ],
   controllers: [AuthUserController],
-  providers: [AuthUserService, LocalStrategy, AuthResolver],
+  providers: [AuthUserService, AuthResolver],
   exports: [AuthUserService, AuthResolver],
 })
 export class AuthUserModule {}

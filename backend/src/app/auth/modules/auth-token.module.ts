@@ -2,6 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthTokenService } from '../services/auth-token.service';
+import { JwtStrategy } from '../strategies/jwt.strategy';
 
 @Global()
 @Module({
@@ -15,7 +16,7 @@ import { AuthTokenService } from '../services/auth-token.service';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthTokenService],
+  providers: [AuthTokenService, JwtStrategy],
   exports: [AuthTokenService, JwtModule],
 })
 export class AuthTokenModule {}

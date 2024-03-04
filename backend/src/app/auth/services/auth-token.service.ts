@@ -1,7 +1,7 @@
 import { FastifyRequest } from 'fastify';
 import { Injectable } from '@nestjs/common';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../users/models/user.model';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import { AuthResponse } from '../models/auth-response.model';
 
