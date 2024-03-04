@@ -67,7 +67,10 @@ export class AppError extends GraphQLError implements AppErrorInterface {
 }
 
 export class UnauthorizedError extends AppError {
-  constructor(message: string, options?: GraphQLErrorOptions) {
+  constructor(
+    message: string = 'Not authenticated',
+    options?: GraphQLErrorOptions,
+  ) {
     super(message, APP_ERRORS.UNAUTHORIZED, options);
   }
 }

@@ -7,7 +7,7 @@ import { UnauthorizedError } from '../models/app-error.model';
 export class GqlAuthGuard extends AuthGuard('customJwt') {
   handleRequest(err: Error, user: any) {
     if (err || !user) {
-      throw err || new UnauthorizedError('Not authenticated');
+      throw err || new UnauthorizedError();
     }
     return user;
   }

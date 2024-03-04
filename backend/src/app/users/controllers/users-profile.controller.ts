@@ -1,4 +1,3 @@
-import { FastifyRequest } from 'fastify';
 import { Body, Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
 import { AuthTokenService } from 'src/app/auth/services/auth-token.service';
 import { UsersService } from '../services/users.service';
@@ -6,6 +5,7 @@ import { User } from '../models/user.model';
 import { PatchUserDto } from '../dto/patch-user.dto';
 import { MessagePattern } from '@nestjs/microservices';
 import { USERS_MESSAGES } from '../enums/users-messages.enum';
+import { UnauthorizedError } from 'src/lib/models/app-error.model';
 
 @Controller()
 export class UsersProfileController {
@@ -16,8 +16,13 @@ export class UsersProfileController {
 
   @MessagePattern({ cmd: USERS_MESSAGES.GET_PROFILE })
   async getUser(userId: number): Promise<User> {
-    const user = await this.usersService.findOneById(userId);
-    return user;
+    try {
+      const user = await this.usersService.findOneById(userId);
+      if (!user) throw new UnauthorizedError();
+      return user;
+    } catch (error) {
+      return error;
+    }
   }
 
   // @UseGuards(JwtAuthGuard)
