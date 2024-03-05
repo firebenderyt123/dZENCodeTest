@@ -17,7 +17,7 @@ import { useLazyQuery } from "@apollo/client";
 import {
   GET_COMMENTS_QUERY,
   GET_COMMENTS_QUERY_NAME,
-} from "@/graphql/get-comments.query";
+} from "@/graphql/queries/comments/get-comments.query";
 
 interface CommentsContextType {
   state: CommentsState;

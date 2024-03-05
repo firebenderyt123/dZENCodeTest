@@ -1,4 +1,4 @@
-import { User } from "@/interfaces/user.interface";
+import { User } from "@/graphql/queries/users/interfaces/user.interface";
 
 export interface Comment {
   id: number;

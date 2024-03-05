@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { User } from "@/interfaces/user.interface";
+import { User } from "@/graphql/queries/users/interfaces/user.interface";
 import { ErrorData } from "@/interfaces/error.interface";
 
 export interface UserState {

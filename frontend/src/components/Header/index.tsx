@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppBar, Button, Container, Toolbar, styled } from "@mui/material";
 import { useAuth } from "@/contexts/AuthContext";
 import SignInForm from "../Auth/SignInForm";
@@ -7,35 +7,41 @@ import FormDialog from "../FormDialog";
 
 export default function Header() {
   const { isAuthenticated, logout } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
 
   const signInButtonRef = useRef<HTMLButtonElement>(null);
   const signUpButtonRef = useRef<HTMLButtonElement>(null);
 
-  const signInForm = !isAuthenticated() && (
+  useEffect(() => {
+    setIsMounted(true);
+    return () => setIsMounted(false);
+  }, []);
+
+  const signInForm = isMounted && !isAuthenticated && (
     <FormDialog ref={signInButtonRef}>
       <SignInForm />
     </FormDialog>
   );
 
-  const signUpForm = !isAuthenticated() && (
+  const signUpForm = isMounted && !isAuthenticated && (
     <FormDialog ref={signUpButtonRef}>
       <SignUpForm />
     </FormDialog>
   );
 
-  const signInButton = !isAuthenticated() && (
+  const signInButton = isMounted && !isAuthenticated && (
     <Button color="inherit" ref={signInButtonRef}>
       Sign In
     </Button>
   );
 
-  const signUpButton = !isAuthenticated() && (
+  const signUpButton = isMounted && !isAuthenticated && (
     <Button color="inherit" ref={signUpButtonRef}>
       Sign Up
     </Button>
   );
 
-  const logoutButton = isAuthenticated() && (
+  const logoutButton = isMounted && isAuthenticated && (
     <Button color="inherit" onClick={logout}>
       Logout
     </Button>

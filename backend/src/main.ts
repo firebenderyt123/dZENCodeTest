@@ -39,7 +39,10 @@ async function bootstrap() {
     });
   });
 
-  app.enableCors({ origin: configService.get('cors.origin') });
+  app.enableCors({
+    origin: configService.get('cors.origin'),
+    credentials: true,
+  });
   app.useWebSocketAdapter(new IoAdapter(app));
   app.setGlobalPrefix('api/v1');
 

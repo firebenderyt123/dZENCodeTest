@@ -31,7 +31,7 @@ export class AppError extends GraphQLError implements AppErrorInterface {
   private static getErrorName(statusCode: number): string {
     switch (statusCode) {
       case 401:
-        return 'UNAUTHORIZED';
+        return 'UNAUTHENTICATED';
       case 403:
         return 'FORBIDDEN';
       case 404:
@@ -66,12 +66,12 @@ export class AppError extends GraphQLError implements AppErrorInterface {
   }
 }
 
-export class UnauthorizedError extends AppError {
+export class UnauthenticatedError extends AppError {
   constructor(
     message: string = 'Not authenticated',
     options?: GraphQLErrorOptions,
   ) {
-    super(message, APP_ERRORS.UNAUTHORIZED, options);
+    super(message, APP_ERRORS.UNAUTHENTICATED, options);
   }
 }
 

@@ -17,8 +17,8 @@ import { Box, BoxProps, styled } from "@mui/joy";
 import { useCallback } from "react";
 
 export default function CommentCreateForm(props: BoxProps) {
-  const commentForm = useCommentForm();
-  const user = useUser();
+  const { createComment } = useCommentForm();
+  const { user, updateUserInfo } = useUser();
 
   const commentBoxForm = useForm<CreateCommentSchema>({
     mode: "onChange",
@@ -35,14 +35,14 @@ export default function CommentCreateForm(props: BoxProps) {
         if (!isValid) return;
 
         const userData = changeUserForm.getValues();
-        user?.updateUserInfo(userData);
-        commentForm?.createComment(data, captcha);
+        updateUserInfo(userData);
+        createComment(data, captcha);
       });
     },
-    [changeUserForm, commentForm, user]
+    [changeUserForm, createComment, updateUserInfo]
   );
 
-  return user?.state.user ? (
+  return user ? (
     <ContainerFormStyled {...props}>
       <UserInfo form={changeUserForm} />
       <CommentBox form={commentBoxForm} submitCallback={commentFormSubmit} />

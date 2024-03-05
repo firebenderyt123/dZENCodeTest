@@ -6,7 +6,7 @@ interface RecaptchaProps {}
 
 function Recaptcha(props: RecaptchaProps, ref: ForwardedRef<Captcha>) {
   return (
-    process.env.isProduction && (
+    process.env.NODE_ENV !== "production" && (
       <Captcha
         {...props}
         sitekey={process.env.googleRecaptchaPublicKey || " "}

@@ -7,7 +7,7 @@ import { User as UserModel } from '../models/user.model';
 import {
   ConflictError,
   NotFoundError,
-  UnauthorizedError,
+  UnauthenticatedError,
 } from 'src/lib/models/app-error.model';
 import { RegisterUserArgs } from 'src/app/auth/dto/register-user.dto';
 
@@ -36,7 +36,7 @@ export class UsersService {
 
   async getUser(userId: number): Promise<UserModel> {
     const user = this.findOneById(userId);
-    if (!user) throw new UnauthorizedError();
+    if (!user) throw new UnauthenticatedError();
     return user;
   }
 
@@ -80,7 +80,7 @@ export class UsersService {
     });
 
     if (!user || passwordHash !== user.passwordHash) {
-      throw new UnauthorizedError('Invalid email or password');
+      throw new UnauthenticatedError('Invalid email or password');
     }
     return user;
   }

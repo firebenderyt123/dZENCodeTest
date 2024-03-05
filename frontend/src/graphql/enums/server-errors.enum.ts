@@ -1,4 +1,4 @@
-export enum APP_ERRORS {
+export enum SERVER_ERRORS {
   UNAUTHENTICATED = 401,
   FORBIDDEN = 403,
   NOT_FOUND = 404,

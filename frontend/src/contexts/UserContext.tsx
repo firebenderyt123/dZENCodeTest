@@ -1,11 +1,33 @@
-import { ReactNode, createContext, useContext, useEffect } from "react";
-import { UserState } from "@/lib/slices/user.slice";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import userService from "@/services/user.service";
-import { User } from "@/interfaces/user.interface";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { User } from "@/graphql/queries/users/interfaces/user.interface";
+import {
+  LazyQueryExecFunction,
+  OperationVariables,
+  useLazyQuery,
+  useMutation,
+} from "@apollo/client";
+import {
+  GET_USER_NAME,
+  GET_USER_QUERY,
+} from "@/graphql/queries/users/get-user.query";
+import {
+  PATCH_USER_MUTATION,
+  PATCH_USER_NAME,
+} from "@/graphql/queries/users/patch-user.mutation";
+import { GetUserResponse } from "@/graphql/queries/users/interfaces/get-user-response.interface";
+import { PatchUserResponse } from "@/graphql/queries/users/interfaces/patch-user-response.interface";
+import { useAuth } from "./AuthContext";
+import { generateContext } from "@/graphql/utils/auth.utils";
 
 interface UserContextType {
-  state: UserState;
+  user: User | null;
+  getUser: LazyQueryExecFunction<GetUserResponse, OperationVariables>;
   updateUserInfo: (userData: UpdateUserData) => void;
 }
 const UserContext = createContext<UserContextType | null>(null);
@@ -15,31 +37,44 @@ interface UserProviderProps {
   children: ReactNode;
 }
 export default function UserProvider({ children }: UserProviderProps) {
-  const dispatch = useAppDispatch();
-  const state = useAppSelector((reducers) => reducers.user);
+  const { isAuthenticated } = useAuth();
+  const [user, setUser] = useState<User | null>(null);
+
+  const [getUser, userData] = useLazyQuery<GetUserResponse>(GET_USER_QUERY);
+  const [patchUser, patchedUser] =
+    useMutation<PatchUserResponse>(PATCH_USER_MUTATION);
+
+  useEffect(() => {
+    if (isAuthenticated) getUser({ ...generateContext() });
+  }, [getUser, isAuthenticated]);
 
   const updateUserInfo = (data: UpdateUserData) => {
     const username =
-      state.user?.username !== data.username?.toLowerCase()
+      user?.username !== data.username?.toLowerCase()
         ? data.username
         : undefined;
     const email =
-      state.user?.email !== data.email?.toLowerCase() ? data.email : undefined;
+      user?.email !== data.email?.toLowerCase() ? data.email : undefined;
     const siteUrl =
-      state.user?.siteUrl !== data.siteUrl?.toLowerCase()
-        ? data.siteUrl
-        : undefined;
-    dispatch(userService.changeUserInfo({ username, email, siteUrl }));
+      user?.siteUrl !== data.siteUrl?.toLowerCase() ? data.siteUrl : undefined;
+
+    patchUser({ variables: { username, email, siteUrl } });
   };
 
   useEffect(() => {
-    if (!state.user && !state.error) {
-      dispatch(userService.getUserInfo());
+    if (userData.data) {
+      setUser(userData.data[GET_USER_NAME]);
     }
-  }, [dispatch, state.error, state.user]);
+  }, [userData.data]);
+
+  useEffect(() => {
+    if (patchedUser.data) {
+      setUser(patchedUser.data[PATCH_USER_NAME]);
+    }
+  }, [patchedUser.data]);
 
   return (
-    <UserContext.Provider value={{ state, updateUserInfo }}>
+    <UserContext.Provider value={{ user, getUser, updateUserInfo }}>
       {children}
     </UserContext.Provider>
   );

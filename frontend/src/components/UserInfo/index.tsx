@@ -8,32 +8,32 @@ interface UserInfo {
   form: UseFormReturn<ChangeUserInfoSchema, any, ChangeUserInfoSchema>;
 }
 export default function UserInfo({ form }: UserInfo) {
-  const user = useUser();
+  const { user } = useUser();
   const {
     register,
     formState: { errors },
   } = form;
 
   return (
-    user?.state.user && (
+    user && (
       <div>
         <InputStyled
           label="Username"
-          defaultValue={user.state.user.username}
+          defaultValue={user.username}
           error={!!errors.username}
           helperText={errors.username?.message}
           {...register("username")}
         />
         <InputStyled
           label="E-mail"
-          defaultValue={user.state.user.email}
+          defaultValue={user.email}
           error={!!errors.email}
           helperText={errors.email?.message}
           {...register("email")}
         />
         <InputStyled
           label="Home Page"
-          defaultValue={user.state.user.siteUrl || ""}
+          defaultValue={user.siteUrl || ""}
           error={!!errors.siteUrl}
           helperText={errors.siteUrl?.message}
           {...register("siteUrl")}

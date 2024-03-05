@@ -1,5 +1,5 @@
 import { API_PATH } from "../config";
-import { User } from "@/interfaces/user.interface";
+import { User } from "@/graphql/queries/users/interfaces/user.interface";
 import BaseApi from "../base";
 import { UserData } from "./user-patch-request.interface";
 

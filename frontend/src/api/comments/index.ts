@@ -2,7 +2,7 @@ import BaseApi from "../base";
 import { API_PATH } from "../config";
 import { CommentsResponse } from "./interfaces/comments-response.interface";
 import { COMMENT_REQUEST_METHOD } from "./enums/comments-requests.enum";
-import { getCommentsQuery } from "../../graphql/get-comments.query";
+import { getCommentsQuery } from "../../graphql/queries/comments/get-comments.query";
 import { GetCommentsProps } from "./interfaces/get-comments.interface";
 import { Comment } from "@/interfaces/comment.interface";
 
