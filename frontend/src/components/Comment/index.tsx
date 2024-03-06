@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import ReplyIcon from "@mui/icons-material/Reply";
 import { formatDateForComments } from "@/utils/date-format.utils";
-import { Comment } from "@/interfaces/comment.interface";
+import { Comment } from "@/graphql/queries/comments/interfaces/comment.interface";
 import BoxInnerHtml from "../BoxInnerHtml";
 import { AttachmentsPreviewBox } from "../AttachmentsPreviewPanel";
 import CommentAttachment from "./CommentAttachment";
@@ -90,11 +90,11 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
 
   const attachmentsBlock = !!attachments.length && (
     <AttachmentsPreviewBox>
-      {attachments.map(({ fileId, file }) => (
+      {attachments.map(({ fileId, containerName, fileUrl }) => (
         <CommentAttachment
           key={fileId}
-          containerName={file.containerName}
-          url={file.fileUrl}
+          containerName={containerName}
+          url={fileUrl}
           alt=""
         />
       ))}

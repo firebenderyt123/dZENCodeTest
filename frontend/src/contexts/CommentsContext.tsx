@@ -6,21 +6,18 @@ import {
   useEffect,
   useState,
 } from "react";
-import {
-  CommentsState,
-  getCommentsFailed,
-  getCommentsSuccess,
-} from "@/lib/slices/comments.slice";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { GetCommentsProps } from "@/services/comments.service";
+import commentsService, { GetCommentsProps } from "@/services/comments.service";
 import { useLazyQuery } from "@apollo/client";
 import {
   GET_COMMENTS_QUERY,
   GET_COMMENTS_QUERY_NAME,
 } from "@/graphql/queries/comments/get-comments.query";
+import { CommentsList } from "@/graphql/queries/comments/interfaces/comments-list.interface";
+import { ExtendedCommentTrees } from "@/graphql/queries/comments/interfaces/extended-comment-trees.interface";
 
 interface CommentsContextType {
-  state: CommentsState;
+  params: GetCommentsProps;
+  commentsList: ExtendedCommentTrees;
   getComments: (props: Partial<GetCommentsProps>) => void;
 }
 
@@ -28,16 +25,28 @@ const CommentsContext = createContext<CommentsContextType | null>(null);
 export const useComments = () =>
   useContext(CommentsContext) as CommentsContextType;
 
+const initCommentsList: ExtendedCommentTrees = {
+  comments: [],
+  totalPages: 1,
+  totalComments: 0,
+};
+
+const initParams: GetCommentsProps = {
+  page: 1,
+  limit: 25,
+  orderBy: "createdAt",
+  order: "DESC",
+};
+
 interface CommentsProviderProps {
   children: ReactNode;
 }
-
 export default function CommentsProvider({ children }: CommentsProviderProps) {
-  const dispatch = useAppDispatch();
-  const state = useAppSelector((reducers) => reducers.comments);
-  const [tempParams, setTempParams] = useState<GetCommentsProps | null>(null);
+  const [commentsList, setCommentsList] =
+    useState<ExtendedCommentTrees>(initCommentsList);
+  const [params, setParams] = useState<GetCommentsProps>(initParams);
 
-  const [getCommentsFunc, comments] = useLazyQuery(GET_COMMENTS_QUERY);
+  const [getCommentsFunc, commentsResp] = useLazyQuery(GET_COMMENTS_QUERY);
 
   const getComments = useCallback(
     (props: Partial<GetCommentsProps>) => {
@@ -46,7 +55,7 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
         limit: stateLimit,
         orderBy: stateOrderBy,
         order: stateOrder,
-      } = state.params;
+      } = params;
       const { page, limit, orderBy, order } = props;
       const variables = {
         page: page || statePage,
@@ -57,28 +66,33 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
       getCommentsFunc({
         variables,
       });
-      setTempParams(variables);
+      setParams(variables);
     },
-    [getCommentsFunc, state.params]
+    [getCommentsFunc, params]
   );
 
   useEffect(() => {
-    if (comments.data) {
-      dispatch(
-        getCommentsSuccess({
-          commentsData: comments.data[GET_COMMENTS_QUERY_NAME],
-          params: tempParams,
-        })
+    if (commentsResp.data) {
+      const data: CommentsList = commentsResp.data[GET_COMMENTS_QUERY_NAME];
+      const trees = commentsService.commentArraysToTree(
+        data.comments,
+        data.commentsLength
       );
-    } else if (comments.error) {
+      setCommentsList({
+        comments: trees,
+        totalPages: data.totalPages,
+        totalComments: data.totalComments,
+      });
+    } else if (commentsResp.error) {
       // dispatch(getCommentsFailed("Error"));
     }
-  }, [comments.data, comments.error, dispatch, tempParams]);
+  }, [commentsResp.data, commentsResp.error, params.page]);
 
   return (
     <CommentsContext.Provider
       value={{
-        state,
+        params,
+        commentsList,
         getComments,
       }}>
       {children}

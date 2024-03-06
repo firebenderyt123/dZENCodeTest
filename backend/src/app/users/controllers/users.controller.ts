@@ -20,10 +20,8 @@ export class UsersController {
   }
 
   @MessagePattern({ cmd: USERS_MESSAGES.PATCH_PROFILE })
-  async patchUser({
-    userId,
-    data,
-  }: UserIdWithData<PatchUserDto>): Promise<User> {
+  async patchUser(args: UserIdWithData<PatchUserDto>): Promise<User> {
+    const { userId, data } = args;
     try {
       return await this.usersService.patchUser(userId, data);
     } catch (error) {

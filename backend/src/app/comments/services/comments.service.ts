@@ -5,7 +5,6 @@ import { FindOptionsOrder, In, IsNull, Repository } from 'typeorm';
 import { UsersService } from '../../users/services/users.service';
 import { CreateCommentArgs } from '../dto/create-comment.dto';
 import { CommentAttachmentsService } from './comment-attachments.service';
-import { FileInput } from 'src/app/files/interfaces/file-input.interface';
 import { CommentList } from '../models/comment-list.model';
 import { Comment as CommentModel } from '../models/comment.model';
 import { Comment } from '../entities/comment.entity';
@@ -23,8 +22,7 @@ export class CommentsService {
   async create(
     userId: number,
     commentData: CreateCommentArgs,
-    files: FileInput[],
-  ): Promise<CommentModel> {
+  ): Promise<number> {
     const { parentId, text } = commentData;
 
     const comment = new Comment();
@@ -36,22 +34,8 @@ export class CommentsService {
     comment.user = await this.usersService.findOneById(userId);
     comment.text = text;
 
-    const savedComment = await this.commentRepository.save(comment);
-    const savedAttachments =
-      await this.commentAttachmentsService.saveAttachments(
-        savedComment.id,
-        files,
-      );
-    const response = {
-      ...savedComment,
-      createdAt: savedComment.createdAt.toISOString(),
-      attachments: flatMap(savedAttachments, ({ fileId, file }) => ({
-        fileId,
-        containerName: file.containerName,
-        fileUrl: file.fileUrl,
-      })),
-    };
-    return response;
+    const newComment = await this.commentRepository.save(comment);
+    return newComment.id;
   }
 
   async getComments(args: GetCommentListArgs): Promise<CommentList> {

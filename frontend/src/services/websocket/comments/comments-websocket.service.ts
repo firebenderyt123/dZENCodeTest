@@ -1,4 +1,4 @@
-import { CommentCreated } from "@/interfaces/comment.interface";
+import { CommentCreated } from "@/graphql/queries/comments/interfaces/comment.interface";
 import WebSocketService from "../websocket.service";
 import { CreateCommentProps } from "../../comments.service";
 import { WS_NAMESPACE } from "../ws.enum";

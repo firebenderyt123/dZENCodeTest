@@ -1,7 +1,7 @@
 import {
   CommentAttachment,
   CommentParent,
-} from "@/interfaces/comment.interface";
+} from "@/graphql/queries/comments/interfaces/comment.interface";
 import { User } from "@/graphql/queries/users/interfaces/user.interface";
 
 export interface CommentTree {

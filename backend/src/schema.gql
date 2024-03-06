@@ -54,11 +54,8 @@ type Query {
 }
 
 type Mutation {
-  addComment(parentId: Int, text: String!, files: [Upload!]!): Float!
+  addComment(parentId: Int, text: String!, hasAttachments: Boolean! = false): Int!
   patchUser(username: String, email: String, siteUrl: String): User!
   registerUser(username: String!, email: String!, siteUrl: String = null, password: String!): AuthResponse!
   loginUser(email: String!, password: String!): AuthResponse!
 }
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload

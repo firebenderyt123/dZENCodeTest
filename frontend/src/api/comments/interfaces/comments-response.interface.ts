@@ -1,4 +1,4 @@
-import { Comment } from "@/interfaces/comment.interface";
+import { Comment } from "@/graphql/queries/comments/interfaces/comment.interface";
 
 export interface CommentsResponse {
   comments: Comment[];

@@ -1,17 +1,15 @@
 import { errorNotify } from "@/utils/notifications.utils";
 import { onError } from "@apollo/client/link/error";
 import { SERVER_ERRORS } from "../enums/server-errors.enum";
-// import { useAuth } from "@/contexts/AuthContext";
+import cookiesService from "@/services/cookies.service";
 
 export const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
-    // const auth = useAuth();
-
     if (graphQLErrors) {
       for (let err of graphQLErrors) {
         switch (err.extensions.statusCode) {
           case SERVER_ERRORS.UNAUTHENTICATED:
-            // auth.logout();
+            cookiesService.deleteToken();
             break;
           default:
             break;

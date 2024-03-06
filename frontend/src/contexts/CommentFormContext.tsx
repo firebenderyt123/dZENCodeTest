@@ -1,11 +1,8 @@
 import {
-  Dispatch,
   ReactNode,
-  SetStateAction,
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
 } from "react";
 import {
@@ -16,6 +13,9 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import commentsService, {
   CreateCommentProps,
 } from "@/services/comments.service";
+import { useMutation } from "@apollo/client";
+import { ADD_COMMENT_QUERY } from "@/graphql/queries/comments/add-comment.mutation";
+import { generateContext } from "@/graphql/utils/auth.utils";
 
 interface CommentFormContextType {
   state: CommentDraftState;
@@ -45,6 +45,9 @@ export default function CommentFormProvider({
 }: CommentFormProviderProps) {
   const [files, setFiles] = useState<MyFile[]>([]);
   const [uploadError, setUploadError] = useState<string>("");
+
+  const [addComment, { data }] = useMutation<boolean>(ADD_COMMENT_QUERY);
+
   const dispatch = useAppDispatch();
   const state = useAppSelector((reducers) => reducers.commentDraft);
 
@@ -55,11 +58,14 @@ export default function CommentFormProvider({
         ...data,
         parentId: state.replyToCommentId || undefined,
       };
-      dispatch(
-        commentsService.createComment(commentData, commentFiles, captcha)
-      );
+      console.log(commentFiles);
+
+      addComment({
+        variables: { commentUUID: "", files: commentFiles },
+        ...generateContext(captcha),
+      });
     },
-    [dispatch, files, state.replyToCommentId]
+    [addComment, files, state.replyToCommentId]
   );
 
   const uploadFile = useCallback(

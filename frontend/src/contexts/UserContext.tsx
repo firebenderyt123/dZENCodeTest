@@ -58,7 +58,10 @@ export default function UserProvider({ children }: UserProviderProps) {
     const siteUrl =
       user?.siteUrl !== data.siteUrl?.toLowerCase() ? data.siteUrl : undefined;
 
-    patchUser({ variables: { username, email, siteUrl } });
+    patchUser({
+      variables: { username, email, siteUrl },
+      ...generateContext(),
+    });
   };
 
   useEffect(() => {

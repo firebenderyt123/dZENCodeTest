@@ -1,21 +1,17 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { Pagination } from "@mui/material";
-import { CommentsState } from "@/lib/slices/comments.slice";
-import { GetCommentsProps } from "@/services/comments.service";
 import CommentComponent, { ListStyled } from "../Comment";
+import { useComments } from "@/contexts/CommentsContext";
 
-interface CommentsListProps {
-  commentsState: CommentsState;
-  getComments: (props: Partial<GetCommentsProps>) => void;
-}
-
-export default function CommentsList({
-  commentsState,
-  getComments,
-}: CommentsListProps) {
-  const { pending, comments, total, error, params } = commentsState;
+export default function CommentsList() {
+  const { getComments, commentsList, params } = useComments();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
+
+  useEffect(() => {
+    getComments({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handlePageChange = (_: ChangeEvent<unknown>, page: number) => {
     getComments({ page });
@@ -24,20 +20,20 @@ export default function CommentsList({
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [comments]);
+  }, [commentsList]);
 
   return (
-    comments && (
+    commentsList && (
       <>
         <ListStyled>
-          {comments.map((comment) => (
+          {commentsList.comments.map((comment) => (
             <CommentComponent
               key={comment.id}
               comment={comment}></CommentComponent>
           ))}
         </ListStyled>
         <Pagination
-          count={total.pages}
+          count={commentsList.totalPages}
           variant="outlined"
           shape="rounded"
           page={params.page}

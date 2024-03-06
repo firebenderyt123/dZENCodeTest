@@ -3,13 +3,22 @@ import {
   Injectable,
   HttpStatus,
   ParseFilePipeBuilder,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInput } from 'src/app/files/interfaces/file-input.interface';
+
+const MAX_FILES_NUMBER = 5;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 mb
+const MAX_FILE_SIZE = 100 * 1024; // 100 kb
 
 @Injectable()
 export class ParseFilePipe implements PipeTransform {
   async transform(files: FileInput[] | undefined): Promise<FileInput[]> {
     if (!files.length) return [];
+    else if (files.length > MAX_FILES_NUMBER)
+      throw new BadRequestException(
+        `Allowed max ${MAX_FILES_NUMBER} files to attach`,
+      );
 
     const processedFiles: FileInput[] = [];
     for await (const file of files) {
@@ -18,7 +27,7 @@ export class ParseFilePipe implements PipeTransform {
           fileType: /(jpg|jpeg|gif|png|text\/plain)$/i,
         })
         .addMaxSizeValidator({
-          maxSize: this.getMaxSizeForFileType(file.type),
+          maxSize: this.getMaxSizeForFileType(file.mimetype) + 1,
         })
         .build({
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
@@ -26,7 +35,7 @@ export class ParseFilePipe implements PipeTransform {
         .transform(file);
 
       if (!result) {
-        throw new Error('Invalid file type or size');
+        throw new BadRequestException('Invalid file type or size');
       }
 
       processedFiles.push(file);
@@ -41,11 +50,11 @@ export class ParseFilePipe implements PipeTransform {
       case 'image/jpg':
       case 'image/png':
       case 'image/gif':
-        return 5242881; // 5mb
+        return MAX_IMAGE_SIZE; // 5mb
       case 'text/plain':
-        return 102401; // 100kb
+        return MAX_FILE_SIZE; // 100kb
       default:
-        return 102401;
+        return MAX_FILE_SIZE;
     }
   }
 }

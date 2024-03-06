@@ -1,7 +1,7 @@
 import { chunk, drop, filter, flatMap } from "lodash";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { CommentsResponse } from "@/api/comments/interfaces/comments-response.interface";
-import { Comment } from "@/interfaces/comment.interface";
+import { Comment } from "@/graphql/queries/comments/interfaces/comment.interface";
 import { ErrorData } from "@/interfaces/error.interface";
 import { CommentTree } from "../interfaces/comment-tree";
 

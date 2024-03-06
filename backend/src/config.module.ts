@@ -12,6 +12,7 @@ import { getEnvFile } from 'src/lib/utils/environment.utils';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 import { modules } from 'src/routes';
+import { YogaDriver, YogaDriverConfig } from '@graphql-yoga/nestjs';
 
 @Module({
   imports: [

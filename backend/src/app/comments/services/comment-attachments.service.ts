@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadGatewayException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FilesService } from '../../files/files.service';
@@ -18,6 +22,8 @@ export class CommentAttachmentsService {
     files: FileInput[],
   ): Promise<CommentAttachment[]> {
     const savedFiles = await this.filesService.saveFiles(files);
+    if (!savedFiles.length)
+      throw new BadGatewayException('Uploading files failed');
     const savedAttachments: CommentAttachment[] = [];
 
     const manager = this.commentAttachmentRepository.manager;

@@ -1,14 +1,18 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GetCommentListArgs } from '../dto/get-comment-list.dto';
 import { CommentList } from '../models/comment-list.model';
 import { CreateCommentArgs } from '../dto/create-comment.dto';
 import { NAMESPACE } from 'src/lib/enums/resolvers-namespace.enums';
-import { Inject } from '@nestjs/common';
+import { Inject, UseGuards } from '@nestjs/common';
 import { RABBIT_CLIENT_NAME } from 'src/lib/enums/rabbitmq.enum';
 import { ClientProxy } from '@nestjs/microservices';
 import { COMMENTS_MESSAGES } from '../enums/comments-messages.enum';
 import { firstValueFrom } from 'rxjs';
 import { getDataOrThrowError } from 'src/lib/utils/app-error.utils';
+import { JwtPayload } from 'src/lib/interfaces/jwt-payload.interface';
+import { Jwt } from 'src/lib/decorators/jwt.decorator';
+import { Comment } from '../models/comment.model';
+import { GqlAuthGuard } from 'src/lib/guards/jwt-gql.guard';
 
 @Resolver(NAMESPACE.COMMENTS)
 export class CommentsResolver {
@@ -16,13 +20,18 @@ export class CommentsResolver {
     @Inject(RABBIT_CLIENT_NAME.COMMENTS) private readonly client: ClientProxy,
   ) {}
 
-  @Mutation(() => Number)
-  async addComment(@Args() data: CreateCommentArgs) {
-    console.log(data);
-    // const newComment = this.commentsService.addComment({ id: postId, comment });
-    // pubSub.publish('commentAdded', { commentAdded: newComment });
-    // return newComment;r
-    return 1;
+  @Mutation(() => Int)
+  @UseGuards(GqlAuthGuard)
+  async addComment(
+    @Jwt() jwtPayload: JwtPayload,
+    @Args() data: CreateCommentArgs,
+  ) {
+    const commentId = this.client.send<void>(
+      { cmd: COMMENTS_MESSAGES.CREATE_COMMENT },
+      { userId: jwtPayload.id, data },
+    );
+    const result = await firstValueFrom(commentId);
+    return getDataOrThrowError<Comment>(result);
   }
 
   @Query(() => CommentList)

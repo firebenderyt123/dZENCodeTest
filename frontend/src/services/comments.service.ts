@@ -18,6 +18,9 @@ import cookiesService from "./cookies.service";
 import commentsWebSocketService from "./websocket/comments/comments-websocket.service";
 import { removeInvalidFiles } from "@/utils/files.utils";
 import { errorNotify } from "@/utils/notifications.utils";
+import { CommentTree } from "@/lib/interfaces/comment-tree";
+import { chunk, drop, filter, flatMap } from "lodash";
+import { Comment } from "@/graphql/queries/comments/interfaces/comment.interface";
 
 class CommentsService extends BaseService {
   createComment(
@@ -37,28 +40,28 @@ class CommentsService extends BaseService {
     };
   }
 
-  onCommentPublished() {
-    return async (dispatch: AppDispatch) => {
-      commentsWebSocketService.onCommentPublished((comment) => {
-        dispatch(createCommentSuccess());
-        dispatch(insertComment(comment));
-      });
-    };
-  }
-  offCommentPublished(): void {
-    commentsWebSocketService.offCommentPublished();
-  }
+  commentArraysToTree(
+    comments: Comment[],
+    commentsLength: number[]
+  ): CommentTree[] {
+    if (commentsLength.length < 2) {
+      return flatMap(comments, (comment) => ({
+        replies: [],
+        ...comment,
+      }));
+    }
 
-  onCommentCreateError() {
-    return async (dispatch: AppDispatch) => {
-      commentsWebSocketService.onCommentCreateError((id, message) => {
-        dispatch(createCommentFailed(message));
-        errorNotify(message);
-      });
-    };
-  }
-  offCommentCreateError(): void {
-    commentsWebSocketService.offCommentCreateError();
+    const [parentComments, replies] = chunk(comments, commentsLength[0]);
+    const subTrees = this.commentArraysToTree(replies, drop(commentsLength));
+
+    const tree = flatMap(parentComments, (parentComment) => ({
+      replies: filter(
+        subTrees,
+        (comment) => comment.parent.id === parentComment.id
+      ),
+      ...parentComment,
+    }));
+    return tree;
   }
 
   removeInvalidAttachments(files: File[]): [File[], Set<string>] {
