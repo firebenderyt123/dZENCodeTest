@@ -1,21 +1,4 @@
-import { CommentsGetRequestProps } from "@/api/comments/interfaces/get-comments.interface";
-import { CommentsCreateRequestProps } from "@/api/comments/interfaces/comments-create.interface";
-import commentsApi from "@/api/comments";
-import { AppDispatch } from "@/lib/store";
-import {
-  getCommentsRequest,
-  getCommentsSuccess,
-  getCommentsFailed,
-  insertComment,
-} from "@/lib/slices/comments.slice";
-import {
-  createCommentFailed,
-  createCommentRequest,
-  createCommentSuccess,
-} from "@/lib/slices/comment-draft.slice";
-import BaseService from "./base.service";
 import cookiesService from "./cookies.service";
-import commentsWebSocketService from "./websocket/comments/comments-websocket.service";
 import { removeInvalidFiles } from "@/utils/files.utils";
 import { errorNotify, successNotify } from "@/utils/notifications.utils";
 import { CommentTree } from "@/graphql/queries/comments/interfaces/comment-tree";
@@ -72,6 +55,3 @@ class CommentsService {
 }
 const commentsService = new CommentsService();
 export default commentsService;
-
-export type GetCommentsProps = CommentsGetRequestProps;
-export type CreateCommentProps = CommentsCreateRequestProps;

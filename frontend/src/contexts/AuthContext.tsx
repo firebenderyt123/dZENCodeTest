@@ -6,7 +6,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { SignInProps, SignUpProps } from "@/services/auth.service";
 import { useMutation } from "@apollo/client";
 import {
   SIGN_UP_MUTATION,
@@ -20,6 +19,8 @@ import cookiesService from "@/services/cookies.service";
 import { Auth } from "@/graphql/queries/auth/interfaces/auth.interface";
 import { SignUpResponse } from "@/graphql/queries/auth/interfaces/sign-up-response.interface";
 import { SignInResponse } from "@/graphql/queries/auth/interfaces/sign-in-response.interface";
+import { SignUpProps } from "@/graphql/queries/auth/interfaces/sign-up-props.interface";
+import { SignInProps } from "@/graphql/queries/auth/interfaces/sign-in-props.interface";
 
 interface AuthContextType {
   auth: Auth | null;

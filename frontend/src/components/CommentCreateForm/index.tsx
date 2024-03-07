@@ -4,7 +4,6 @@ import {
   CreateCommentSchema,
   createCommentSchema,
 } from "@/schemas/create-comment.shema";
-import { CreateCommentProps } from "@/services/comments.service";
 import {
   ChangeUserInfoSchema,
   changeUserInfoSchema,
@@ -30,13 +29,13 @@ export default function CommentCreateForm(props: BoxProps) {
   });
 
   const commentFormSubmit = useCallback(
-    (data: CreateCommentProps, captcha: string) => {
+    (text: string, captcha: string) => {
       changeUserForm.trigger().then((isValid) => {
         if (!isValid) return;
 
         const userData = changeUserForm.getValues();
         updateUserInfo(userData);
-        createComment(data, captcha);
+        createComment(text, captcha);
       });
     },
     [changeUserForm, createComment, updateUserInfo]

@@ -1,5 +1,5 @@
 import { styled } from "@mui/joy";
-import { SubmitHandler, UseFormReturn } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import InputField from "../FormParts/InputField";
 import { ChangeUserInfoSchema } from "@/schemas/change-user-info.schema";
 import { useUser } from "@/contexts/UserContext";

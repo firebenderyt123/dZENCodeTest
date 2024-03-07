@@ -4,8 +4,6 @@ import { SubmitHandler, UseFormReturn } from "react-hook-form";
 import htmlTagsService, { AllowedTags } from "@/services/html-tags.service";
 import { CreateCommentSchema } from "@/schemas/create-comment.shema";
 import InnerCommentBox from "./InnerCommentBox";
-import { transformHtmlText } from "@/utils/sanitize-html.utils";
-import { CreateCommentProps } from "@/services/comments.service";
 import { useCommentForm } from "@/contexts/CommentFormContext";
 import AttachmentsPreviewPanel from "../AttachmentsPreviewPanel";
 import Recaptcha, { ReCAPTCHA } from "../Recaptcha";
@@ -14,7 +12,7 @@ import FormLabel from "../FormParts/FormLabel";
 
 interface WithCommentBoxProps {
   form: UseFormReturn<CreateCommentSchema, any, CreateCommentSchema>;
-  submitCallback: (data: CreateCommentProps, captcha: string) => void;
+  submitCallback: (text: string, captcha: string) => void;
 }
 export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
   return function WithCommentBox({
@@ -71,7 +69,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
 
     const checkHtmlHandler = useCallback(
       (html: string = commentText) => {
-        setValue("text", transformHtmlText(html.trim()));
+        setValue("text", htmlTagsService.transformHtmlText(html.trim()));
       },
       [commentText, setValue]
     );
@@ -85,7 +83,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
         if (isValid && captchaRef.current) {
           const captcha = captchaRef.current.getValue();
           if (captcha) {
-            submitCallback(data, captcha);
+            submitCallback(data.text, captcha);
             captchaRef.current.reset();
           } else errorNotify("Captcha is required");
         }

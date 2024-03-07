@@ -6,14 +6,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import {
-  CommentDraftState,
-  replyToComment,
-} from "@/lib/slices/comment-draft.slice";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import commentsService, {
-  CreateCommentProps,
-} from "@/services/comments.service";
+import commentsService from "@/services/comments.service";
 import { useMutation } from "@apollo/client";
 import {
   ADD_COMMENT_QUERY,
@@ -24,7 +17,7 @@ import { successNotify } from "@/utils/notifications.utils";
 
 interface CommentFormContextType {
   state: State;
-  createComment: (data: CreateCommentProps, captcha: string) => void;
+  createComment: (text: string, captcha: string) => void;
   setReplyCommentId: (commentId: number | null) => void;
   uploadFile: (file: File[]) => void;
   removeFile: (file: MyFile) => void;
@@ -67,10 +60,10 @@ export default function CommentFormProvider({
   }>(ADD_COMMENT_QUERY);
 
   const createComment = useCallback(
-    (data: Omit<CreateCommentProps, "parentId">, captcha: string) => {
+    (text: string, captcha: string) => {
       const commentData = {
-        ...data,
         parentId: state.replyToCommentId || null,
+        text,
         hasAttachments: !!state.files.length,
       };
       setPending(true);

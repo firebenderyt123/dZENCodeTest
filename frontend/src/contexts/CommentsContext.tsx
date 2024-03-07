@@ -6,7 +6,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import commentsService, { GetCommentsProps } from "@/services/comments.service";
+import commentsService from "@/services/comments.service";
 import { useLazyQuery } from "@apollo/client";
 import {
   GET_COMMENTS_QUERY,
@@ -14,6 +14,8 @@ import {
 } from "@/graphql/queries/comments/get-comments.query";
 import { CommentsList } from "@/graphql/queries/comments/interfaces/comments-list.interface";
 import { ExtendedCommentTrees } from "@/graphql/queries/comments/interfaces/extended-comment-trees.interface";
+import { GetCommentsProps } from "@/graphql/queries/comments/interfaces/get-comments-props.interface";
+import { errorNotify } from "@/utils/notifications.utils";
 
 interface CommentsContextType {
   params: GetCommentsProps;
@@ -84,7 +86,7 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
         totalComments: data.totalComments,
       });
     } else if (commentsResp.error) {
-      // dispatch(getCommentsFailed("Error"));
+      errorNotify("Error while getting comments");
     }
   }, [commentsResp.data, commentsResp.error, params.page]);
 

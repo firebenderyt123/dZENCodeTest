@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ForwardedRef, RefObject, forwardRef, useRef, useState } from "react";
+import { ForwardedRef, RefObject, forwardRef, useRef } from "react";
 import {
   Avatar,
   Box,
@@ -11,7 +11,6 @@ import {
 } from "@mui/material";
 import ReplyIcon from "@mui/icons-material/Reply";
 import { formatDateForComments } from "@/utils/date-format.utils";
-import { Comment } from "@/graphql/queries/comments/interfaces/comment.interface";
 import BoxInnerHtml from "../BoxInnerHtml";
 import { AttachmentsPreviewBox } from "../AttachmentsPreviewPanel";
 import CommentAttachment from "./CommentAttachment";
