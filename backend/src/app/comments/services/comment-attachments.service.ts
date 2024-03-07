@@ -1,8 +1,4 @@
-import {
-  BadGatewayException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { BadGatewayException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FilesService } from '../../files/files.service';
@@ -47,28 +43,5 @@ export class CommentAttachmentsService {
       await queryRunner.release();
     }
     return savedAttachments;
-  }
-
-  async removeAttachment(userId: number, fileId: number): Promise<void> {
-    const attachment = await this.findAttachmentWithUserByFileId(fileId);
-
-    if (!attachment) return;
-
-    if (attachment.comment.user.id !== userId) {
-      throw new ForbiddenException(
-        'You are not allowed to delete this attachment',
-      );
-    }
-
-    await this.filesService.remove(fileId);
-  }
-
-  private async findAttachmentWithUserByFileId(
-    fileId: number,
-  ): Promise<CommentAttachment | null> {
-    return await this.commentAttachmentRepository.findOne({
-      where: { fileId },
-      relations: ['comment', 'comment.user'],
-    });
   }
 }

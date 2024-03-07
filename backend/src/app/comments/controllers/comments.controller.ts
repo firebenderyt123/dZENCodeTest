@@ -69,7 +69,6 @@ export class CommentsController {
   async getComments(args: GetCommentListArgs): Promise<CommentList> {
     try {
       const cachedData = await this.cacheService.getCommentsList(args);
-      console.log('comments', cachedData);
       if (cachedData) return cachedData;
 
       const newData = await this.commentsService.getComments(args);

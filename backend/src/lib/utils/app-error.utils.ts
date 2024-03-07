@@ -1,6 +1,6 @@
 import { AppError, InternalServerError } from '../models/app-error.model';
 
-export function isAppError(data: unknown): data is AppError {
+function isAppError(data: unknown): data is AppError {
   if (
     typeof data === 'object' &&
     'message' in data &&
@@ -14,14 +14,14 @@ export function isAppError(data: unknown): data is AppError {
   return false;
 }
 
-export function isError(data: unknown): data is Error {
+function isError(data: unknown): data is Error {
   if (typeof data === 'object' && 'message' in data) {
     return true;
   }
   return false;
 }
 
-export function isEmptyObject(data: unknown): data is object {
+function isEmptyObject(data: unknown): data is object {
   if (typeof data === 'object' && !Object.keys(data).length) return true;
   return false;
 }

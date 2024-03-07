@@ -34,12 +34,6 @@ export class UsersService {
     return newUser;
   }
 
-  async getUser(userId: number): Promise<UserModel> {
-    const user = this.findOneById(userId);
-    if (!user) throw new UnauthenticatedError();
-    return user;
-  }
-
   async patchUser(
     id: number,
     userData: Partial<UserModel>,
@@ -63,10 +57,6 @@ export class UsersService {
 
   async findOneById(userId: number): Promise<User> {
     return await this.usersRepository.findOneBy({ id: userId });
-  }
-
-  async remove(id: number): Promise<void> {
-    await this.usersRepository.delete(id);
   }
 
   async searchByEmailAndPassword(

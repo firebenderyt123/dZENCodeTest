@@ -1,5 +1,5 @@
 import { flatMap, dropRight } from 'lodash';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsOrder, In, IsNull, Repository } from 'typeorm';
 import { UsersService } from '../../users/services/users.service';
@@ -59,19 +59,6 @@ export class CommentsService {
       totalPages: Math.ceil(totalComments / limit),
       totalComments: totalComments,
     };
-  }
-
-  async remove(commentId: number, userId: number): Promise<void> {
-    const comment = await this.findCommentWithUserById(commentId);
-
-    if (!comment) return;
-
-    if (comment.user.id !== userId)
-      throw new ForbiddenException(
-        'You are not allowed to delete this comment',
-      );
-
-    await this.commentRepository.delete(commentId);
   }
 
   async findCommentWithUserById(id: number): Promise<Comment | null> {

@@ -1,18 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-// import { BullModule } from '@nestjs/bull';
-import { CacheModule, CacheStore } from '@nestjs/cache-manager';
-import type { RedisClientOptions } from 'redis';
-import { redisStore } from 'cache-manager-redis-store';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { GoogleRecaptchaModule } from '@nestlab/google-recaptcha';
+import { ConfigModule } from '@nestjs/config';
 import configuration from 'src/lib/config/configuration';
 import { getEnvFile } from 'src/lib/utils/environment.utils';
-import { GraphQLModule } from '@nestjs/graphql';
-import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
-import { modules } from 'src/routes';
-import { YogaDriver, YogaDriverConfig } from '@graphql-yoga/nestjs';
+import { RedisCacheModule } from './lib/modules/cache.module';
+import { RecaptchaModule } from './lib/modules/recaptcha.module';
+import { GraphQlModule } from './lib/modules/graphql.module';
+import { TypeORMModule } from './lib/modules/typeorm.module';
 
 @Module({
   imports: [
@@ -21,52 +14,10 @@ import { YogaDriver, YogaDriverConfig } from '@graphql-yoga/nestjs';
       load: [configuration],
       envFilePath: getEnvFile(),
     }),
-    CacheModule.registerAsync<RedisClientOptions>({
-      isGlobal: true,
-      useFactory: async (configService: ConfigService) => {
-        const store = await redisStore({
-          name: 'cache',
-          database: 1,
-          socket: {
-            host: configService.get('redis.host'),
-            port: +configService.get('redis.port'),
-          },
-          password: configService.get('redis.password'),
-        });
-        return {
-          store: store as unknown as CacheStore,
-        };
-      },
-      inject: [ConfigService],
-    }),
-    GoogleRecaptchaModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        ...configService.get('recaptcha'),
-        response: (req) => req.headers.recaptcha,
-      }),
-      inject: [ConfigService],
-    }),
-    GraphQLModule.forRoot<MercuriusDriverConfig>({
-      driver: MercuriusDriver,
-      include: modules,
-      useGlobalPrefix: true,
-      autoSchemaFile: 'src/schema.gql',
-      subscription: true,
-    }),
-    TypeOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('database.host'),
-        port: configService.get('database.port'),
-        database: configService.get('database.name'),
-        username: configService.get('database.user'),
-        password: configService.get('database.password'),
-        autoLoadEntities: true,
-        synchronize: false,
-        ssl: configService.get('database.ssl'),
-      }),
-      inject: [ConfigService],
-    }),
+    RedisCacheModule,
+    RecaptchaModule,
+    GraphQlModule,
+    TypeORMModule,
   ],
 })
 export class ConfigureModule {}
