@@ -10,6 +10,8 @@ import { CommentsResolver } from '../resolvers/comments.resolver';
 import { UsersModule } from 'src/app/users/modules/users.module';
 import { RMQModule } from 'src/lib/modules/rabbitmq.module';
 import { RABBIT_CLIENT_NAME, RABBIT_QUEUE } from 'src/lib/enums/rabbitmq.enum';
+import { CommentsCacheService } from '../services/comments-cache.service';
+import { CommentAttachmentsController } from '../controllers/comment-attachments.controller';
 
 @Module({
   imports: [
@@ -22,8 +24,13 @@ import { RABBIT_CLIENT_NAME, RABBIT_QUEUE } from 'src/lib/enums/rabbitmq.enum';
     TypeOrmModule.forFeature([Comment]),
     TypeOrmModule.forFeature([CommentAttachment]),
   ],
-  controllers: [CommentsController],
-  providers: [CommentsService, CommentAttachmentsService, CommentsResolver],
+  controllers: [CommentsController, CommentAttachmentsController],
+  providers: [
+    CommentsService,
+    CommentAttachmentsService,
+    CommentsResolver,
+    CommentsCacheService,
+  ],
   exports: [CommentsService],
 })
 export class CommentsModule {}

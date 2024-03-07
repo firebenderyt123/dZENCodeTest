@@ -13,6 +13,7 @@ import { JwtPayload } from 'src/lib/interfaces/jwt-payload.interface';
 import { Jwt } from 'src/lib/decorators/jwt.decorator';
 import { Comment } from '../models/comment.model';
 import { GqlAuthGuard } from 'src/lib/guards/jwt-gql.guard';
+import { GqlRecaptchaGuard } from 'src/lib/guards/recaptcha-gql.guard';
 
 @Resolver(NAMESPACE.COMMENTS)
 export class CommentsResolver {
@@ -22,6 +23,7 @@ export class CommentsResolver {
 
   @Mutation(() => Int)
   @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlRecaptchaGuard)
   async addComment(
     @Jwt() jwtPayload: JwtPayload,
     @Args() data: CreateCommentArgs,

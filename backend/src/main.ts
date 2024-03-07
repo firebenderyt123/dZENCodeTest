@@ -8,7 +8,6 @@ import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { RABBIT_QUEUE } from './lib/enums/rabbitmq.enum';
-import { mercuriusUpload } from 'mercurius-upload';
 import { fastifyMultipart } from '@fastify/multipart';
 
 async function bootstrap() {
@@ -40,10 +39,6 @@ async function bootstrap() {
     });
   });
   app.register(fastifyMultipart);
-  // app.register(mercuriusUpload, {
-  //   maxFieldSize: 10 * 1024 * 1024, // 10 MB
-  //   maxFiles: 5,
-  // });
 
   app.enableCors({
     origin: configService.get('cors.origin'),

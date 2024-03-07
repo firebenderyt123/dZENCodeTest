@@ -21,26 +21,24 @@ import { YogaDriver, YogaDriverConfig } from '@graphql-yoga/nestjs';
       load: [configuration],
       envFilePath: getEnvFile(),
     }),
-    // CacheModule.registerAsync<RedisClientOptions>({
-    //   isGlobal: true,
-    //   useFactory: async (configService: ConfigService) => {
-    //     const store = await redisStore({
-    //       name: 'cache',
-    //       database: 1,
-    //       socket: {
-    //         host: configService.get('redis.host'),
-    //         port: +configService.get('redis.port'),
-    //       },
-    //       password: configService.get('redis.password'),
-    //       ttl: configService.get('cache.ttl'),
-    //     });
-    //     return {
-    //       store: store as unknown as CacheStore,
-    //     };
-    //   },
-    //   inject: [ConfigService],
-    // }),
-    EventEmitterModule.forRoot(),
+    CacheModule.registerAsync<RedisClientOptions>({
+      isGlobal: true,
+      useFactory: async (configService: ConfigService) => {
+        const store = await redisStore({
+          name: 'cache',
+          database: 1,
+          socket: {
+            host: configService.get('redis.host'),
+            port: +configService.get('redis.port'),
+          },
+          password: configService.get('redis.password'),
+        });
+        return {
+          store: store as unknown as CacheStore,
+        };
+      },
+      inject: [ConfigService],
+    }),
     GoogleRecaptchaModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         ...configService.get('recaptcha'),
@@ -55,17 +53,6 @@ import { YogaDriver, YogaDriverConfig } from '@graphql-yoga/nestjs';
       autoSchemaFile: 'src/schema.gql',
       subscription: true,
     }),
-    // BullModule.forRootAsync({
-    //   useFactory: (configService: ConfigService) => ({
-    //     redis: configService.get('redis'),
-    //     defaultJobOptions: {
-    //       removeOnComplete: 1000,
-    //       removeOnFail: 4000,
-    //       attempts: 3,
-    //     },
-    //   }),
-    //   inject: [ConfigService],
-    // }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',

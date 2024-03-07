@@ -62,7 +62,7 @@ export default function CommentFormProvider({
 }: CommentFormProviderProps) {
   const [state, setState] = useState<State>(initState);
 
-  const [addComment, { data }] = useMutation<{
+  const [addComment, { data, reset }] = useMutation<{
     [ADD_COMMENT_QUERY_NAME]: number;
   }>(ADD_COMMENT_QUERY);
 
@@ -83,24 +83,26 @@ export default function CommentFormProvider({
   );
 
   const onCommentSuccess = useCallback(() => {
+    reset();
     setState(initState);
     successNotify("Comment created");
-  }, []);
+  }, [reset]);
 
   useEffect(() => {
-    if (data) {
-      if (!!state.files.length) {
-        const commentFiles = state.files.map((item) => item.data);
-        commentsService
-          .uploadAttachments(data[ADD_COMMENT_QUERY_NAME], commentFiles)
-          .then((isSuccess) => {
-            if (isSuccess) {
-              setState(initState);
-            }
-          });
-      } else {
-        onCommentSuccess();
-      }
+    if (!data) return;
+    if (!!state.files.length) {
+      const commentFiles = state.files.map((item) => item.data);
+      commentsService
+        .uploadAttachments(data[ADD_COMMENT_QUERY_NAME], commentFiles)
+        .then((isSuccess) => {
+          if (isSuccess) {
+            setState(initState);
+          } else {
+            setPending(false);
+          }
+        });
+    } else {
+      onCommentSuccess();
     }
   }, [data, onCommentSuccess, state.files]);
 

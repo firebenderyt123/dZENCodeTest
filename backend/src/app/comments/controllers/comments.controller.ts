@@ -1,65 +1,39 @@
-import {
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Inject,
-  Param,
-  Post,
-  UploadedFiles,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, ForbiddenException, HttpException } from '@nestjs/common';
 import { CommentsService } from '../services/comments.service';
 import { CommentAttachmentsService } from '../services/comment-attachments.service';
 import { CommentList } from '../models/comment-list.model';
 import { GetCommentListArgs } from '../dto/get-comment-list.dto';
-import { ClientProxy, MessagePattern } from '@nestjs/microservices';
+import { MessagePattern } from '@nestjs/microservices';
 import { COMMENTS_MESSAGES } from '../enums/comments-messages.enum';
-import { FilesInterceptor } from '@nest-lab/fastify-multer';
-import { ParseFilePipe } from 'src/lib/pipes/parse-file.pipe';
-import { FileUpload } from 'src/app/files/interfaces/file-input.interface';
 import { UserIdWithData } from 'src/lib/interfaces/user-id-with-data.interface';
 import { CreateCommentArgs } from '../dto/create-comment.dto';
-import { RABBIT_CLIENT_NAME } from 'src/lib/enums/rabbitmq.enum';
-import { RestApiAuthGuard } from 'src/lib/guards/jwt-rest-api.guard';
 import { UploadAttachmentsArgs } from '../dto/upload-attachments.dto';
-import { Jwt, JwtPayload } from 'src/lib/decorators/jwt-rest-api.decorator';
-import { firstValueFrom } from 'rxjs';
-import { CommentAttachment } from '../models/comment-attachment.model';
+import { CommentsCacheService } from '../services/comments-cache.service';
 
 @Controller()
 export class CommentsController {
   constructor(
-    @Inject(RABBIT_CLIENT_NAME.COMMENTS) private readonly client: ClientProxy,
     private readonly commentsService: CommentsService,
     private readonly commentAttachmentsService: CommentAttachmentsService,
+    private readonly cacheService: CommentsCacheService,
   ) {}
-
-  @Post('attachments/:id')
-  @UseGuards(RestApiAuthGuard)
-  @UseInterceptors(FilesInterceptor('files'))
-  @HttpCode(HttpStatus.OK)
-  async uploadFiles(
-    @Param('id') commentId: number,
-    @Jwt() jwtPayload: JwtPayload,
-    @UploadedFiles(new ParseFilePipe()) files: FileUpload[],
-  ): Promise<boolean> {
-    const attachments = this.client.send<boolean>(
-      { cmd: COMMENTS_MESSAGES.UPLOAD_ATTACHMENTS },
-      { userId: jwtPayload, data: { commentId, files } },
-    );
-    return await firstValueFrom(attachments);
-  }
 
   @MessagePattern({ cmd: COMMENTS_MESSAGES.UPLOAD_ATTACHMENTS })
   async uploadAttachments(
     args: UserIdWithData<UploadAttachmentsArgs>,
-  ): Promise<boolean> {
+  ): Promise<boolean | HttpException> {
     const {
       userId,
       data: { commentId, files },
     } = args;
-    // get from redis by comment id, user that must upload attachments
+
+    const ownerId =
+      await this.cacheService.getCommentWaitingForUploads(commentId);
+    if (ownerId !== userId)
+      return new ForbiddenException(
+        "Not allowed to upload attachments to stranger's comment",
+      );
+
     try {
       const correctFiles = files.map((file) => ({
         ...file,
@@ -69,8 +43,8 @@ export class CommentsController {
         commentId,
         correctFiles,
       );
+      await this.cacheService.delCommentWaitingForUploads(commentId);
       return !!result;
-      // remove from redis comment id and user id
     } catch (error) {
       throw error;
     }
@@ -83,7 +57,8 @@ export class CommentsController {
     const { userId, data } = args;
     try {
       const commentId = await this.commentsService.create(userId, data);
-      // save commentId and user id to redis to quickly validate who must upload files
+      await this.cacheService.setCommentWaitingForUploads(commentId, userId);
+      await this.cacheService.delCommentsList();
       return commentId;
     } catch (error) {
       throw error;
@@ -93,26 +68,15 @@ export class CommentsController {
   @MessagePattern({ cmd: COMMENTS_MESSAGES.GET_COMMENTS })
   async getComments(args: GetCommentListArgs): Promise<CommentList> {
     try {
-      return await this.commentsService.getComments(args);
+      const cachedData = await this.cacheService.getCommentsList(args);
+      console.log('comments', cachedData);
+      if (cachedData) return cachedData;
+
+      const newData = await this.commentsService.getComments(args);
+      await this.cacheService.setCommentsList(args, newData);
+      return newData;
     } catch (error) {
       throw error;
     }
   }
-
-  // @UseGuards(JwtAuthGuard)
-  // @Delete('/:id')
-  // @HttpCode(HttpStatus.OK)
-  // async remove(
-  //   @Param('id') commentId: number,
-  //   @Req() req: FastifyRequest,
-  // ): Promise<'ok'> {
-  //   if (isNaN(commentId)) {
-  //     throw new BadRequestException(':id must be a number');
-  //   }
-
-  //   const { id } = this.authTokenService.isAuthenticated(req.headers);
-
-  //   await this.commentsService.remove(commentId, id);
-  //   return 'ok';
-  // }
 }

@@ -38,6 +38,7 @@ class CommentsService {
       );
     } catch (err) {
       errorNotify("Upload attachments failed");
+      return false;
     }
   }
 

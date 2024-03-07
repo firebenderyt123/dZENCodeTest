@@ -12,9 +12,6 @@ export default () => ({
       rejectUnauthorized: false,
     },
   },
-  cache: {
-    ttl: parseInt(process.env.CACHE_TTL, 10) || 5,
-  },
   rabbitmq: {
     urls: [process.env.RABBITMQ_URL],
     queueDurable: parseBoolean(process.env.RABBITMQ_QUEUE_DURABLE) || false,
