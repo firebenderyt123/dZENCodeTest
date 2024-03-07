@@ -18,9 +18,10 @@ import CommentAttachment from "./CommentAttachment";
 import { IconButton } from "@mui/joy";
 import { useCommentForm } from "@/contexts/CommentFormContext";
 import CommentCreateForm from "../CommentCreateForm";
+import { CommentTree } from "@/graphql/queries/comments/interfaces/comment-tree";
 
 interface ComponentProps {
-  comment: Comment;
+  comment: CommentTree;
   parentCommentText?: string;
 }
 type Ref = ForwardedRef<HTMLLIElement>;

@@ -21,7 +21,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
     form,
     submitCallback,
   }: WithCommentBoxProps & TextareaProps) {
-    const commentForm = useCommentForm();
+    const { state, removeFile } = useCommentForm();
     const {
       register,
       handleSubmit,
@@ -36,14 +36,10 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
     const commentRef = useRef<HTMLDivElement | null>(null);
     const commentText = watch("text", "");
 
-    const commentError: string =
-      errors?.text?.message || commentForm?.uploadError || "";
+    const commentError: string = errors?.text?.message || state.error || "";
 
-    const attachmentPreviews = commentForm && (
-      <AttachmentsPreviewPanel
-        files={commentForm.files}
-        removeFile={commentForm.removeFile}
-      />
+    const attachmentPreviews = (
+      <AttachmentsPreviewPanel files={state.files} removeFile={removeFile} />
     );
 
     const wrapWithTagHandler = useCallback(
@@ -97,10 +93,10 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
     };
 
     useEffect(() => {
-      if (commentForm?.state.error === null) {
+      if (state.error === null) {
         reset();
       }
-    }, [commentForm?.state, reset]);
+    }, [state.error, reset]);
 
     return (
       <form onSubmit={handleSubmit(submitHandler)}>

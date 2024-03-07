@@ -43,19 +43,18 @@ export class CommentsController {
     @Param('id') commentId: number,
     @Jwt() jwtPayload: JwtPayload,
     @UploadedFiles(new ParseFilePipe()) files: FileUpload[],
-  ) {
-    const attachments = this.client.send<void>(
+  ): Promise<boolean> {
+    const attachments = this.client.send<boolean>(
       { cmd: COMMENTS_MESSAGES.UPLOAD_ATTACHMENTS },
       { userId: jwtPayload, data: { commentId, files } },
     );
-    await firstValueFrom(attachments);
-    return true;
+    return await firstValueFrom(attachments);
   }
 
   @MessagePattern({ cmd: COMMENTS_MESSAGES.UPLOAD_ATTACHMENTS })
   async uploadAttachments(
     args: UserIdWithData<UploadAttachmentsArgs>,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const {
       userId,
       data: { commentId, files },
@@ -66,10 +65,11 @@ export class CommentsController {
         ...file,
         buffer: Buffer.from(file.buffer.data),
       }));
-      await this.commentAttachmentsService.saveAttachments(
+      const result = await this.commentAttachmentsService.saveAttachments(
         commentId,
         correctFiles,
       );
+      return !!result;
       // remove from redis comment id and user id
     } catch (error) {
       throw error;

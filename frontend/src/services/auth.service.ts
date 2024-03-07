@@ -14,7 +14,7 @@ import cookiesService from "./cookies.service";
 import { ErrorData } from "@/interfaces/error.interface";
 import { userInfoSuccess, userLogout } from "@/lib/slices/user.slice";
 
-class AuthService extends BaseService {
+class AuthService {
   logout() {
     cookiesService.deleteToken();
   }
@@ -29,7 +29,7 @@ class AuthService extends BaseService {
 
   deauthIfShould(error: ErrorData, dispatch: AppDispatch) {
     if (error.statusCode === 401) {
-      super.showError("Not Authenticated");
+      // super.showError("Not Authenticated");
     }
   }
 

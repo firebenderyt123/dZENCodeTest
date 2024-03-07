@@ -3,6 +3,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import {
@@ -14,13 +15,15 @@ import commentsService, {
   CreateCommentProps,
 } from "@/services/comments.service";
 import { useMutation } from "@apollo/client";
-import { ADD_COMMENT_QUERY } from "@/graphql/queries/comments/add-comment.mutation";
+import {
+  ADD_COMMENT_QUERY,
+  ADD_COMMENT_QUERY_NAME,
+} from "@/graphql/queries/comments/add-comment.mutation";
 import { generateContext } from "@/graphql/utils/auth.utils";
+import { successNotify } from "@/utils/notifications.utils";
 
 interface CommentFormContextType {
-  state: CommentDraftState;
-  files: MyFile[];
-  uploadError: string;
+  state: State;
   createComment: (data: CreateCommentProps, captcha: string) => void;
   setReplyCommentId: (commentId: number | null) => void;
   uploadFile: (file: File[]) => void;
@@ -30,6 +33,20 @@ interface CommentFormContextType {
 const CommentFormContext = createContext<CommentFormContextType | null>(null);
 export const useCommentForm = () =>
   useContext(CommentFormContext) as CommentFormContextType;
+
+interface State {
+  files: MyFile[];
+  replyToCommentId: number | null;
+  pending: boolean;
+  error: string | null;
+}
+
+const initState: State = {
+  files: [],
+  replyToCommentId: null,
+  pending: false,
+  error: null,
+};
 
 interface CommentFormProviderProps {
   children: ReactNode;
@@ -43,30 +60,53 @@ export type MyFile = {
 export default function CommentFormProvider({
   children,
 }: CommentFormProviderProps) {
-  const [files, setFiles] = useState<MyFile[]>([]);
-  const [uploadError, setUploadError] = useState<string>("");
+  const [state, setState] = useState<State>(initState);
 
-  const [addComment, { data }] = useMutation<boolean>(ADD_COMMENT_QUERY);
-
-  const dispatch = useAppDispatch();
-  const state = useAppSelector((reducers) => reducers.commentDraft);
+  const [addComment, { data }] = useMutation<{
+    [ADD_COMMENT_QUERY_NAME]: number;
+  }>(ADD_COMMENT_QUERY);
 
   const createComment = useCallback(
     (data: Omit<CreateCommentProps, "parentId">, captcha: string) => {
-      const commentFiles = files.map((item) => item.data);
       const commentData = {
         ...data,
-        parentId: state.replyToCommentId || undefined,
+        parentId: state.replyToCommentId || null,
+        hasAttachments: !!state.files.length,
       };
-      console.log(commentFiles);
-
+      setPending(true);
       addComment({
-        variables: { commentUUID: "", files: commentFiles },
+        variables: commentData,
         ...generateContext(captcha),
       });
     },
-    [addComment, files, state.replyToCommentId]
+    [state.files, state.replyToCommentId, addComment]
   );
+
+  const onCommentSuccess = useCallback(() => {
+    setState(initState);
+    successNotify("Comment created");
+  }, []);
+
+  useEffect(() => {
+    if (data) {
+      if (!!state.files.length) {
+        const commentFiles = state.files.map((item) => item.data);
+        commentsService
+          .uploadAttachments(data[ADD_COMMENT_QUERY_NAME], commentFiles)
+          .then((isSuccess) => {
+            if (isSuccess) {
+              setState(initState);
+            }
+          });
+      } else {
+        onCommentSuccess();
+      }
+    }
+  }, [data, onCommentSuccess, state.files]);
+
+  const setPending = (val: boolean) => {
+    setState((prev) => ({ ...prev, pending: val }));
+  };
 
   const uploadFile = useCallback(
     (newFiles: File[]) => {
@@ -79,38 +119,43 @@ export default function CommentFormProvider({
           ? URL.createObjectURL(file)
           : null,
       }));
-      setFiles((prev) =>
-        prev ? [...prev, ...filesWithPreview] : filesWithPreview
-      );
-      setUploadError(!!errors.size ? Array.from(errors).join("\n") : "");
+      setState((prev) => ({
+        ...prev,
+        files: [...prev.files, ...filesWithPreview],
+        error: !!errors.size ? Array.from(errors)[0] : null,
+      }));
 
       return () => {
-        files.forEach((file) =>
+        state.files.forEach((file) =>
           URL.revokeObjectURL(file.preview ? file.preview : "")
         );
       };
     },
-    [files]
+    [state.files]
   );
 
   const removeFile = useCallback((file: MyFile) => {
-    setFiles((prev) => [...prev.filter((f) => f !== file)]);
+    setState((prev) => ({
+      ...prev,
+      files: [...prev.files.filter((f) => f !== file)],
+    }));
   }, []);
 
   const setReplyCommentId = useCallback(
     (commentId: number | null) => {
       if (state.replyToCommentId !== commentId)
-        dispatch(replyToComment(commentId));
+        setState((prev) => ({
+          ...prev,
+          replyToCommentId: commentId,
+        }));
     },
-    [dispatch, state.replyToCommentId]
+    [state.replyToCommentId]
   );
 
   return (
     <CommentFormContext.Provider
       value={{
         state,
-        files,
-        uploadError,
         createComment,
         setReplyCommentId,
         uploadFile,

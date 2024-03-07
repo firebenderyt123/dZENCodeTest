@@ -17,27 +17,28 @@ import BaseService from "./base.service";
 import cookiesService from "./cookies.service";
 import commentsWebSocketService from "./websocket/comments/comments-websocket.service";
 import { removeInvalidFiles } from "@/utils/files.utils";
-import { errorNotify } from "@/utils/notifications.utils";
-import { CommentTree } from "@/lib/interfaces/comment-tree";
-import { chunk, drop, filter, flatMap } from "lodash";
+import { errorNotify, successNotify } from "@/utils/notifications.utils";
+import { CommentTree } from "@/graphql/queries/comments/interfaces/comment-tree";
+import { chunk, drop, filter, flatMap, forEach } from "lodash";
 import { Comment } from "@/graphql/queries/comments/interfaces/comment.interface";
+import uploadsApi from "@/rest-api/uploads";
 
-class CommentsService extends BaseService {
-  createComment(
-    commentData: CreateCommentProps,
-    files: File[],
-    captcha: string
-  ) {
-    return async (dispatch: AppDispatch) => {
-      dispatch(createCommentRequest());
-      const token: string = cookiesService.getToken();
-      await commentsWebSocketService.emitCreateComment(
+class CommentsService {
+  async uploadAttachments(commentId: number, files: File[]): Promise<boolean> {
+    const token = cookiesService.getToken();
+    const formData = new FormData();
+    forEach(files, (file) => {
+      formData.append("files", file);
+    });
+    try {
+      return await uploadsApi.uploadCommentAttachments(
         token,
-        commentData,
-        files,
-        captcha
+        commentId,
+        formData
       );
-    };
+    } catch (err) {
+      errorNotify("Upload attachments failed");
+    }
   }
 
   commentArraysToTree(

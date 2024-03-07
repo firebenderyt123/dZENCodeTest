@@ -3,7 +3,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { CommentsResponse } from "@/api/comments/interfaces/comments-response.interface";
 import { Comment } from "@/graphql/queries/comments/interfaces/comment.interface";
 import { ErrorData } from "@/interfaces/error.interface";
-import { CommentTree } from "../interfaces/comment-tree";
+import { CommentTree } from "../../graphql/queries/comments/interfaces/comment-tree";
 
 export interface CommentsState {
   pending: boolean;
