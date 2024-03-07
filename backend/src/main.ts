@@ -4,7 +4,6 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { ConfigService } from '@nestjs/config';
-import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { RABBIT_QUEUE } from './lib/enums/rabbitmq.enum';
@@ -44,7 +43,6 @@ async function bootstrap() {
     origin: configService.get('cors.origin'),
     credentials: true,
   });
-  app.useWebSocketAdapter(new IoAdapter(app));
   app.setGlobalPrefix('api/v1');
 
   const port = configService.get('port');
