@@ -29,20 +29,30 @@ export class CommentsCacheService {
   }
 
   async getCommentsList(props: GetCommentListArgs): Promise<CommentList> {
-    const key = getSpecialKey(COMMENTS_CACHE.COMMENTS_LIST, props);
+    const { page, limit, orderBy, order } = props;
+    const key = getSpecialKey(COMMENTS_CACHE.COMMENTS_LIST, {
+      page,
+      limit,
+      orderBy,
+      order,
+    });
     const data = await this.cacheService.get<CommentList>(key);
     return data;
   }
-
   async setCommentsList(
     props: GetCommentListArgs,
     value: CommentList,
     ttl?: number,
   ): Promise<void> {
-    const key = getSpecialKey(COMMENTS_CACHE.COMMENTS_LIST, props);
+    const { page, limit, orderBy, order } = props;
+    const key = getSpecialKey(COMMENTS_CACHE.COMMENTS_LIST, {
+      page,
+      limit,
+      orderBy,
+      order,
+    });
     await this.cacheService.set(key, value, ttl);
   }
-
   async delCommentsList(): Promise<void> {
     const keys = await this.cacheService.store.keys(
       `${COMMENTS_CACHE.COMMENTS_LIST}*`,

@@ -1,8 +1,9 @@
 import { ArgsType, Field, Int } from '@nestjs/graphql';
 import { IsIn, Max, Min } from 'class-validator';
+import { UUIDArgs } from 'src/lib/dto/uuid.dto';
 
 @ArgsType()
-export class GetCommentListArgs {
+export class GetCommentListArgs extends UUIDArgs {
   @Field(() => Int, { defaultValue: 1 })
   @Min(1)
   page: number = 1;

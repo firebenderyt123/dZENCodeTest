@@ -3,13 +3,13 @@ import ListOrderPanel from "../ListOrderPanel";
 import { useComments } from "@/contexts/CommentsContext";
 
 export default function CommentOrderPanel() {
-  const comments = useComments();
+  const { updateParams } = useComments();
 
   const onChangeItemsPerPage = useCallback(
     (value: string) => {
-      comments?.getComments({ limit: +value });
+      updateParams({ limit: +value });
     },
-    [comments]
+    [updateParams]
   );
 
   const onChangeOrderBy = useCallback(
@@ -21,9 +21,9 @@ export default function CommentOrderPanel() {
           orderBy === "createdAt") &&
         (order === "ASC" || order === "DESC")
       )
-        comments?.getComments({ orderBy, order });
+        updateParams({ orderBy, order });
     },
-    [comments]
+    [updateParams]
   );
 
   return (

@@ -11,7 +11,7 @@ import { redisStore } from 'cache-manager-redis-store';
       useFactory: async (configService: ConfigService) => {
         const store = await redisStore({
           name: 'cache',
-          database: 1,
+          database: 0,
           socket: {
             host: configService.get('redis.host'),
             port: +configService.get('redis.port'),

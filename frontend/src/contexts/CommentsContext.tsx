@@ -7,20 +7,30 @@ import {
   useState,
 } from "react";
 import commentsService from "@/services/comments.service";
-import { useLazyQuery } from "@apollo/client";
 import {
-  GET_COMMENTS_QUERY,
-  GET_COMMENTS_QUERY_NAME,
-} from "@/graphql/queries/comments/get-comments.query";
-import { CommentsList } from "@/graphql/queries/comments/interfaces/comments-list.interface";
-import { ExtendedCommentTrees } from "@/graphql/queries/comments/interfaces/extended-comment-trees.interface";
+  useApolloClient,
+  useLazyQuery,
+  useQuery,
+  useSubscription,
+} from "@apollo/client";
+import { GET_COMMENTS_QUERY } from "@/graphql/queries/comments/get-comments.query";
 import { GetCommentsProps } from "@/graphql/queries/comments/interfaces/get-comments-props.interface";
+import {
+  COMMENTS_SUBSCRIPTION,
+  COMMENTS_SUBSCRIPTION_NAME,
+} from "@/graphql/queries/comments/comments-subscription";
+import { ExtendedCommentTrees } from "@/graphql/queries/comments/interfaces/extended-comment-trees.interface";
 import { errorNotify } from "@/utils/notifications.utils";
+import { GetCommentsResponse } from "@/graphql/queries/comments/interfaces/get-comments-response.interface";
+import { v4 as uuidv4 } from "uuid";
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+
+const commentsUUID = uuidv4();
 
 interface CommentsContextType {
   params: GetCommentsProps;
   commentsList: ExtendedCommentTrees;
-  getComments: (props: Partial<GetCommentsProps>) => void;
+  updateParams: (props: Partial<GetCommentsProps>) => void;
 }
 
 const CommentsContext = createContext<CommentsContextType | null>(null);
@@ -48,54 +58,60 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
     useState<ExtendedCommentTrees>(initCommentsList);
   const [params, setParams] = useState<GetCommentsProps>(initParams);
 
-  const [getCommentsFunc, commentsResp] = useLazyQuery(GET_COMMENTS_QUERY);
-
-  const getComments = useCallback(
-    (props: Partial<GetCommentsProps>) => {
-      const {
-        page: statePage,
-        limit: stateLimit,
-        orderBy: stateOrderBy,
-        order: stateOrder,
-      } = params;
-      const { page, limit, orderBy, order } = props;
-      const variables = {
-        page: page || statePage,
-        limit: limit || stateLimit,
-        orderBy: orderBy || stateOrderBy,
-        order: order || stateOrder,
-      };
-      getCommentsFunc({
-        variables,
-      });
-      setParams(variables);
-    },
-    [getCommentsFunc, params]
+  const [firstRequest, { called, refetch, client }] = useLazyQuery(
+    GET_COMMENTS_QUERY,
+    {
+      variables: { uuid: commentsUUID, ...params },
+    }
   );
+  const { data } = useSubscription<GetCommentsResponse>(COMMENTS_SUBSCRIPTION, {
+    variables: { uuid: commentsUUID },
+  });
 
-  useEffect(() => {
-    if (commentsResp.data) {
-      const data: CommentsList = commentsResp.data[GET_COMMENTS_QUERY_NAME];
+  const updateParams = useCallback((props: Partial<GetCommentsProps>) => {
+    setParams((prev) => ({ ...prev, ...props }));
+  }, []);
+
+  const setCommentsListData = (data: GetCommentsResponse) => {
+    try {
+      const response = data[COMMENTS_SUBSCRIPTION_NAME];
       const trees = commentsService.commentArraysToTree(
-        data.comments,
-        data.commentsLength
+        response.comments,
+        response.commentsLength
       );
       setCommentsList({
         comments: trees,
-        totalPages: data.totalPages,
-        totalComments: data.totalComments,
+        totalPages: response.totalPages,
+        totalComments: response.totalComments,
       });
-    } else if (commentsResp.error) {
-      errorNotify("Error while getting comments");
+    } catch (error) {
+      errorNotify("Receiving comments failed");
     }
-  }, [commentsResp.data, commentsResp.error, params.page]);
+  };
+  (client.link.right?.left as GraphQLWsLink).client.on("connected", () => {
+    if (!called) firstRequest();
+  });
+
+  useEffect(() => {
+    if (data) {
+      setCommentsListData(data);
+    }
+  }, [data, params]);
+
+  useEffect(() => {
+    if (called)
+      refetch({
+        uuid: commentsUUID,
+        ...params,
+      });
+  }, [called, params, refetch]);
 
   return (
     <CommentsContext.Provider
       value={{
         params,
         commentsList,
-        getComments,
+        updateParams,
       }}>
       {children}
     </CommentsContext.Provider>

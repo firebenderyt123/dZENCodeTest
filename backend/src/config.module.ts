@@ -6,6 +6,7 @@ import { RedisCacheModule } from './lib/modules/cache.module';
 import { RecaptchaModule } from './lib/modules/recaptcha.module';
 import { GraphQlModule } from './lib/modules/graphql.module';
 import { TypeORMModule } from './lib/modules/typeorm.module';
+import { PubSubModule } from './pubsub.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { TypeORMModule } from './lib/modules/typeorm.module';
     RecaptchaModule,
     GraphQlModule,
     TypeORMModule,
+    PubSubModule,
   ],
 })
 export class ConfigureModule {}

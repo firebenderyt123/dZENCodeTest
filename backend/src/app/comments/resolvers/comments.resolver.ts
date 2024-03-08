@@ -1,48 +1,53 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { GetCommentListArgs } from '../dto/get-comment-list.dto';
-import { CommentList } from '../models/comment-list.model';
 import { CreateCommentArgs } from '../dto/create-comment.dto';
 import { NAMESPACE } from 'src/lib/enums/resolvers-namespace.enums';
 import { Inject, UseGuards } from '@nestjs/common';
 import { RABBIT_CLIENT_NAME } from 'src/lib/enums/rabbitmq.enum';
 import { ClientProxy } from '@nestjs/microservices';
 import { COMMENTS_MESSAGES } from '../enums/comments-messages.enum';
-import { firstValueFrom } from 'rxjs';
-import { getDataOrThrowError } from 'src/lib/utils/app-error.utils';
 import { JwtPayload } from 'src/lib/interfaces/jwt-payload.interface';
 import { Jwt } from 'src/lib/decorators/jwt.decorator';
-import { Comment } from '../models/comment.model';
 import { GqlAuthGuard } from 'src/lib/guards/jwt-gql.guard';
 import { GqlRecaptchaGuard } from 'src/lib/guards/recaptcha-gql.guard';
+import { RedisPubSub } from 'graphql-redis-subscriptions/dist';
+import { PUB_SUB } from 'src/pubsub.module';
+import { UUIDArgs } from 'src/lib/dto/uuid.dto';
+import { CommentList } from '../models/comment-list.model';
+import { CommentsListPayload } from '../interfaces/comments-list-payload.interface';
 
 @Resolver(NAMESPACE.COMMENTS)
 export class CommentsResolver {
   constructor(
     @Inject(RABBIT_CLIENT_NAME.COMMENTS) private readonly client: ClientProxy,
+    @Inject(PUB_SUB) private readonly pubSub: RedisPubSub,
   ) {}
 
-  @Mutation(() => Int)
+  @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
   @UseGuards(GqlRecaptchaGuard)
-  async addComment(
-    @Jwt() jwtPayload: JwtPayload,
-    @Args() data: CreateCommentArgs,
-  ) {
-    const commentId = this.client.send<void>(
-      { cmd: COMMENTS_MESSAGES.CREATE_COMMENT },
-      { userId: jwtPayload.id, data },
-    );
-    const result = await firstValueFrom(commentId);
-    return getDataOrThrowError<Comment>(result);
+  addComment(@Jwt() jwtPayload: JwtPayload, @Args() data: CreateCommentArgs) {
+    this.client.emit(COMMENTS_MESSAGES.CREATE_COMMENT, {
+      userId: jwtPayload.id,
+      data,
+    });
+    return true;
   }
 
-  @Query(() => CommentList)
+  @Query(() => Boolean)
   async getComments(@Args() params: GetCommentListArgs) {
-    const comments = this.client.send(
-      { cmd: COMMENTS_MESSAGES.GET_COMMENTS },
-      params,
-    );
-    const result = await firstValueFrom(comments);
-    return getDataOrThrowError<CommentList>(result);
+    this.client.emit(COMMENTS_MESSAGES.GET_COMMENTS, params);
+    return true;
+  }
+
+  @Subscription(() => CommentList, {
+    filter: (payload: CommentsListPayload, variables: GetCommentListArgs) =>
+      payload.uuid === variables.uuid,
+    resolve: (payload: CommentsListPayload): CommentList =>
+      payload.commentsList,
+  })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async commentsList(@Args() _args: UUIDArgs) {
+    return this.pubSub.asyncIterator(COMMENTS_MESSAGES.RESPONSE_COMMENT_LIST);
   }
 }

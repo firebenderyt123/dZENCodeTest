@@ -7,6 +7,7 @@ export const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
     if (graphQLErrors) {
       for (let err of graphQLErrors) {
+        console.log(err);
         switch (err.extensions.statusCode) {
           case SERVER_ERRORS.UNAUTHENTICATED:
             cookiesService.deleteToken();

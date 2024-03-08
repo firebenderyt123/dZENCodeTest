@@ -49,13 +49,17 @@ type CommentList {
 }
 
 type Query {
-  getComments(page: Int! = 1, limit: Int! = 25, orderBy: String! = "createdAt", order: String! = "DESC"): CommentList!
+  getComments(uuid: String!, page: Int! = 1, limit: Int! = 25, orderBy: String! = "createdAt", order: String! = "DESC"): Boolean!
   getUser: User!
 }
 
 type Mutation {
-  addComment(parentId: Int, text: String!, hasAttachments: Boolean! = false): Int!
+  addComment(parentId: Int, text: String!, hasAttachments: Boolean! = false): Boolean!
   patchUser(username: String, email: String, siteUrl: String): User!
   registerUser(username: String!, email: String!, siteUrl: String = null, password: String!): AuthResponse!
   loginUser(email: String!, password: String!): AuthResponse!
+}
+
+type Subscription {
+  commentsList(uuid: String!): CommentList!
 }

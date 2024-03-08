@@ -1,21 +1,13 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { Pagination } from "@mui/material";
 import CommentComponent, { ListStyled } from "../Comment";
 import { useComments } from "@/contexts/CommentsContext";
 
 export default function CommentsList() {
-  const { getComments, commentsList, params } = useComments();
-
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
-  useEffect(() => {
-    getComments({});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { updateParams, commentsList, params } = useComments();
 
   const handlePageChange = (_: ChangeEvent<unknown>, page: number) => {
-    getComments({ page });
-    setCurrentPage(page);
+    updateParams({ page });
   };
 
   useEffect(() => {

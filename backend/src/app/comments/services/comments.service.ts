@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsOrder, In, IsNull, Repository } from 'typeorm';
 import { UsersService } from '../../users/services/users.service';
 import { CreateCommentArgs } from '../dto/create-comment.dto';
-import { CommentAttachmentsService } from './comment-attachments.service';
 import { CommentList } from '../models/comment-list.model';
 import { Comment as CommentModel } from '../models/comment.model';
 import { Comment } from '../entities/comment.entity';
@@ -15,16 +14,14 @@ export class CommentsService {
   constructor(
     @InjectRepository(Comment)
     private commentRepository: Repository<Comment>,
-    private commentAttachmentsService: CommentAttachmentsService,
     private usersService: UsersService,
   ) {}
 
   async create(
     userId: number,
-    commentData: CreateCommentArgs,
+    parentId: number | null,
+    text: string,
   ): Promise<number> {
-    const { parentId, text } = commentData;
-
     const comment = new Comment();
     comment.parent = parentId
       ? await this.commentRepository.findOneBy({
