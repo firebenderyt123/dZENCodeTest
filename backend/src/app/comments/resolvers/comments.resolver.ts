@@ -15,6 +15,8 @@ import { PUB_SUB } from 'src/pubsub.module';
 import { UUIDArgs } from 'src/lib/dto/uuid.dto';
 import { CommentList } from '../models/comment-list.model';
 import { CommentsListPayload } from '../interfaces/comments-list-payload.interface';
+import { parseUploadedFiles } from 'src/lib/utils/files.utils';
+import { InternalServerError } from 'src/lib/models/app-error.model';
 
 @Resolver(NAMESPACE.COMMENTS)
 export class CommentsResolver {
@@ -26,12 +28,20 @@ export class CommentsResolver {
   @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
   @UseGuards(GqlRecaptchaGuard)
-  addComment(@Jwt() jwtPayload: JwtPayload, @Args() data: CreateCommentArgs) {
-    this.client.emit(COMMENTS_MESSAGES.CREATE_COMMENT, {
-      userId: jwtPayload.id,
-      data,
-    });
-    return true;
+  async addComment(
+    @Jwt() jwtPayload: JwtPayload,
+    @Args() data: CreateCommentArgs,
+  ) {
+    try {
+      const files = await parseUploadedFiles(data.files);
+      this.client.emit(COMMENTS_MESSAGES.CREATE_COMMENT, {
+        userId: jwtPayload.id,
+        data: { ...data, files },
+      });
+      return true;
+    } catch (error) {
+      throw new InternalServerError('Uploading files failed');
+    }
   }
 
   @Query(() => Boolean)

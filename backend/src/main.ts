@@ -8,6 +8,7 @@ import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { RABBIT_QUEUE } from './lib/enums/rabbitmq.enum';
 import { fastifyMultipart } from '@fastify/multipart';
+import MercuriusGQLUpload from 'mercurius-upload';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -38,6 +39,10 @@ async function bootstrap() {
     });
   });
   app.register(fastifyMultipart);
+  app.register(MercuriusGQLUpload, {
+    maxFiles: 5,
+    maxFileSize: 5 * 1024 * 1024,
+  });
 
   app.enableCors({
     origin: configService.get('cors.origin'),

@@ -15,6 +15,7 @@ import Main from "./Main";
 import AuthProvider from "@/contexts/AuthContext";
 import { errorLink } from "@/graphql/errors/error-link.gql";
 import { getMainDefinition } from "@apollo/client/utilities";
+import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
 const wsLink = new GraphQLWsLink(
   createClient({
@@ -23,7 +24,7 @@ const wsLink = new GraphQLWsLink(
     lazy: true,
   })
 );
-const httpLink = new HttpLink({ uri: process.env.graphQlEndpoint });
+const httpLink = createUploadLink({ uri: process.env.graphQlEndpoint });
 const splitLink = split(
   ({ query }) => {
     const definition = getMainDefinition(query);

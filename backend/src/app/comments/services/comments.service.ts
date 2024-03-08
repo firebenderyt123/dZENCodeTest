@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsOrder, In, IsNull, Repository } from 'typeorm';
 import { UsersService } from '../../users/services/users.service';
-import { CreateCommentArgs } from '../dto/create-comment.dto';
 import { CommentList } from '../models/comment-list.model';
 import { Comment as CommentModel } from '../models/comment.model';
 import { Comment } from '../entities/comment.entity';

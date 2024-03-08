@@ -11,7 +11,6 @@ import { UsersModule } from 'src/app/users/modules/users.module';
 import { RMQModule } from 'src/lib/modules/rabbitmq.module';
 import { RABBIT_CLIENT_NAME, RABBIT_QUEUE } from 'src/lib/enums/rabbitmq.enum';
 import { CommentsCacheService } from '../services/comments-cache.service';
-import { CommentAttachmentsController } from '../controllers/comment-attachments.controller';
 
 @Module({
   imports: [
@@ -24,7 +23,7 @@ import { CommentAttachmentsController } from '../controllers/comment-attachments
     TypeOrmModule.forFeature([Comment]),
     TypeOrmModule.forFeature([CommentAttachment]),
   ],
-  controllers: [CommentsController, CommentAttachmentsController],
+  controllers: [CommentsController],
   providers: [
     CommentsService,
     CommentAttachmentsService,

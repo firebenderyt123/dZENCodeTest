@@ -2,6 +2,7 @@ import { ArgsType, Field, Int } from '@nestjs/graphql';
 import { Length } from 'class-validator';
 import { CleanTextHTML } from 'src/lib/decorators/clean-text.decorator';
 import { TrimLowercase } from 'src/lib/decorators/trim-lowercase.decorator';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-minimal';
 
 @ArgsType()
 export class CreateCommentArgs {
@@ -14,6 +15,6 @@ export class CreateCommentArgs {
   @CleanTextHTML()
   text: string;
 
-  @Field(() => Boolean, { defaultValue: false })
-  hasAttachments: boolean;
+  @Field(() => [GraphQLUpload])
+  files: FileUpload[];
 }

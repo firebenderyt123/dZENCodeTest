@@ -14,6 +14,7 @@ import {
 } from "@/graphql/queries/comments/add-comment.mutation";
 import { generateContext } from "@/graphql/utils/auth.utils";
 import { successNotify } from "@/utils/notifications.utils";
+import { CreateCommentProps } from "@/graphql/queries/comments/interfaces/create-comments-props.interface";
 
 interface CommentFormContextType {
   state: State;
@@ -61,10 +62,10 @@ export default function CommentFormProvider({
 
   const createComment = useCallback(
     (text: string, captcha: string) => {
-      const commentData = {
+      const commentData: CreateCommentProps = {
         parentId: state.replyToCommentId || null,
         text,
-        hasAttachments: !!state.files.length,
+        files: state.files.map((item) => item.data),
       };
       setPending(true);
       addComment({
@@ -81,23 +82,23 @@ export default function CommentFormProvider({
     successNotify("Comment created");
   }, [reset]);
 
-  useEffect(() => {
-    if (!data) return;
-    if (!!state.files.length) {
-      const commentFiles = state.files.map((item) => item.data);
-      commentsService
-        .uploadAttachments(data[ADD_COMMENT_QUERY_NAME], commentFiles)
-        .then((isSuccess) => {
-          if (isSuccess) {
-            setState(initState);
-          } else {
-            setPending(false);
-          }
-        });
-    } else {
-      onCommentSuccess();
-    }
-  }, [data, onCommentSuccess, state.files]);
+  // useEffect(() => {
+  //   if (!data) return;
+  //   if (!!state.files.length) {
+  //     const commentFiles = state.files.map((item) => item.data);
+  //     commentsService
+  //       .uploadAttachments(data[ADD_COMMENT_QUERY_NAME], commentFiles)
+  //       .then((isSuccess) => {
+  //         if (isSuccess) {
+  //           setState(initState);
+  //         } else {
+  //           setPending(false);
+  //         }
+  //       });
+  //   } else {
+  //     onCommentSuccess();
+  //   }
+  // }, [data, onCommentSuccess, state.files]);
 
   const setPending = (val: boolean) => {
     setState((prev) => ({ ...prev, pending: val }));
