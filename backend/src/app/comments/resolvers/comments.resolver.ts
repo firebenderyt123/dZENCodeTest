@@ -15,7 +15,7 @@ import { PUB_SUB } from 'src/pubsub.module';
 import { UUIDArgs } from 'src/lib/dto/uuid.dto';
 import { CommentList } from '../models/comment-list.model';
 import { CommentsListPayload } from '../interfaces/comments-list-payload.interface';
-import { parseUploadedFiles } from 'src/lib/utils/files.utils';
+import { parseUploadedFiles, validateFiles } from 'src/lib/utils/files.utils';
 import { InternalServerError } from 'src/lib/models/app-error.model';
 
 @Resolver(NAMESPACE.COMMENTS)
@@ -34,9 +34,10 @@ export class CommentsResolver {
   ) {
     try {
       const files = await parseUploadedFiles(data.files);
+      const validFiles = validateFiles(files);
       this.client.emit(COMMENTS_MESSAGES.CREATE_COMMENT, {
         userId: jwtPayload.id,
-        data: { ...data, files },
+        data: { ...data, files: validFiles },
       });
       return true;
     } catch (error) {

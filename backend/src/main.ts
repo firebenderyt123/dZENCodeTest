@@ -7,7 +7,6 @@ import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { RABBIT_QUEUE } from './lib/enums/rabbitmq.enum';
-import { fastifyMultipart } from '@fastify/multipart';
 import MercuriusGQLUpload from 'mercurius-upload';
 
 async function bootstrap() {
@@ -19,13 +18,6 @@ async function bootstrap() {
   );
 
   const configService = app.get(ConfigService);
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.REDIS,
-    options: {
-      host: 'localhost',
-      port: 6379,
-    },
-  });
   Object.keys(RABBIT_QUEUE).forEach((key) => {
     app.connectMicroservice<MicroserviceOptions>({
       transport: Transport.RMQ,
@@ -38,7 +30,6 @@ async function bootstrap() {
       },
     });
   });
-  app.register(fastifyMultipart);
   app.register(MercuriusGQLUpload, {
     maxFiles: 5,
     maxFileSize: 5 * 1024 * 1024,

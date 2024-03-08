@@ -4,6 +4,10 @@ import {
   FileUpload as FU,
 } from 'src/app/files/interfaces/file-input.interface';
 
+const MAX_FILES_NUMBER = 5;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 mb
+const MAX_FILE_SIZE = 100 * 1024; // 100 kb
+
 export async function parseUploadedFiles(
   files: FileUpload[] | Promise<FileUpload>[],
 ): Promise<FileInput[]> {
@@ -55,4 +59,26 @@ export function filesUploadToFilesInput(files: FU[]) {
     ...file,
     buffer: Buffer.from(file.buffer.data),
   }));
+}
+
+export function validateFiles(files: FileInput[]) {
+  return files.filter((file) =>
+    validateFilesBySizeAndType(file.mimetype, file.size),
+  );
+}
+function validateFilesBySizeAndType(
+  fileType: string,
+  fileSize: number,
+): boolean {
+  switch (fileType) {
+    case 'image/jpeg':
+    case 'image/jpg':
+    case 'image/png':
+    case 'image/gif':
+      return fileSize <= MAX_IMAGE_SIZE; // 5mb
+    case 'text/plain':
+      return fileSize <= MAX_FILE_SIZE; // 100kb
+    default:
+      return false;
+  }
 }
