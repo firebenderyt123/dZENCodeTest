@@ -33,7 +33,7 @@ async function bootstrap() {
   });
   app.register(MercuriusGQLUpload, {
     maxFiles: MAX_FILES_NUMBER,
-    maxFileSize: MAX_ALLOWED_UPLOAD,
+    maxFieldSize: MAX_ALLOWED_UPLOAD,
   });
 
   app.enableCors({

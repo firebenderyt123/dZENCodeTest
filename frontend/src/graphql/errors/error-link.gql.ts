@@ -5,10 +5,9 @@ import cookiesService from "@/services/cookies.service";
 
 export const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
-    console.log(graphQLErrors);
     if (graphQLErrors) {
       for (let err of graphQLErrors) {
-        console.log(err);
+        console.error(err);
         if (err.extensions) {
           if (err.extensions.code === SERVER_ERRORS.UNAUTHENTICATED) {
             cookiesService.deleteToken();
@@ -23,7 +22,7 @@ export const errorLink = onError(
 
     if (networkError) {
       errorNotify("Network error");
-      console.log(`[Network error]: ${networkError}`);
+      console.error(`[Network error]: ${networkError}`);
     }
   }
 );
