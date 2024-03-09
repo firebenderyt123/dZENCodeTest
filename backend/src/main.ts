@@ -9,12 +9,13 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { RABBIT_QUEUE } from './lib/enums/rabbitmq.enum';
 import MercuriusGQLUpload from 'mercurius-upload';
 import { MAX_ALLOWED_UPLOAD, MAX_FILES_NUMBER } from './lib/utils/files.utils';
+import { isProd } from './lib/utils/environment.utils';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({
-      logger: true,
+      logger: !isProd(),
     }),
   );
 

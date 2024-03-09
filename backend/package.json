@@ -16,7 +16,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "rabbit:dev": "docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.13-management"
+    "graphql:schema": "node dist/generate-schema.js"
   },
   "dependencies": {
     "@as-integrations/fastify": "^2.1.1",

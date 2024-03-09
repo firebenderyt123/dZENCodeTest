@@ -13,6 +13,7 @@ export const PUB_SUB = 'PUB_SUB';
       useFactory: (configService: ConfigService) =>
         new RedisPubSub({
           connection: {
+            name: 'redisPubSub',
             host: configService.get('redis.host'),
             port: configService.get('redis.port'),
             password: configService.get('redis.password'),

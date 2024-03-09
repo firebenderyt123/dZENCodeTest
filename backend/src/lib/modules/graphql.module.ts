@@ -3,6 +3,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 import { modules } from 'src/app/modules';
 import { isProd } from '../utils/environment.utils';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -10,7 +11,7 @@ import { isProd } from '../utils/environment.utils';
       driver: MercuriusDriver,
       include: modules,
       useGlobalPrefix: true,
-      autoSchemaFile: 'src/schema.gql',
+      autoSchemaFile: join(process.cwd(), 'schema.gql'),
       graphiql: !isProd(),
       subscription: true,
     }),

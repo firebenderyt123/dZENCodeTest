@@ -14,7 +14,8 @@ import { redisStore } from 'cache-manager-redis-store';
           database: 0,
           socket: {
             host: configService.get('redis.host'),
-            port: +configService.get('redis.port'),
+            port: configService.get('redis.port'),
+            tls: configService.get('redis.isTls'),
           },
           password: configService.get('redis.password'),
         });

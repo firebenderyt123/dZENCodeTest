@@ -23,6 +23,7 @@ export default () => ({
     tls: parseBoolean(process.env.REDIS_TLS) && {
       rejectUnauthorized: false,
     },
+    isTls: parseBoolean(process.env.REDIS_TLS),
   },
   jwt: {
     secret: process.env.JWT_SECRET,
