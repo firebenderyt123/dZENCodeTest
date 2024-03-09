@@ -15,8 +15,6 @@ import { PUB_SUB } from 'src/lib/modules/pubsub.module';
 import { UUIDArgs } from 'src/lib/dto/uuid.dto';
 import { CommentList } from '../models/comment-list.model';
 import { CommentsListPayload } from '../interfaces/comments-list-payload.interface';
-import { validateFiles } from 'src/lib/utils/files.utils';
-import { InternalServerError } from 'src/lib/models/app-error.model';
 import { UloadsValidationGuard } from 'src/lib/guards/uploads-gql.guard';
 import { UploadedFiles } from 'src/lib/decorators/uploaded-files.decorator';
 import { FileInput } from 'src/app/files/interfaces/file-input.interface';
