@@ -60,12 +60,7 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
   );
 
   const replyButton = commentForm && (
-    <IconButton
-      onClick={() =>
-        commentForm.setReplyCommentId(
-          commentForm?.state.replyToCommentId !== id ? id : null
-        )
-      }>
+    <IconButton onClick={() => commentForm.setReplyCommentId(id)}>
       <ReplyIcon />
     </IconButton>
   );

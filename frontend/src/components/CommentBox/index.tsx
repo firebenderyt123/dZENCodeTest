@@ -19,7 +19,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
     form,
     submitCallback,
   }: WithCommentBoxProps & TextareaProps) {
-    const { state, removeFile } = useCommentForm();
+    const { state, formCleared, removeFile } = useCommentForm();
     const {
       register,
       handleSubmit,
@@ -84,17 +84,18 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
           const captcha = captchaRef.current.getValue();
           if (captcha) {
             submitCallback(data.text, captcha);
-            captchaRef.current.reset();
           } else errorNotify("Captcha is required");
         }
       });
     };
 
     useEffect(() => {
-      if (state.error === null) {
+      if (state.commentSent) {
+        captchaRef.current?.reset();
         reset();
+        formCleared();
       }
-    }, [state.error, reset]);
+    }, [formCleared, reset, state.commentSent]);
 
     return (
       <form onSubmit={handleSubmit(submitHandler)}>

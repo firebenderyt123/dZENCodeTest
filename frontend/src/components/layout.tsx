@@ -4,7 +4,6 @@ import {
   InMemoryCache,
   ApolloProvider,
   from,
-  HttpLink,
   split,
 } from "@apollo/client";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
@@ -19,12 +18,12 @@ import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: "ws://localhost:8000/api/v1/graphql",
+    url: process.env.wsGraphQlEndpoint as string,
     retryAttempts: 5,
     lazy: true,
   })
 );
-const httpLink = createUploadLink({ uri: process.env.graphQlEndpoint });
+const httpLink = createUploadLink({ uri: process.env.httpGraphQlEndpoint });
 const splitLink = split(
   ({ query }) => {
     const definition = getMainDefinition(query);

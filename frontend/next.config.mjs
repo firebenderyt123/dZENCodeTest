@@ -2,8 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    graphQlEndpoint: process.env.BACKEND_SERVER + "/graphql",
-    attachmentUploadsEndpoint: process.env.BACKEND_SERVER + "/attachments",
+    httpGraphQlEndpoint: process.env.HTTP_GRAPHQL_ENDPOINT,
+    wsGraphQlEndpoint: process.env.WS_GRAPHQL_ENDPOINT,
     googleRecaptchaPublicKey: process.env.GOOGLE_RECAPTCHA_PUBLIC_KEY,
   },
   images: {
