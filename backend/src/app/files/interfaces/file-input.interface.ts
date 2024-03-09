@@ -1,13 +1,20 @@
 export interface FileInput {
-  name: string;
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
   buffer: Buffer;
   size: number;
-  type: string;
 }
 
 export interface FileUpload {
-  name: string;
-  buffer: ArrayBuffer;
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: {
+    type: string;
+    data: ArrayBuffer;
+  };
   size: number;
-  type: string;
 }

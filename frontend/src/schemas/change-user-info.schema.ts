@@ -11,5 +11,5 @@ export interface ChangeUserInfoSchema {
 export const changeUserInfoSchema = yup.object().shape({
   email: emailSchema,
   username: usernameSchema,
-  siteUrl: yup.string().optional(),
+  siteUrl: yup.string().optional().max(100),
 });

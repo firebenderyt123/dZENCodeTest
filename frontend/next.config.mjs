@@ -2,13 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    apiRoot: process.env.API_ROOT,
-    apiComments: "/comments",
-    apiCommentsAttachments: "/comments/attachments",
-    signIn: "/auth/sign-in",
-    signUp: "/auth/sign-up",
-    users: "/users",
-    wsRoot: process.env.WS_ROOT,
+    httpGraphQlEndpoint: process.env.HTTP_GRAPHQL_ENDPOINT,
+    wsGraphQlEndpoint: process.env.WS_GRAPHQL_ENDPOINT,
     googleRecaptchaPublicKey: process.env.GOOGLE_RECAPTCHA_PUBLIC_KEY,
   },
   images: {

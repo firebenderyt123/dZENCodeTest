@@ -13,4 +13,7 @@ export class User {
 
   @Column('varchar', { name: 'site_url', length: 255, nullable: true })
   siteUrl: string | null;
+
+  @Column('varchar', { name: 'password_hash', length: 255 })
+  passwordHash: string;
 }

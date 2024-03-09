@@ -6,7 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { SignUpSchema, signUpSchema } from "@/schemas/sign-up.schema";
 
 export default function SignUpForm() {
-  const auth = useAuth();
+  const { register: reg } = useAuth();
   const {
     register,
     handleSubmit,
@@ -18,7 +18,7 @@ export default function SignUpForm() {
 
   const onSubmit: SubmitHandler<SignUpSchema> = (data) => {
     const { repeatPassword, ...userData } = data;
-    auth?.register(userData);
+    reg(userData);
     reset();
   };
 

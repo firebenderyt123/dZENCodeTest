@@ -4,8 +4,6 @@ import { SubmitHandler, UseFormReturn } from "react-hook-form";
 import htmlTagsService, { AllowedTags } from "@/services/html-tags.service";
 import { CreateCommentSchema } from "@/schemas/create-comment.shema";
 import InnerCommentBox from "./InnerCommentBox";
-import { transformHtmlText } from "@/utils/sanitize-html.utils";
-import { CreateCommentProps } from "@/services/comments.service";
 import { useCommentForm } from "@/contexts/CommentFormContext";
 import AttachmentsPreviewPanel from "../AttachmentsPreviewPanel";
 import Recaptcha, { ReCAPTCHA } from "../Recaptcha";
@@ -14,14 +12,14 @@ import FormLabel from "../FormParts/FormLabel";
 
 interface WithCommentBoxProps {
   form: UseFormReturn<CreateCommentSchema, any, CreateCommentSchema>;
-  submitCallback: (data: CreateCommentProps, captcha: string) => void;
+  submitCallback: (text: string, captcha: string) => void;
 }
 export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
   return function WithCommentBox({
     form,
     submitCallback,
   }: WithCommentBoxProps & TextareaProps) {
-    const commentForm = useCommentForm();
+    const { state, formCleared, removeFile } = useCommentForm();
     const {
       register,
       handleSubmit,
@@ -36,14 +34,10 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
     const commentRef = useRef<HTMLDivElement | null>(null);
     const commentText = watch("text", "");
 
-    const commentError: string =
-      errors?.text?.message || commentForm?.uploadError || "";
+    const commentError: string = errors?.text?.message || state.error || "";
 
-    const attachmentPreviews = commentForm && (
-      <AttachmentsPreviewPanel
-        files={commentForm.files}
-        removeFile={commentForm.removeFile}
-      />
+    const attachmentPreviews = (
+      <AttachmentsPreviewPanel files={state.files} removeFile={removeFile} />
     );
 
     const wrapWithTagHandler = useCallback(
@@ -75,7 +69,7 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
 
     const checkHtmlHandler = useCallback(
       (html: string = commentText) => {
-        setValue("text", transformHtmlText(html.trim()));
+        setValue("text", htmlTagsService.transformHtmlText(html.trim()));
       },
       [commentText, setValue]
     );
@@ -89,18 +83,19 @@ export const withCommentBox = (WrappedComponent: typeof InnerCommentBox) => {
         if (isValid && captchaRef.current) {
           const captcha = captchaRef.current.getValue();
           if (captcha) {
-            submitCallback(data, captcha);
-            captchaRef.current.reset();
+            submitCallback(data.text, captcha);
           } else errorNotify("Captcha is required");
         }
       });
     };
 
     useEffect(() => {
-      if (commentForm?.state.error === null) {
+      if (state.commentSent) {
+        captchaRef.current?.reset();
         reset();
+        formCleared();
       }
-    }, [commentForm?.state, reset]);
+    }, [formCleared, reset, state.commentSent]);
 
     return (
       <form onSubmit={handleSubmit(submitHandler)}>

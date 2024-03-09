@@ -4,24 +4,47 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { ConfigService } from '@nestjs/config';
-import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AppModule } from './app.module';
-import { GlobalValidationPipe } from './pipes/global-validation.pipe';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { RABBIT_QUEUE } from './lib/enums/rabbitmq.enum';
+import MercuriusGQLUpload from 'mercurius-upload';
+import { MAX_ALLOWED_UPLOAD, MAX_FILES_NUMBER } from './lib/utils/files.utils';
+import { isProd } from './lib/utils/environment.utils';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter(),
+    new FastifyAdapter({
+      logger: !isProd(),
+    }),
   );
-  app.useGlobalPipes(new GlobalValidationPipe());
 
   const configService = app.get(ConfigService);
+  Object.keys(RABBIT_QUEUE).forEach((key) => {
+    app.connectMicroservice<MicroserviceOptions>({
+      transport: Transport.RMQ,
+      options: {
+        urls: configService.get('rabbitmq.urls'),
+        queue: RABBIT_QUEUE[key],
+        queueOptions: {
+          durable: configService.get('rabbitmq.queueDurable'),
+        },
+      },
+    });
+  });
+  app.register(MercuriusGQLUpload, {
+    maxFiles: MAX_FILES_NUMBER,
+    maxFieldSize: MAX_ALLOWED_UPLOAD,
+  });
 
-  app.enableCors({ origin: configService.get('cors.origin') });
-  app.useWebSocketAdapter(new IoAdapter(app));
+  app.enableCors({
+    origin: configService.get('cors.origin'),
+    credentials: true,
+  });
   app.setGlobalPrefix('api/v1');
 
   const port = configService.get('port');
+  await app.startAllMicroservices();
   await app.listen(port, '0.0.0.0');
 }
 bootstrap();

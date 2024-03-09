@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { RouterModule } from '@nestjs/core';
-import { routes, modules } from './routes';
-import { ConfigureModule } from './queue/config.module';
+import { ConfigureModule } from './config.module';
+import { modules } from './app/modules';
 
 @Module({
-  imports: [ConfigureModule, RouterModule.register(routes), ...modules],
+  imports: [ConfigureModule, ...modules],
 })
 export class AppModule {}

@@ -1,7 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity('files')
-@Index(['containerName', 'blobName'], { unique: true })
+@Unique(['containerName', 'blobName'])
 export class File {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;

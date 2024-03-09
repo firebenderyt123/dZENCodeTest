@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { migrations } from './migrations';
 import { config } from 'dotenv';
-import { getEnvFile, parseBoolean } from 'src/utils/environment.utils';
+import { getEnvFile, parseBoolean } from 'src/lib/utils/environment.utils';
 
 config({
   path: getEnvFile(),

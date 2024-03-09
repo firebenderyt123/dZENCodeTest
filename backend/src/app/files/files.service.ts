@@ -46,7 +46,7 @@ export class FilesService {
   }
 
   private isFileImage(file: FileInput): boolean {
-    return this.allowedImageTypes.includes(file.type);
+    return this.allowedImageTypes.includes(file.mimetype);
   }
 
   private async resizeImage(
@@ -66,8 +66,8 @@ export class FilesService {
     blobName: string;
     fileUrl: string;
   }> {
-    const { name, buffer } = file;
-    const extension = name.split('.').pop();
+    const { originalname, buffer } = file;
+    const extension = originalname.split('.').pop();
     const newFileName = randomBytes(16).toString('hex') + '.' + extension;
 
     const containerName = extension === 'txt' ? 'files' : 'images';

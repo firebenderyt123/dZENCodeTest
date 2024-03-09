@@ -1,29 +1,25 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-} from 'class-validator';
-import { TrimLowercase } from 'src/decorators/trim-lowercase.decorator';
-import { IsValidUsername } from 'src/decorators/username-valid.decorator';
+import { ArgsType, Field } from '@nestjs/graphql';
+import { IsEmail, IsOptional, Length, MaxLength } from 'class-validator';
+import { TrimLowercase } from 'src/lib/decorators/trim-lowercase.decorator';
+import { IsValidUsername } from 'src/lib/decorators/username-valid.decorator';
 
+@ArgsType()
 export class PatchUserDto {
-  @IsString({ message: 'Username should be a string' })
-  @IsNotEmpty({ message: 'Username should not be empty' })
-  @MaxLength(50)
+  @Field({ nullable: true })
+  @Length(1, 50)
   @IsOptional()
   @TrimLowercase()
   @IsValidUsername()
   username?: string;
 
-  @IsEmail({}, { message: 'Invalid email format' })
+  @Field({ nullable: true })
+  @IsEmail()
   @MaxLength(100)
   @IsOptional()
   @TrimLowercase()
   email?: string;
 
-  @IsString({ message: 'Site URL should be a string' })
+  @Field({ nullable: true })
   @MaxLength(255)
   @IsOptional()
   siteUrl?: string;

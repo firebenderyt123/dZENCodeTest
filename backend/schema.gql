@@ -1,0 +1,68 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: Int!
+  username: String!
+  email: String!
+  siteUrl: String
+}
+
+type AuthResponse {
+  accessToken: String!
+  user: User!
+}
+
+type CommentAuthor {
+  id: Int!
+  username: String!
+  email: String!
+  siteUrl: String
+}
+
+type CommentAttachment {
+  fileId: Int!
+  containerName: String!
+  fileUrl: String!
+}
+
+type ParentComment {
+  id: Int!
+  text: String!
+}
+
+type Comment {
+  id: Int!
+  text: String!
+  user: CommentAuthor!
+  createdAt: String!
+  parent: ParentComment
+  attachments: [CommentAttachment!]!
+}
+
+type CommentList {
+  comments: [Comment!]!
+  commentsLength: [Int!]!
+  totalPages: Int!
+  totalComments: Int!
+}
+
+type Query {
+  getComments(uuid: String!, page: Int! = 1, limit: Int! = 25, orderBy: String! = "createdAt", order: String! = "DESC"): Boolean!
+  getUser: User!
+}
+
+type Mutation {
+  addComment(parentId: Int, text: String!, files: [Upload!]!): Boolean!
+  patchUser(username: String, email: String, siteUrl: String): User!
+  registerUser(username: String!, email: String!, siteUrl: String = null, password: String!): AuthResponse!
+  loginUser(email: String!, password: String!): AuthResponse!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+type Subscription {
+  commentsList(uuid: String!): CommentList!
+}

@@ -1,35 +1,44 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
-import { CommentList } from '../interfaces/comment-list';
 import { COMMENTS_CACHE } from '../enums/comments-cache.enum';
-import { GetCommentsListDto } from '../dto/get-comments-list.dto';
-import { getSpecialKey } from 'src/utils/cache.utils';
-import { RedisCacheService } from 'src/interfaces/redis-cache-service.interface';
+import { getSpecialKey } from 'src/lib/utils/cache.utils';
+import { RedisCacheService } from 'src/lib/interfaces/redis-cache-service.interface';
+import { GetCommentListArgs } from '../dto/get-comment-list.dto';
+import { CommentList } from '../models/comment-list.model';
 
 @Injectable()
 export class CommentsCacheService {
   constructor(@Inject(CACHE_MANAGER) private cacheService: RedisCacheService) {}
 
-  async getCommentsList(props: GetCommentsListDto): Promise<CommentList> {
-    const key = getSpecialKey(COMMENTS_CACHE.COMMENTS_LIST, props);
+  async getCommentsList(props: GetCommentListArgs): Promise<CommentList> {
+    const { page, limit, orderBy, order } = props;
+    const key = getSpecialKey(COMMENTS_CACHE.COMMENTS_LIST, {
+      page,
+      limit,
+      orderBy,
+      order,
+    });
     const data = await this.cacheService.get<CommentList>(key);
     return data;
   }
-
   async setCommentsList(
-    props: GetCommentsListDto,
+    props: GetCommentListArgs,
     value: CommentList,
     ttl?: number,
   ): Promise<void> {
-    const key = getSpecialKey(COMMENTS_CACHE.COMMENTS_LIST, props);
+    const { page, limit, orderBy, order } = props;
+    const key = getSpecialKey(COMMENTS_CACHE.COMMENTS_LIST, {
+      page,
+      limit,
+      orderBy,
+      order,
+    });
     await this.cacheService.set(key, value, ttl);
   }
-
   async delCommentsList(): Promise<void> {
-    const keys = await this.cacheService.store.keys();
-    const keysToDel = keys.filter((key) =>
-      key.includes(COMMENTS_CACHE.COMMENTS_LIST),
+    const keys = await this.cacheService.store.keys(
+      `${COMMENTS_CACHE.COMMENTS_LIST}*`,
     );
-    await this.cacheService.store.mdel(...keysToDel);
+    if (keys.length) await this.cacheService.store.mdel(...keys);
   }
 }
