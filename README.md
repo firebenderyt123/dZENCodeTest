@@ -4,22 +4,34 @@ This repository contains the source code for a Single Page Application (SPA) for
 
 ## ✨Technologies Used
 
-- **Backend**:
-  - Typescript
-  - Object-oriented programming (OOP)
-  - PostgreSQL
-  - Nest.js
-  - ORM
-  - REST API
-  - WebSocket
-- **Frontend**:
-  - React.js
-  - Material UI
-  - AJAX for asynchronous communication with the backend
-  - Form validation on the client-side
-  - Integration with Google ReCAPTCHA V2 service for user verification
-  - Authentication for typing comment
-  - Use of cookies for data storage
+**Backend**:
+
+- Typescript
+- Object-oriented programming (OOP)
+- PostgreSQL
+- Nest.js (Fastify)
+- ORM
+- GraphQL (Mercurius)
+- RabbitMQ
+- Redis
+- WebSocket
+
+**Frontend**:
+
+- React.js
+- Material UI
+- Apollo Client
+- AJAX for asynchronous communication with the backend
+- Form validation on the client-side
+- Integration with Google ReCAPTCHA V2 service for user verification
+- Authentication for typing comment
+- Use of cookies for data storage
+
+**Deployment**:
+
+- Vercel (frontend)
+- Azure (backend server + redis + file storage)
+- CloudAMPQ (RabbitMQ)
 
 ## 🎉Features
 
@@ -56,36 +68,44 @@ cd dZENCodeTest
 
 > **BLOB_HOSTNAME**: This parameter is used to specify the host where media files (images and text files) are stored. You must to use [Azure Blob Storage](https://azure.microsoft.com/en-us/products/storage/blobs)
 
-> **API_ROOT**: This parameter is used to specify the root URL of your application's API. This is the address of your server where the application's backend code is deployed. For example, if your server is deployed on localhost and listening on port 8000, the URL would be http://localhost:8000/api/v1.
+> **HTTP_GRAPHQL_ENDPOINT**: This parameter is used to specify the root URL of your application's GraphQL. This is the address of your server where the application's backend code is deployed. For example, if your server is deployed on localhost and listening on port 8000, the URL would be [http://localhost:8000/api/v1/graphql](http://localhost:8000/api/v1/graphql).
 
-> **WS_ROOT**: This parameter is used to configure a WebSocket connection for real-time communication. For example, if your backend deployed on localhost and is listening on port 8000, the URL would be ws://localhost:8000.
+> **WS_GRAPHQL_ENDPOINT**: This parameter is used to configure a GraphQL WebSocket connection for real-time communication. For example, if your backend deployed on localhost and is listening on port 8000, the URL would be [ws://localhost:8000/api/v1/graphql](ws://localhost:8000/api/v1/graphql).
 
 > **GOOGLE_RECAPTCHA_PUBLIC_KEY**: This parameter is used to specify the reCAPTCHA public key if your application uses this service to protect against spam and bots. Get this key from the official [Google reCAPTCHA](https://www.google.com/recaptcha/about/) website. **_You must to use reCAPTCHA v2_**
 
 2. To configure the **backend** of your application, you need to go to the backend directory
    and create an _.env.production_ file based on _.env-example_ and specify the following parameters:
 
-> **POSTGRES_HOST**: The host on which the PostgreSQL database is deployed. This is usually localhost if the database is deployed locally.
+> **POSTGRES_HOST**: The host on which the PostgreSQL database is deployed. This is `db` if the database is deployed with docker.
 
-> **POSTGRES_PORT**: The port on which PostgreSQL listens for connections. The default is 5432.
+> **POSTGRES_PORT**: The port on which PostgreSQL listens for connections. The default is `5432`.
 
-> **POSTGRES_DB**: The name of the PostgreSQL database to which your application will connect.
+> **POSTGRES_DB**: The name of the PostgreSQL database to which your application will connect. The default is `postgres`
 
-> **POSTGRES_USER**: The PostgreSQL user who has access to the database.
+> **POSTGRES_USER**: The PostgreSQL user who has access to the database. The default is `postgres`
 
-> **POSTGRES_PASSWORD**: The password of the PostgreSQL user to access the database.
+> **POSTGRES_PASSWORD**: The password of the PostgreSQL user to access the database. The default is `postgres`
 
-> **REDIS_HOST**: The host on which the Redis server is deployed. This variable specifies the hostname or IP address where the Redis server is running. If Redis is deployed locally, you can set this to `localhost`.
+> **POSTGRES_SSL**: Specifies whether SSL encryption is enabled for connections to the PostgreSQL database. Set this variable to "true" to enable SSL encryption, or "false" to disable it. If your PostgreSQL server is configured to use SSL encryption, set this variable to "`true`". Otherwise, leave it as "`false`".
 
-> **REDIS_PORT**: The port on which the Redis server listens for connections. The default port for Redis is 6379. If your Redis server is configured to use a different port, specify it here.
+> **REDIS_HOST**: The host on which the Redis server is deployed. This variable specifies the hostname or IP address where the Redis server is running. If Redis is deployed with docker, you can set this to `redis`.
+
+> **REDIS_PORT**: The port on which the Redis server listens for connections. The default port for Redis is `6379`. If your Redis server is configured to use a different port, specify it here.
 
 > **REDIS_PASSWORD**: The password required to authenticate and access the Redis server. If your Redis server is password-protected, you should provide the password here. If no password is set, leave this variable empty.
 
+> **REDIS_TLS**: Determines whether TLS encryption is enabled for connections to the Redis server. Set this variable to "true" to enable TLS encryption, or "false" to disable it. If your Redis server is configured to use TLS encryption, set this variable to "`true`". Otherwise, leave it as "`false`".
+
+> **RABBITMQ_URL**: This variable specifies the URL of the RabbitMQ server, including the protocol (AMQP), hostname, and port number. For example, "`amqp://rabbitmq:5672`" indicates that RabbitMQ is accessible via the AMQP protocol on the IP address `rabbitmq` and port `5672`.
+
+> **RABBITMQ_QUEUE_DURABLE**: When set to "false", this variable indicates that RabbitMQ queues should not be durable. In RabbitMQ, durable queues survive broker restarts and ensure that messages are not lost even if the broker goes down. Setting this variable to "`false`" means that queues will not be durable, and messages may be lost if the broker restarts or fails. However, non-durable queues have better performance compared to durable queues, especially for transient or temporary data.
+
 > **JWT_SECRET**: The secret key for signing and verifying JWT tokens used for user authentication. Simply generate a long string of different characters
 
-> **JWT_EXPIRATION_TIME**: The lifetime of the JWT token, specified in seconds such time format ("1h" for one hour, "7d" for seven days, etc.).
+> **JWT_EXPIRATION_TIME**: The lifetime of the JWT token, specified in seconds such time format ("`1h`" for one hour, "`7d`" for seven days, etc.).
 
-> **CORS_ORIGIN**: The allowed source for CORS requests. This is the address of your frontend application that will be accessing the backend. Typically, this is http://localhost:3000.
+> **CORS_ORIGIN**: The allowed source for CORS requests. This is the address of your frontend application that will be accessing the backend. Typically, this is `http://localhost:3000`.
 
 > **AZURE_STORAGE_ACCOUNT_NAME**: The Azure Blob storage account name for Azure Blob Storage.
 
