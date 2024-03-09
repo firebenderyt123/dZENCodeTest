@@ -16,6 +16,7 @@ export const PUB_SUB = 'PUB_SUB';
             host: configService.get('redis.host'),
             port: configService.get('redis.port'),
             password: configService.get('redis.password'),
+            tls: configService.get('redis.tls'),
             db: 1,
           },
         }),

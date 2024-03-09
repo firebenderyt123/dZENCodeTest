@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
-import { modules } from 'src/modules';
+import { modules } from 'src/app/modules';
 import { isProd } from '../utils/environment.utils';
 
 @Module({

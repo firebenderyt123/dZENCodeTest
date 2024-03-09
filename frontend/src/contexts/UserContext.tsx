@@ -9,6 +9,7 @@ import { User } from "@/graphql/queries/users/interfaces/user.interface";
 import {
   LazyQueryExecFunction,
   OperationVariables,
+  useFragment,
   useLazyQuery,
   useMutation,
 } from "@apollo/client";

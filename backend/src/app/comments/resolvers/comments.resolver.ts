@@ -11,7 +11,7 @@ import { Jwt } from 'src/lib/decorators/jwt.decorator';
 import { GqlAuthGuard } from 'src/lib/guards/jwt-gql.guard';
 import { GqlRecaptchaGuard } from 'src/lib/guards/recaptcha-gql.guard';
 import { RedisPubSub } from 'graphql-redis-subscriptions/dist';
-import { PUB_SUB } from 'src/pubsub.module';
+import { PUB_SUB } from 'src/lib/modules/pubsub.module';
 import { UUIDArgs } from 'src/lib/dto/uuid.dto';
 import { CommentList } from '../models/comment-list.model';
 import { CommentsListPayload } from '../interfaces/comments-list-payload.interface';

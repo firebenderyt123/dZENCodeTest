@@ -15,6 +15,8 @@ import AuthProvider from "@/contexts/AuthContext";
 import { errorLink } from "@/graphql/errors/error-link.gql";
 import { getMainDefinition } from "@apollo/client/utilities";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
+import { createFragmentRegistry } from "@apollo/client/cache";
+import { allFragments } from "@/graphql/fragments";
 
 const wsLink = new GraphQLWsLink(
   createClient({
@@ -36,7 +38,9 @@ const splitLink = split(
   httpLink
 );
 const client = new ApolloClient({
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    fragments: createFragmentRegistry(...allFragments),
+  }),
   link: from([errorLink, splitLink]),
 });
 

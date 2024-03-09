@@ -7,12 +7,7 @@ import {
   useState,
 } from "react";
 import commentsService from "@/services/comments.service";
-import {
-  useApolloClient,
-  useLazyQuery,
-  useQuery,
-  useSubscription,
-} from "@apollo/client";
+import { useLazyQuery, useSubscription } from "@apollo/client";
 import { GET_COMMENTS_QUERY } from "@/graphql/queries/comments/get-comments.query";
 import { GetCommentsProps } from "@/graphql/queries/comments/interfaces/get-comments-props.interface";
 import {
@@ -23,7 +18,6 @@ import { ExtendedCommentTrees } from "@/graphql/queries/comments/interfaces/exte
 import { errorNotify } from "@/utils/notifications.utils";
 import { GetCommentsResponse } from "@/graphql/queries/comments/interfaces/get-comments-response.interface";
 import { v4 as uuidv4 } from "uuid";
-import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 
 const commentsUUID = uuidv4();
 
@@ -58,12 +52,9 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
     useState<ExtendedCommentTrees>(initCommentsList);
   const [params, setParams] = useState<GetCommentsProps>(initParams);
 
-  const [firstRequest, { called, refetch, client }] = useLazyQuery(
-    GET_COMMENTS_QUERY,
-    {
-      variables: { uuid: commentsUUID, ...params },
-    }
-  );
+  const [firstRequest, { called, refetch }] = useLazyQuery(GET_COMMENTS_QUERY, {
+    variables: { uuid: commentsUUID, ...params },
+  });
   const { data } = useSubscription<GetCommentsResponse>(COMMENTS_SUBSCRIPTION, {
     variables: { uuid: commentsUUID },
   });
@@ -88,9 +79,19 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
       errorNotify("Receiving comments failed");
     }
   };
-  (client.link.right?.left as GraphQLWsLink).client.on("connected", () => {
-    if (!called) firstRequest();
-  });
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (data) return;
+      else if (!called) firstRequest();
+      else refetch();
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (data) {

@@ -7,7 +7,7 @@ import { COMMENTS_MESSAGES } from '../enums/comments-messages.enum';
 import { UserIdWithData } from 'src/lib/interfaces/user-id-with-data.interface';
 import { CommentsCacheService } from '../services/comments-cache.service';
 import { RedisPubSub } from 'graphql-redis-subscriptions/dist';
-import { PUB_SUB } from 'src/pubsub.module';
+import { PUB_SUB } from 'src/lib/modules/pubsub.module';
 import { CommentsListPayload } from '../interfaces/comments-list-payload.interface';
 import { CreateCommentParams } from '../interfaces/create-comment-params.interface';
 import { filesUploadToFilesInput } from 'src/lib/utils/files.utils';

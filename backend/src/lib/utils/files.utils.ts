@@ -4,9 +4,12 @@ import {
   FileUpload as FU,
 } from 'src/app/files/interfaces/file-input.interface';
 
-const MAX_FILES_NUMBER = 5;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 mb
 const MAX_FILE_SIZE = 100 * 1024; // 100 kb
+
+export const MAX_FILES_NUMBER = 5;
+export const MAX_ALLOWED_UPLOAD =
+  MAX_IMAGE_SIZE > MAX_FILE_SIZE ? MAX_IMAGE_SIZE : MAX_FILE_SIZE;
 
 export async function parseUploadedFiles(
   files: FileUpload[] | Promise<FileUpload>[],
