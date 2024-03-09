@@ -3,29 +3,23 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommentsController } from '../controllers/comments.controller';
 import { CommentsService } from '../services/comments.service';
 import { Comment } from '../entities/comment.entity';
-import { AuthModule } from '../../auth/modules/auth.module';
-import { UsersProfileModule } from '../../users/modules/users-profile.module';
 import { FilesModule } from '../../files/files.module';
-import { FastifyMulterModule } from '@nest-lab/fastify-multer';
 import { CommentAttachmentsService } from '../services/comment-attachments.service';
 import { CommentAttachment } from '../entities/comment-attachment.entity';
-import { CommentsEventEmitterService } from '../services/comments-emitter.service';
-import { CommentsEventListenerService } from '../services/comments-listener.service';
-import { CommentsGateway } from '../gateways/comments.gateway';
-import { CommentsQueueService } from '../services/comments-queue.service';
-import { CommentsQueueProcessor } from '../processors/comments-queue.processor';
-import { BullModule } from '@nestjs/bull';
-import { QUEUE } from 'src/queue/queue.enums';
+import { CommentsResolver } from '../resolvers/comments.resolver';
+import { UsersModule } from 'src/app/users/modules/users.module';
+import { RMQModule } from 'src/lib/modules/rabbitmq.module';
+import { RABBIT_CLIENT_NAME, RABBIT_QUEUE } from 'src/lib/enums/rabbitmq.enum';
+import { CommentsCacheService } from '../services/comments-cache.service';
 
 @Module({
   imports: [
-    BullModule.registerQueue({
-      name: QUEUE.COMMENTS,
+    RMQModule.register({
+      name: RABBIT_CLIENT_NAME.COMMENTS,
+      queue: RABBIT_QUEUE.COMMENTS,
     }),
-    AuthModule,
+    UsersModule,
     FilesModule,
-    FastifyMulterModule,
-    UsersProfileModule,
     TypeOrmModule.forFeature([Comment]),
     TypeOrmModule.forFeature([CommentAttachment]),
   ],
@@ -33,11 +27,8 @@ import { QUEUE } from 'src/queue/queue.enums';
   providers: [
     CommentsService,
     CommentAttachmentsService,
-    CommentsEventEmitterService,
-    CommentsEventListenerService,
-    CommentsGateway,
-    CommentsQueueService,
-    CommentsQueueProcessor,
+    CommentsResolver,
+    CommentsCacheService,
   ],
   exports: [CommentsService],
 })

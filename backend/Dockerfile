@@ -9,7 +9,7 @@ WORKDIR ${WORKDIR}
 # INSTALL
 FROM base as deps
 
-COPY package.json yarn.lock .
+COPY package.json yarn.lock ./
 
 RUN yarn install --frozen-lockfile --production
 
@@ -22,6 +22,7 @@ FROM deps as build
 COPY . .
 
 RUN yarn run build
+RUN yarn run graphql:schema
 
 # RUN
 FROM base as final
@@ -34,6 +35,7 @@ COPY --from=deps ${WORKDIR}/node_modules ./node_modules
 COPY --from=deps ${WORKDIR}/package.json .
 
 COPY --from=build ${WORKDIR}/dist ./dist
+COPY --chown=node:node --from=build ${WORKDIR}/schema.gql .
 
 EXPOSE 8000
 

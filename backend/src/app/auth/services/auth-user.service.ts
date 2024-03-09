@@ -1,34 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../../users/entities/user.entity';
-import { UsersProfileService } from '../../users/services/users-profile.service';
-import { RegisterUserDto } from '../dto/register-user.dto';
-import { Auth } from '../interfaces/auth.interface';
-import { AuthTokenService } from './auth-token.service';
+import { UsersService } from '../../users/services/users.service';
+import { RegisterUserArgs } from '../dto/register-user.dto';
+import { AuthResponse } from '../models/auth-response.model';
+import { LoginUserArgs } from '../dto/login-user.dto';
+import { User } from 'src/app/users/models/user.model';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthUserService {
   constructor(
-    private authTokenService: AuthTokenService,
-    private usersProfileService: UsersProfileService,
+    private readonly jwtService: JwtService,
+    private readonly usersService: UsersService,
   ) {}
 
-  async signUp(userData: RegisterUserDto): Promise<Auth> {
-    const { siteUrl, password, ...restData } = userData;
-    const user = await this.usersProfileService.create(
-      { ...restData, siteUrl: siteUrl || null },
-      password,
-    );
-    return await this.authTokenService.getAuth(user);
+  async signUp(userData: RegisterUserArgs): Promise<AuthResponse> {
+    const user = await this.usersService.create(userData);
+    return await this.getAuth(user);
   }
 
-  async signIn(user: User): Promise<Auth> {
-    return await this.authTokenService.getAuth(user);
-  }
-
-  async validateUser(email: string, password: string): Promise<User> {
-    return await this.usersProfileService.searchByEmailAndPassword(
+  async signIn(userData: LoginUserArgs): Promise<AuthResponse> {
+    const { email, password } = userData;
+    const user = await this.usersService.searchByEmailAndPassword(
       email,
       password,
     );
+    return await this.getAuth(user);
+  }
+
+  private async getAuth(
+    user: User,
+    options?: JwtSignOptions,
+  ): Promise<AuthResponse> {
+    return {
+      accessToken: await this.jwtService.signAsync({ id: user.id }, options),
+      user,
+    };
   }
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ForwardedRef, RefObject, forwardRef, useRef, useState } from "react";
+import { ForwardedRef, RefObject, forwardRef, useRef } from "react";
 import {
   Avatar,
   Box,
@@ -11,16 +11,16 @@ import {
 } from "@mui/material";
 import ReplyIcon from "@mui/icons-material/Reply";
 import { formatDateForComments } from "@/utils/date-format.utils";
-import { Comment } from "@/interfaces/comment.interface";
 import BoxInnerHtml from "../BoxInnerHtml";
 import { AttachmentsPreviewBox } from "../AttachmentsPreviewPanel";
 import CommentAttachment from "./CommentAttachment";
 import { IconButton } from "@mui/joy";
 import { useCommentForm } from "@/contexts/CommentFormContext";
 import CommentCreateForm from "../CommentCreateForm";
+import { CommentTree } from "@/graphql/queries/comments/interfaces/comment-tree";
 
 interface ComponentProps {
-  comment: Comment;
+  comment: CommentTree;
   parentCommentText?: string;
 }
 type Ref = ForwardedRef<HTMLLIElement>;
@@ -45,27 +45,14 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
   );
 
   const userInfo = (
-    <InlineBox>
-      <BoldText>
-        {user.siteUrl ? (
-          <LinkStyled href={user.siteUrl} target="_blank" rel="nofollow">
-            {user.username}
-          </LinkStyled>
-        ) : (
-          user.username
-        )}
-      </BoldText>
+    <UserInfoBox>
+      <BoldText>{user.username}</BoldText>
       {formatDateForComments(createdAt)}
-    </InlineBox>
+    </UserInfoBox>
   );
 
   const replyButton = commentForm && (
-    <IconButton
-      onClick={() =>
-        commentForm.setReplyCommentId(
-          commentForm?.state.replyToCommentId !== id ? id : null
-        )
-      }>
+    <IconButton onClick={() => commentForm.setReplyCommentId(id)}>
       <ReplyIcon />
     </IconButton>
   );
@@ -90,11 +77,11 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
 
   const attachmentsBlock = !!attachments.length && (
     <AttachmentsPreviewBox>
-      {attachments.map(({ fileId, file }) => (
+      {attachments.map(({ fileId, containerName, fileUrl }) => (
         <CommentAttachment
           key={fileId}
-          containerName={file.containerName}
-          url={file.fileUrl}
+          containerName={containerName}
+          url={fileUrl}
           alt=""
         />
       ))}
@@ -147,6 +134,14 @@ const InlineBox = styled(Box)(({ theme }) => ({
   gap: "0.625rem",
 }));
 
+const UserInfoBox = styled(InlineBox)(({ theme }) => ({
+  [theme.breakpoints.down("sm")]: {
+    textWrap: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+}));
+
 const ListItemAvatarStyled = styled(ListItemAvatar)(() => ({
   minWidth: 40,
 }));
@@ -177,11 +172,6 @@ const CommentText = styled(BoxInnerHtml)(() => ({
   padding: "0.5rem 0 0",
   overflow: "hidden",
   overflowWrap: "break-word",
-}));
-
-const LinkStyled = styled(Link)(() => ({
-  textDecoration: "none",
-  color: "inherit",
 }));
 
 const CommentCreateFormStyled = styled(CommentCreateForm)(() => ({

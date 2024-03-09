@@ -1,4 +1,5 @@
 import {
+  Column,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -10,15 +11,15 @@ import { Comment } from './comment.entity';
 
 @Entity('comment_attachments')
 export class CommentAttachment {
-  @PrimaryColumn({ name: 'comment_id', type: 'int' })
+  @PrimaryColumn({ name: 'file_id', type: 'int' })
+  fileId: number;
+
+  @Column({ name: 'comment_id', type: 'int' })
   commentId: number;
 
   @ManyToOne(() => Comment, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'comment_id' })
   comment: Comment;
-
-  @PrimaryColumn({ name: 'file_id', type: 'int', unique: true })
-  fileId: number;
 
   @OneToOne(() => File, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'file_id' })

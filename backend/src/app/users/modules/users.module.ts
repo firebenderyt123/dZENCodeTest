@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { UsersProfileController } from '../controllers/users-profile.controller';
-import { UsersSecretInfoModule } from './users-secret-info.module';
-import { UsersProfileModule } from './users-profile.module';
-import { AuthTokenModule } from 'src/app/auth/modules/auth-token.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../entities/user.entity';
+import { UsersService } from '../services/users.service';
+import { UsersResolver } from '../resolvers/users.resolver';
 
 @Module({
-  imports: [AuthTokenModule, UsersProfileModule, UsersSecretInfoModule],
-  controllers: [UsersProfileController],
+  imports: [TypeOrmModule.forFeature([User])],
+  providers: [UsersService, UsersResolver],
+  exports: [UsersService],
 })
 export class UsersModule {}

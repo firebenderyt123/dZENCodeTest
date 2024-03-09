@@ -1,21 +1,23 @@
 import { Module } from '@nestjs/common';
-import { AuthTokenModule } from './auth-token.module';
-import { AuthUserModule } from './auth-user.module';
-import { AuthUserController } from '../controllers/auth-user.controller';
-import { JwtStrategy } from '../strategies/jwt.strategy';
-import { AuthEventEmitterService } from 'src/app/auth/services/auth-emitter.service';
-import { AuthEventListenerService } from 'src/app/auth/services/auth-listener.service';
-import { AuthGateway } from 'src/app/auth/gateways/auth.gateway';
+import { AuthUserService } from '../services/auth-user.service';
+import { AuthResolver } from '../resolvers/auth.resolver';
+import { UsersModule } from 'src/app/users/modules/users.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { JwtStrategy } from 'src/lib/strategies/jwt.strategy';
 
 @Module({
-  imports: [AuthTokenModule, AuthUserModule],
-  controllers: [AuthUserController],
-  providers: [
-    JwtStrategy,
-    AuthEventEmitterService,
-    AuthEventListenerService,
-    AuthGateway,
+  imports: [
+    JwtModule.registerAsync({
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('jwt.secret'),
+        signOptions: { expiresIn: configService.get('jwt.expiresIn') },
+      }),
+      inject: [ConfigService],
+    }),
+    UsersModule,
   ],
-  exports: [AuthTokenModule, AuthEventEmitterService],
+  providers: [AuthUserService, AuthResolver, JwtStrategy],
+  exports: [AuthUserService],
 })
 export class AuthModule {}
