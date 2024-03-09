@@ -27,6 +27,7 @@ interface AuthContextType {
   login: (userData: SignInProps) => void;
   register: (userData: SignUpProps) => void;
   logout: () => void;
+  checkAuthentification: () => void;
   isAuthenticated: boolean;
 }
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -75,6 +76,13 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     cookiesService.setToken(data.accessToken);
   };
 
+  const checkAuthentification = useCallback(() => {
+    const token = cookiesService.getToken();
+    if (!token) {
+      logout();
+    }
+  }, [logout]);
+
   useEffect(() => {
     if (loginData.data) {
       onAuth(loginData.data[SIGN_IN_MUTATION_NAME]);
@@ -89,7 +97,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   return (
     <AuthContext.Provider
-      value={{ auth, login, register, logout, isAuthenticated }}>
+      value={{
+        auth,
+        login,
+        register,
+        logout,
+        checkAuthentification,
+        isAuthenticated,
+      }}>
       {children}
     </AuthContext.Provider>
   );

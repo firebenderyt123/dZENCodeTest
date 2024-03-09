@@ -5,17 +5,18 @@ import cookiesService from "@/services/cookies.service";
 
 export const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
+    console.log(graphQLErrors);
     if (graphQLErrors) {
       for (let err of graphQLErrors) {
         console.log(err);
-        switch (err.extensions.statusCode) {
-          case SERVER_ERRORS.UNAUTHENTICATED:
+        if (err.extensions) {
+          if (err.extensions.code === SERVER_ERRORS.UNAUTHENTICATED) {
             cookiesService.deleteToken();
-            break;
-          default:
-            break;
-        }
-        errorNotify(err.message);
+          }
+          errorNotify(err.message);
+        } else if (err.message) {
+          errorNotify(err.message);
+        } else errorNotify("Unknown server error");
         return forward(operation);
       }
     }

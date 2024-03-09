@@ -9,7 +9,6 @@ import { User } from "@/graphql/queries/users/interfaces/user.interface";
 import {
   LazyQueryExecFunction,
   OperationVariables,
-  useFragment,
   useLazyQuery,
   useMutation,
 } from "@apollo/client";
@@ -38,18 +37,15 @@ interface UserProviderProps {
   children: ReactNode;
 }
 export default function UserProvider({ children }: UserProviderProps) {
-  const { isAuthenticated } = useAuth();
+  const { auth, isAuthenticated, checkAuthentification } = useAuth();
   const [user, setUser] = useState<User | null>(null);
 
   const [getUser, userData] = useLazyQuery<GetUserResponse>(GET_USER_QUERY);
   const [patchUser, patchedUser] =
     useMutation<PatchUserResponse>(PATCH_USER_MUTATION);
 
-  useEffect(() => {
-    if (isAuthenticated) getUser({ ...generateContext() });
-  }, [getUser, isAuthenticated]);
-
   const updateUserInfo = (data: UpdateUserData) => {
+    if (!isAuthenticated) return;
     const username =
       user?.username !== data.username?.toLowerCase()
         ? data.username
@@ -59,21 +55,46 @@ export default function UserProvider({ children }: UserProviderProps) {
     const siteUrl =
       user?.siteUrl !== data.siteUrl?.toLowerCase() ? data.siteUrl : undefined;
 
-    patchUser({
-      variables: { username, email, siteUrl },
-      ...generateContext(),
-    });
+    if (username || email || typeof siteUrl === "string")
+      patchUser({
+        variables: { username, email, siteUrl },
+        ...generateContext(),
+      });
+  };
+
+  const changeUserData = (user: User) => {
+    setUser({ ...user, siteUrl: user.siteUrl !== null ? user.siteUrl : "" });
   };
 
   useEffect(() => {
+    if (userData.error) {
+      checkAuthentification();
+    }
+  }, [checkAuthentification, userData.error]);
+
+  useEffect(() => {
+    if (patchedUser.error) {
+      checkAuthentification();
+    }
+  }, [checkAuthentification, patchedUser.error]);
+
+  useEffect(() => {
+    if (!userData && isAuthenticated) getUser({ ...generateContext() });
+  }, [getUser, isAuthenticated, userData]);
+
+  useEffect(() => {
+    if (auth?.user) changeUserData(auth?.user);
+  }, [auth?.user]);
+
+  useEffect(() => {
     if (userData.data) {
-      setUser(userData.data[GET_USER_NAME]);
+      changeUserData(userData.data[GET_USER_NAME]);
     }
   }, [userData.data]);
 
   useEffect(() => {
     if (patchedUser.data) {
-      setUser(patchedUser.data[PATCH_USER_NAME]);
+      changeUserData(patchedUser.data[PATCH_USER_NAME]);
     }
   }, [patchedUser.data]);
 

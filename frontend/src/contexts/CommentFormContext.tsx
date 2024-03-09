@@ -13,8 +13,9 @@ import {
   ADD_COMMENT_QUERY_NAME,
 } from "@/graphql/queries/comments/add-comment.mutation";
 import { generateContext } from "@/graphql/utils/auth.utils";
-import { errorNotify, successNotify } from "@/utils/notifications.utils";
+import { successNotify } from "@/utils/notifications.utils";
 import { CreateCommentProps } from "@/graphql/queries/comments/interfaces/create-comments-props.interface";
+import { useAuth } from "./AuthContext";
 
 interface CommentFormContextType {
   state: State;
@@ -58,8 +59,9 @@ export default function CommentFormProvider({
   children,
 }: CommentFormProviderProps) {
   const [state, setState] = useState<State>(initState);
+  const { checkAuthentification } = useAuth();
 
-  const [addComment, { reset, data }] = useMutation<{
+  const [addComment, { reset, data, error }] = useMutation<{
     [ADD_COMMENT_QUERY_NAME]: boolean;
   }>(ADD_COMMENT_QUERY);
 
@@ -80,6 +82,16 @@ export default function CommentFormProvider({
   );
 
   useEffect(() => {
+    if (error) {
+      setState((prev) => ({
+        ...prev,
+        pending: false,
+      }));
+      checkAuthentification();
+    }
+  }, [checkAuthentification, error]);
+
+  useEffect(() => {
     if (data?.[ADD_COMMENT_QUERY_NAME]) {
       reset();
       setState((prev) => ({
@@ -89,12 +101,6 @@ export default function CommentFormProvider({
         commentSent: true,
       }));
       successNotify("Comment sent");
-    } else if (data && data[ADD_COMMENT_QUERY_NAME] === false) {
-      setState((prev) => ({
-        ...prev,
-        pending: false,
-      }));
-      errorNotify("An error occurred while creating a comment");
     }
   }, [data, reset]);
 

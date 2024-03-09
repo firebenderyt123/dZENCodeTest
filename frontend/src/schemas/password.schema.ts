@@ -7,5 +7,5 @@ export const passwordSchema = yup
   .max(32, "Password must not exceed 32 characters")
   .matches(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]+$/,
-    "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character"
+    "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character (!@#$%^&*)"
   );
