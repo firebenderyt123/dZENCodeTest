@@ -68,23 +68,24 @@ export default function UserProvider({ children }: UserProviderProps) {
 
   useEffect(() => {
     if (userData.error) {
+      userData.error = undefined;
       checkAuthentification();
     }
-  }, [checkAuthentification, userData.error]);
+  }, [checkAuthentification, userData]);
 
   useEffect(() => {
     if (patchedUser.error) {
+      patchedUser.reset();
       checkAuthentification();
     }
-  }, [checkAuthentification, patchedUser.error]);
+  }, [checkAuthentification, patchedUser]);
 
   useEffect(() => {
-    if (!userData && isAuthenticated) getUser({ ...generateContext() });
-  }, [getUser, isAuthenticated, userData]);
-
-  useEffect(() => {
-    if (auth?.user) changeUserData(auth?.user);
-  }, [auth?.user]);
+    if (!isAuthenticated && user) {
+      setUser(null);
+    } else if (isAuthenticated && auth?.user) changeUserData(auth?.user);
+    else if (isAuthenticated && !user) getUser({ ...generateContext() });
+  }, [auth?.user, getUser, isAuthenticated, user]);
 
   useEffect(() => {
     if (userData.data) {

@@ -64,20 +64,16 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
   }, []);
 
   const setCommentsListData = (data: GetCommentsResponse) => {
-    try {
-      const response = data[COMMENTS_SUBSCRIPTION_NAME];
-      const trees = commentsService.commentArraysToTree(
-        response.comments,
-        response.commentsLength
-      );
-      setCommentsList({
-        comments: trees,
-        totalPages: response.totalPages,
-        totalComments: response.totalComments,
-      });
-    } catch (error) {
-      errorNotify("Receiving comments failed");
-    }
+    const response = data[COMMENTS_SUBSCRIPTION_NAME];
+    const trees = commentsService.commentArraysToTree(
+      response.comments,
+      response.commentsLength
+    );
+    setCommentsList({
+      comments: trees,
+      totalPages: response.totalPages,
+      totalComments: response.totalComments,
+    });
   };
 
   useEffect(() => {

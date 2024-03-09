@@ -6,7 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { SignInSchema, signInSchema } from "@/schemas/sign-in.schema";
 
 export default function SignInForm() {
-  const auth = useAuth();
+  const { login } = useAuth();
   const {
     register,
     handleSubmit,
@@ -17,7 +17,7 @@ export default function SignInForm() {
   });
 
   const onSubmit: SubmitHandler<SignInSchema> = (data) => {
-    auth?.login(data);
+    login(data);
     reset();
   };
 

@@ -4,17 +4,13 @@ import CommentOrderPanel from "../CommentsOrderPanel";
 import CommentCreateForm from "../CommentCreateForm";
 
 export default function CommentsPageContent() {
-  const commentForm = useCommentForm();
+  const { state } = useCommentForm();
 
   return (
     <>
-      {commentForm && (
-        <>
-          {commentForm.state.replyToCommentId === null && <CommentCreateForm />}
-          <CommentOrderPanel />
-          <CommentsList></CommentsList>
-        </>
-      )}
+      {state.replyToCommentId === null && <CommentCreateForm />}
+      <CommentOrderPanel />
+      <CommentsList></CommentsList>
     </>
   );
 }

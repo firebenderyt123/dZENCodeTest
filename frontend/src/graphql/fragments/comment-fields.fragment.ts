@@ -8,7 +8,7 @@ export const COMMENT_FIELDS_FRAGMENT = gql`
       ...ParentCommentFields
     }
     user {
-      ...UserFields
+      ...CommentAuthorFields
     }
     createdAt
     attachments {

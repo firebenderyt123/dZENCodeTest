@@ -83,13 +83,14 @@ export default function CommentFormProvider({
 
   useEffect(() => {
     if (error) {
+      reset();
       setState((prev) => ({
         ...prev,
         pending: false,
       }));
       checkAuthentification();
     }
-  }, [checkAuthentification, error]);
+  }, [checkAuthentification, error, reset]);
 
   useEffect(() => {
     if (data?.[ADD_COMMENT_QUERY_NAME]) {

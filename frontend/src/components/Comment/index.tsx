@@ -45,18 +45,10 @@ function Component({ comment, parentCommentText }: ComponentProps, ref: Ref) {
   );
 
   const userInfo = (
-    <InlineBox>
-      <BoldText>
-        {user.siteUrl ? (
-          <LinkStyled href={user.siteUrl} target="_blank" rel="nofollow">
-            {user.username}
-          </LinkStyled>
-        ) : (
-          user.username
-        )}
-      </BoldText>
+    <UserInfoBox>
+      <BoldText>{user.username}</BoldText>
       {formatDateForComments(createdAt)}
-    </InlineBox>
+    </UserInfoBox>
   );
 
   const replyButton = commentForm && (
@@ -142,6 +134,14 @@ const InlineBox = styled(Box)(({ theme }) => ({
   gap: "0.625rem",
 }));
 
+const UserInfoBox = styled(InlineBox)(({ theme }) => ({
+  [theme.breakpoints.down("sm")]: {
+    textWrap: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+  },
+}));
+
 const ListItemAvatarStyled = styled(ListItemAvatar)(() => ({
   minWidth: 40,
 }));
@@ -172,11 +172,6 @@ const CommentText = styled(BoxInnerHtml)(() => ({
   padding: "0.5rem 0 0",
   overflow: "hidden",
   overflowWrap: "break-word",
-}));
-
-const LinkStyled = styled(Link)(() => ({
-  textDecoration: "none",
-  color: "inherit",
 }));
 
 const CommentCreateFormStyled = styled(CommentCreateForm)(() => ({

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppBar, Button, Container, Toolbar, styled } from "@mui/material";
 import { useAuth } from "@/contexts/AuthContext";
 import SignInForm from "../Auth/SignInForm";
@@ -17,28 +17,26 @@ export default function Header() {
     return () => setIsMounted(false);
   }, []);
 
-  const signInForm = isMounted && !isAuthenticated && (
-    <FormDialog ref={signInButtonRef}>
-      <SignInForm />
-    </FormDialog>
-  );
-
-  const signUpForm = isMounted && !isAuthenticated && (
-    <FormDialog ref={signUpButtonRef}>
-      <SignUpForm />
-    </FormDialog>
-  );
-
   const signInButton = isMounted && !isAuthenticated && (
-    <Button color="inherit" ref={signInButtonRef}>
-      Sign In
-    </Button>
+    <>
+      <Button color="inherit" ref={signInButtonRef}>
+        Sign In
+      </Button>
+      <FormDialog ref={signInButtonRef}>
+        <SignInForm />
+      </FormDialog>
+    </>
   );
 
   const signUpButton = isMounted && !isAuthenticated && (
-    <Button color="inherit" ref={signUpButtonRef}>
-      Sign Up
-    </Button>
+    <>
+      <Button color="inherit" ref={signUpButtonRef}>
+        Sign Up
+      </Button>
+      <FormDialog ref={signUpButtonRef}>
+        <SignUpForm />
+      </FormDialog>
+    </>
   );
 
   const logoutButton = isMounted && isAuthenticated && (
@@ -58,8 +56,6 @@ export default function Header() {
           </ToolbarStyled>
         </Container>
       </AppBar>
-      {signInForm}
-      {signUpForm}
     </>
   );
 }

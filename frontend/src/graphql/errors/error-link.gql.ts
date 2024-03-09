@@ -9,7 +9,7 @@ export const errorLink = onError(
       for (let err of graphQLErrors) {
         console.error(err);
         if (err.extensions) {
-          if (err.extensions.code === SERVER_ERRORS.UNAUTHENTICATED) {
+          if (err.extensions.statusCode === SERVER_ERRORS.UNAUTHENTICATED) {
             cookiesService.deleteToken();
           }
           errorNotify(err.message);
