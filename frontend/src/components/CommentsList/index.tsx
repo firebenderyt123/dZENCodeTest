@@ -5,7 +5,8 @@ import { useComments } from "@/contexts/CommentsContext";
 import { CommentsListSkeleton } from "./CommentsListSkeleton";
 
 export default function CommentsList() {
-  const { getComments, updateParams, commentsList, params } = useComments();
+  const { getComments, updateParams, commentsList, params, loading } =
+    useComments();
 
   const handlePageChange = (_: ChangeEvent<unknown>, page: number) => {
     updateParams({ page });
@@ -18,13 +19,17 @@ export default function CommentsList() {
 
   return (
     <>
-      <ListStyled>
-        {commentsList.comments.map((comment) => (
-          <CommentComponent
-            key={comment.id}
-            comment={comment}></CommentComponent>
-        ))}
-      </ListStyled>
+      {loading || !commentsList.comments.length ? (
+        <CommentsListSkeleton />
+      ) : (
+        <ListStyled>
+          {commentsList.comments.map((comment) => (
+            <CommentComponent
+              key={comment.id}
+              comment={comment}></CommentComponent>
+          ))}
+        </ListStyled>
+      )}
       <PaginationStyled
         count={commentsList.totalPages}
         variant="outlined"
