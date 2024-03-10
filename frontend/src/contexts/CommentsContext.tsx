@@ -15,9 +15,9 @@ import {
   COMMENTS_SUBSCRIPTION_NAME,
 } from "@/graphql/queries/comments/comments-subscription";
 import { ExtendedCommentTrees } from "@/graphql/queries/comments/interfaces/extended-comment-trees.interface";
-import { errorNotify } from "@/utils/notifications.utils";
 import { GetCommentsResponse } from "@/graphql/queries/comments/interfaces/get-comments-response.interface";
 import { v4 as uuidv4 } from "uuid";
+import { Comment } from "@/graphql/queries/comments/interfaces/comment.interface";
 
 const commentsUUID = uuidv4();
 
@@ -25,6 +25,7 @@ interface CommentsContextType {
   params: GetCommentsProps;
   commentsList: ExtendedCommentTrees;
   updateParams: (props: Partial<GetCommentsProps>) => void;
+  updateCommentsList: (newComment: Comment) => void;
 }
 
 const CommentsContext = createContext<CommentsContextType | null>(null);
@@ -62,6 +63,22 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
   const updateParams = useCallback((props: Partial<GetCommentsProps>) => {
     setParams((prev) => ({ ...prev, ...props }));
   }, []);
+
+  const updateCommentsList = useCallback(
+    (newComment: Comment) => {
+      console.log(newComment);
+      const newComments = commentsService.insertCommentToTree(
+        newComment,
+        commentsList.comments
+      );
+      setCommentsList((prev) => ({
+        comments: newComments,
+        totalPages: Math.ceil((prev.totalComments + 1) / params.limit),
+        totalComments: prev.totalComments + 1,
+      }));
+    },
+    [commentsList.comments, params.limit]
+  );
 
   const setCommentsListData = (data: GetCommentsResponse) => {
     const response = data[COMMENTS_SUBSCRIPTION_NAME];
@@ -109,6 +126,7 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
         params,
         commentsList,
         updateParams,
+        updateCommentsList,
       }}>
       {children}
     </CommentsContext.Provider>

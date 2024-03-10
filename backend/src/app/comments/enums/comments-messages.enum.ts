@@ -4,4 +4,5 @@ export enum COMMENTS_MESSAGES {
   UPLOAD_ATTACHMENTS = 'comments:upload-attachments',
 
   RESPONSE_COMMENT_LIST = 'comments:response-comments',
+  RESPONSE_COMMENT = 'comments:response-new-comment',
 }

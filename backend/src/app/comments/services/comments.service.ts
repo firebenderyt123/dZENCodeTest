@@ -20,7 +20,7 @@ export class CommentsService {
     userId: number,
     parentId: number | null,
     text: string,
-  ): Promise<number> {
+  ): Promise<CommentModel> {
     const comment = new Comment();
     comment.parent = parentId
       ? await this.commentRepository.findOneBy({
@@ -31,7 +31,14 @@ export class CommentsService {
     comment.text = text;
 
     const newComment = await this.commentRepository.save(comment);
-    return newComment.id;
+
+    const result = {
+      ...newComment,
+      createdAt: newComment.createdAt.toISOString(),
+      replies: [],
+      attachments: [],
+    };
+    return result;
   }
 
   async getComments(args: GetCommentListArgs): Promise<CommentList> {

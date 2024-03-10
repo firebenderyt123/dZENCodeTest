@@ -65,4 +65,5 @@ scalar Upload
 
 type Subscription {
   commentsList(uuid: String!): CommentList!
+  createdComment(userId: Int!): Comment!
 }

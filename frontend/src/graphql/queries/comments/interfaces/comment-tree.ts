@@ -9,7 +9,7 @@ export interface CommentTree {
   text: string;
   user: User;
   createdAt: string;
-  parent: CommentParent;
+  parent: CommentParent | null;
   replies: CommentTree[];
   attachments: CommentAttachment[];
 }

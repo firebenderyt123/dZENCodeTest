@@ -5,7 +5,7 @@ export interface Comment {
   text: string;
   user: User;
   createdAt: string;
-  parent: CommentParent;
+  parent: CommentParent | null;
   attachments: CommentAttachment[];
 }
 
