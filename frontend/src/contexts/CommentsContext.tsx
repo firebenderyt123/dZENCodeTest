@@ -16,14 +16,15 @@ import {
 } from "@/graphql/queries/comments/comments-subscription";
 import { ExtendedCommentTrees } from "@/graphql/queries/comments/interfaces/extended-comment-trees.interface";
 import { GetCommentsResponse } from "@/graphql/queries/comments/interfaces/get-comments-response.interface";
-import { v4 as uuidv4 } from "uuid";
 import { Comment } from "@/graphql/queries/comments/interfaces/comment.interface";
+import { v4 as uuidv4 } from "uuid";
 
 const commentsUUID = uuidv4();
 
 interface CommentsContextType {
   params: GetCommentsProps;
   commentsList: ExtendedCommentTrees;
+  getComments: () => void;
   updateParams: (props: Partial<GetCommentsProps>) => void;
   updateCommentsList: (newComment: Comment) => void;
 }
@@ -53,12 +54,15 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
     useState<ExtendedCommentTrees>(initCommentsList);
   const [params, setParams] = useState<GetCommentsProps>(initParams);
 
-  const [firstRequest, { called, refetch }] = useLazyQuery(GET_COMMENTS_QUERY, {
-    variables: { uuid: commentsUUID, ...params },
-  });
   const { data } = useSubscription<GetCommentsResponse>(COMMENTS_SUBSCRIPTION, {
     variables: { uuid: commentsUUID },
   });
+  const [getComments, { called, refetch }] = useLazyQuery<GetCommentsResponse>(
+    GET_COMMENTS_QUERY,
+    {
+      variables: { uuid: commentsUUID, ...params },
+    }
+  );
 
   const updateParams = useCallback((props: Partial<GetCommentsProps>) => {
     setParams((prev) => ({ ...prev, ...props }));
@@ -66,7 +70,6 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
 
   const updateCommentsList = useCallback(
     (newComment: Comment) => {
-      console.log(newComment);
       const newComments = commentsService.insertCommentToTree(
         newComment,
         commentsList.comments
@@ -94,19 +97,6 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
   };
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (data) return;
-      else if (!called) firstRequest();
-      else refetch();
-    }, 1000);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     if (data) {
       setCommentsListData(data);
     }
@@ -125,6 +115,7 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
       value={{
         params,
         commentsList,
+        getComments,
         updateParams,
         updateCommentsList,
       }}>

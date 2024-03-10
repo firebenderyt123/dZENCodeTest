@@ -21,8 +21,11 @@ import { allFragments } from "@/graphql/fragments";
 const wsLink = new GraphQLWsLink(
   createClient({
     url: process.env.wsGraphQlEndpoint as string,
-    retryAttempts: 5,
+    retryAttempts: 10,
     lazy: true,
+    shouldRetry() {
+      return true;
+    },
   })
 );
 const httpLink = createUploadLink({ uri: process.env.httpGraphQlEndpoint });

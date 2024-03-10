@@ -1,12 +1,13 @@
-import { Button, Typography, Container } from "@mui/material";
+import { Container } from "@mui/joy";
 import { SubmitHandler, useForm } from "react-hook-form";
-import FormField from "@/components/FormParts/FormField";
 import { useAuth } from "@/contexts/AuthContext";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SignInSchema, signInSchema } from "@/schemas/sign-in.schema";
+import InputField from "@/components/FormParts/InputField";
+import { AuthButton, Title } from "../Blocks";
 
 export default function SignInForm() {
-  const { login } = useAuth();
+  const { login, loginData } = useAuth();
   const {
     register,
     handleSubmit,
@@ -24,25 +25,29 @@ export default function SignInForm() {
   return (
     <Container component="main" maxWidth="xs">
       <div>
-        <Typography component="h1" variant="h5">
-          Sign in
-        </Typography>
+        <Title>Sign in</Title>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FormField
+          <InputField
             {...register("email")}
-            fieldError={errors.email}
+            helperText={errors.email?.message}
+            error={!!errors.email}
             label="E-mail"
             type="email"
           />
-          <FormField
+          <InputField
             {...register("password")}
-            fieldError={errors.password}
+            helperText={errors.password?.message}
+            error={!!errors.password}
             label="Password"
             type="password"
           />
-          <Button type="submit" fullWidth variant="contained" color="primary">
+          <AuthButton
+            type="submit"
+            fullWidth
+            color="primary"
+            loading={loginData.loading}>
             Sign In
-          </Button>
+          </AuthButton>
         </form>
       </div>
     </Container>
