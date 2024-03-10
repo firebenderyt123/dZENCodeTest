@@ -24,6 +24,7 @@ const commentsUUID = uuidv4();
 interface CommentsContextType {
   params: GetCommentsProps;
   commentsList: ExtendedCommentTrees;
+  loading: boolean;
   getComments: () => void;
   updateParams: (props: Partial<GetCommentsProps>) => void;
   updateCommentsList: (newComment: Comment) => void;
@@ -53,6 +54,7 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
   const [commentsList, setCommentsList] =
     useState<ExtendedCommentTrees>(initCommentsList);
   const [params, setParams] = useState<GetCommentsProps>(initParams);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { data } = useSubscription<GetCommentsResponse>(COMMENTS_SUBSCRIPTION, {
     variables: { uuid: commentsUUID },
@@ -99,15 +101,18 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
   useEffect(() => {
     if (data) {
       setCommentsListData(data);
+      setLoading(false);
     }
   }, [data, params]);
 
   useEffect(() => {
-    if (called)
+    if (called) {
       refetch({
         uuid: commentsUUID,
         ...params,
       });
+      setLoading(true);
+    }
   }, [called, params, refetch]);
 
   return (
@@ -115,6 +120,7 @@ export default function CommentsProvider({ children }: CommentsProviderProps) {
       value={{
         params,
         commentsList,
+        loading,
         getComments,
         updateParams,
         updateCommentsList,
