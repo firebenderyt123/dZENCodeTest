@@ -18,17 +18,13 @@ export default function CommentsList() {
 
   return (
     <>
-      {!commentsList.comments.length ? (
-        <CommentsListSkeleton />
-      ) : (
-        <ListStyled>
-          {commentsList.comments.map((comment) => (
-            <CommentComponent
-              key={comment.id}
-              comment={comment}></CommentComponent>
-          ))}
-        </ListStyled>
-      )}
+      <ListStyled>
+        {commentsList.comments.map((comment) => (
+          <CommentComponent
+            key={comment.id}
+            comment={comment}></CommentComponent>
+        ))}
+      </ListStyled>
       <PaginationStyled
         count={commentsList.totalPages}
         variant="outlined"

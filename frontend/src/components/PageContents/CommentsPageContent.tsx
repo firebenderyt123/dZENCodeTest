@@ -3,6 +3,7 @@ import { useCommentForm } from "@/contexts/CommentFormContext";
 import CommentOrderPanel from "../CommentsOrderPanel";
 import CommentCreateForm from "../CommentCreateForm";
 import { useWs } from "@/hooks/useWs.hook";
+import { CommentsListSkeleton } from "../CommentsList/CommentsListSkeleton";
 
 export default function CommentsPageContent() {
   const { state } = useCommentForm();
@@ -12,7 +13,7 @@ export default function CommentsPageContent() {
     <>
       {state.replyToCommentId === null && <CommentCreateForm />}
       <CommentOrderPanel />
-      {isConnected && <CommentsList />}
+      {!isConnected ? <CommentsListSkeleton /> : <CommentsList />}
     </>
   );
 }
