@@ -7,15 +7,23 @@ import {
   useState,
 } from "react";
 import commentsService from "@/services/comments.service";
-import { useMutation } from "@apollo/client";
+import { useMutation, useSubscription } from "@apollo/client";
 import {
-  ADD_COMMENT_QUERY,
-  ADD_COMMENT_QUERY_NAME,
+  ADD_COMMENT_MUTATION,
+  ADD_COMMENT_MUTATION_NAME,
 } from "@/graphql/queries/comments/add-comment.mutation";
 import { generateContext } from "@/graphql/utils/auth.utils";
 import { successNotify } from "@/utils/notifications.utils";
 import { CreateCommentProps } from "@/graphql/queries/comments/interfaces/create-comments-props.interface";
 import { useAuth } from "./AuthContext";
+import {
+  CREATED_COMMENT_SUBSCRIPTION,
+  CREATED_COMMENT_SUBSCRIPTION_NAME,
+} from "@/graphql/queries/comments/new-comment.subscription";
+import { useUser } from "./UserContext";
+import { AddCommentMutationResponse } from "@/graphql/queries/comments/interfaces/add-comment-mutation.interface";
+import { useComments } from "./CommentsContext";
+import { AddCommentSubscriptionResponse } from "@/graphql/queries/comments/interfaces/add-comment-subscription.interface";
 
 interface CommentFormContextType {
   state: State;
@@ -59,11 +67,19 @@ export default function CommentFormProvider({
   children,
 }: CommentFormProviderProps) {
   const [state, setState] = useState<State>(initState);
-  const { checkAuthentification } = useAuth();
+  const { checkAuthentification, isAuthenticated } = useAuth();
+  const { updateCommentsList } = useComments();
+  const { user } = useUser();
 
-  const [addComment, { reset, data, error }] = useMutation<{
-    [ADD_COMMENT_QUERY_NAME]: boolean;
-  }>(ADD_COMMENT_QUERY);
+  const [addComment, { reset, data, error }] =
+    useMutation<AddCommentMutationResponse>(ADD_COMMENT_MUTATION);
+  const { data: newComment } = useSubscription<AddCommentSubscriptionResponse>(
+    CREATED_COMMENT_SUBSCRIPTION,
+    {
+      variables: { userId: user?.id || 0 },
+      shouldResubscribe: isAuthenticated,
+    }
+  );
 
   const createComment = useCallback(
     (text: string, captcha: string) => {
@@ -82,6 +98,13 @@ export default function CommentFormProvider({
   );
 
   useEffect(() => {
+    if (newComment) {
+      updateCommentsList(newComment[CREATED_COMMENT_SUBSCRIPTION_NAME]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newComment]);
+
+  useEffect(() => {
     if (error) {
       reset();
       setState((prev) => ({
@@ -93,7 +116,7 @@ export default function CommentFormProvider({
   }, [checkAuthentification, error, reset]);
 
   useEffect(() => {
-    if (data?.[ADD_COMMENT_QUERY_NAME]) {
+    if (data?.[ADD_COMMENT_MUTATION_NAME]) {
       reset();
       setState((prev) => ({
         ...prev,

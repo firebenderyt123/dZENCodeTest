@@ -1,22 +1,26 @@
 import { ChangeEvent, useEffect } from "react";
-import { Pagination } from "@mui/material";
+import { Pagination, styled } from "@mui/material";
 import CommentComponent, { ListStyled } from "../Comment";
 import { useComments } from "@/contexts/CommentsContext";
+import { CommentsListSkeleton } from "./CommentsListSkeleton";
 
 export default function CommentsList() {
-  const { updateParams, commentsList, params } = useComments();
+  const { getComments, updateParams, commentsList, params } = useComments();
 
   const handlePageChange = (_: ChangeEvent<unknown>, page: number) => {
     updateParams({ page });
   };
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [commentsList]);
+    getComments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    commentsList && (
-      <>
+    <>
+      {!commentsList.comments.length ? (
+        <CommentsListSkeleton />
+      ) : (
         <ListStyled>
           {commentsList.comments.map((comment) => (
             <CommentComponent
@@ -24,16 +28,22 @@ export default function CommentsList() {
               comment={comment}></CommentComponent>
           ))}
         </ListStyled>
-        <Pagination
-          count={commentsList.totalPages}
-          variant="outlined"
-          shape="rounded"
-          page={params.page}
-          onChange={handlePageChange}
-          showFirstButton
-          showLastButton
-        />
-      </>
-    )
+      )}
+      <PaginationStyled
+        count={commentsList.totalPages}
+        variant="outlined"
+        shape="rounded"
+        page={params.page}
+        onChange={handlePageChange}
+        showFirstButton
+        showLastButton
+      />
+    </>
   );
 }
+
+const PaginationStyled = styled(Pagination)(() => ({
+  padding: "1rem",
+  display: "flex",
+  justifyContent: "center",
+}));

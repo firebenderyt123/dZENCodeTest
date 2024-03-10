@@ -11,6 +11,7 @@ import { PUB_SUB } from 'src/lib/modules/pubsub.module';
 import { CommentsListPayload } from '../interfaces/comments-list-payload.interface';
 import { CreateCommentParams } from '../interfaces/create-comment-params.interface';
 import { filesUploadToFilesInput } from 'src/lib/utils/files.utils';
+import { CommentPayload } from '../interfaces/comment-payload';
 
 @Controller()
 export class CommentsController {
@@ -29,15 +30,24 @@ export class CommentsController {
     const { parentId, text } = data;
     const files = filesUploadToFilesInput(data.files);
     try {
-      const commentId = await this.commentsService.create(
-        userId,
-        parentId,
-        text,
-      );
+      const comment = await this.commentsService.create(userId, parentId, text);
       if (!!files.length) {
-        await this.commentAttachmentsService.saveAttachments(commentId, files);
+        const attachments =
+          await this.commentAttachmentsService.saveAttachments(
+            comment.id,
+            files,
+          );
+        comment.attachments = attachments.map(({ file, fileId }) => ({
+          fileId,
+          containerName: file.containerName,
+          fileUrl: file.fileUrl,
+        }));
       }
       await this.cacheService.delCommentsList();
+      return this.pubSub.publish<CommentPayload>(
+        COMMENTS_MESSAGES.RESPONSE_COMMENT,
+        { userId, comment },
+      );
     } catch (error) {
       throw error;
     }

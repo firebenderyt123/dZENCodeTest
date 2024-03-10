@@ -1,12 +1,13 @@
-import { Button, Typography, Container } from "@mui/material";
+import { Container } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
-import FormField from "@/components/FormParts/FormField";
 import { useAuth } from "@/contexts/AuthContext";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { SignUpSchema, signUpSchema } from "@/schemas/sign-up.schema";
+import { AuthButton, Title } from "../Blocks";
+import InputField from "@/components/FormParts/InputField";
 
 export default function SignUpForm() {
-  const { register: reg } = useAuth();
+  const { register: reg, registerData } = useAuth();
   const {
     register,
     handleSubmit,
@@ -25,43 +26,50 @@ export default function SignUpForm() {
   return (
     <Container component="main" maxWidth="xs">
       <div>
-        <Typography component="h1" variant="h5">
-          Sign up
-        </Typography>
+        <Title>Sign up</Title>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FormField
+          <InputField
             {...register("email")}
-            fieldError={errors.email}
+            helperText={errors.email?.message}
+            error={!!errors.email}
             label="E-mail"
             type="email"
           />
-          <FormField
+          <InputField
             {...register("username")}
-            fieldError={errors.username}
+            helperText={errors.username?.message}
+            error={!!errors.username}
             label="Username"
             type="text"
           />
-          <FormField
+          <InputField
             {...register("siteUrl")}
-            fieldError={errors.siteUrl}
+            helperText={errors.siteUrl?.message}
+            error={!!errors.siteUrl}
             label="Home page"
             type="url"
           />
-          <FormField
+          <InputField
             {...register("password")}
-            fieldError={errors.password}
+            helperText={errors.password?.message}
+            error={!!errors.password}
             label="Password"
             type="password"
           />
-          <FormField
+          <InputField
             {...register("repeatPassword")}
-            fieldError={errors.repeatPassword}
+            helperText={errors.repeatPassword?.message}
+            error={!!errors.repeatPassword}
             label="Repeat Password"
             type="password"
           />
-          <Button type="submit" fullWidth variant="contained" color="primary">
+          <AuthButton
+            type="submit"
+            fullWidth
+            color="primary"
+            loading={registerData.loading}>
             Sign Up
-          </Button>
+          </AuthButton>
         </form>
       </div>
     </Container>

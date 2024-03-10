@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { GetCommentListArgs } from '../dto/get-comment-list.dto';
 import { CreateCommentArgs } from '../dto/create-comment.dto';
@@ -18,6 +19,9 @@ import { CommentsListPayload } from '../interfaces/comments-list-payload.interfa
 import { UloadsValidationGuard } from 'src/lib/guards/uploads-gql.guard';
 import { UploadedFiles } from 'src/lib/decorators/uploaded-files.decorator';
 import { FileInput } from 'src/app/files/interfaces/file-input.interface';
+import { Comment } from '../models/comment.model';
+import { UserIdArgs } from 'src/lib/dto/userId.dto';
+import { CommentPayload } from '../interfaces/comment-payload';
 
 @Resolver(NAMESPACE.COMMENTS)
 export class CommentsResolver {
@@ -49,13 +53,21 @@ export class CommentsResolver {
   }
 
   @Subscription(() => CommentList, {
-    filter: (payload: CommentsListPayload, variables: GetCommentListArgs) =>
+    filter: (payload: CommentsListPayload, variables: UUIDArgs) =>
       payload.uuid === variables.uuid,
     resolve: (payload: CommentsListPayload): CommentList =>
       payload.commentsList,
   })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async commentsList(@Args() _args: UUIDArgs) {
     return this.pubSub.asyncIterator(COMMENTS_MESSAGES.RESPONSE_COMMENT_LIST);
+  }
+
+  @Subscription(() => Comment, {
+    filter: (payload: CommentPayload, variables: UserIdArgs) =>
+      payload.userId === variables.userId,
+    resolve: (payload: CommentPayload): Comment => payload.comment,
+  })
+  async createdComment(@Args() _args: UserIdArgs) {
+    return this.pubSub.asyncIterator(COMMENTS_MESSAGES.RESPONSE_COMMENT);
   }
 }

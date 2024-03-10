@@ -47,13 +47,17 @@ export default function UserProvider({ children }: UserProviderProps) {
   const updateUserInfo = (data: UpdateUserData) => {
     if (!isAuthenticated) return;
     const username =
-      user?.username !== data.username?.toLowerCase()
+      user?.username.toLowerCase() !== data.username?.toLowerCase()
         ? data.username
         : undefined;
     const email =
-      user?.email !== data.email?.toLowerCase() ? data.email : undefined;
+      user?.email.toLowerCase() !== data.email?.toLowerCase()
+        ? data.email
+        : undefined;
     const siteUrl =
-      user?.siteUrl !== data.siteUrl?.toLowerCase() ? data.siteUrl : undefined;
+      user?.siteUrl?.toLowerCase() !== data.siteUrl?.toLowerCase()
+        ? data.siteUrl
+        : undefined;
 
     if (username || email || typeof siteUrl === "string")
       patchUser({
