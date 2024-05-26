@@ -9,8 +9,7 @@ const nextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: `
-              default-src 'self';
+            value: `default-src 'self';
               script-src 'self' ${
                 process.env.NODE_ENV == "production" ? "" : "'unsafe-eval'"
               } https://www.google.com/recaptcha/api.js https://www.gstatic.com/;
@@ -26,7 +25,9 @@ const nextConfig = {
               form-action 'self';
               frame-ancestors 'none';
               upgrade-insecure-requests;
-            `.replace(/\n/g, ""),
+            `
+              .replace(/\n/g, "")
+              .replace(/\s\s+/g, " "),
           },
           { key: "Access-Control-Allow-Credentials", value: "true" },
           {
