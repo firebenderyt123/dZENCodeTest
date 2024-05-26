@@ -13,6 +13,7 @@ COPY package.json package-lock.json .
 
 RUN npm ci --omit=dev
 RUN npm install -g next
+RUN npm i sharp --ignore-engines
 
 # BUILD
 FROM deps as build
@@ -33,6 +34,7 @@ COPY public ./public
 
 COPY --from=deps ${WORKDIR}/node_modules ./node_modules
 COPY --from=build ${WORKDIR}/.next ./.next
+COPY --from=build ${WORKDIR}/next.config.mjs ./next.config.mjs
 
 EXPOSE 3000
 
