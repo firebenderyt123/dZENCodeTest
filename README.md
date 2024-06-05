@@ -101,7 +101,7 @@ cd dZENCodeTest
 
 > **RABBITMQ_QUEUE_DURABLE**: When set to "false", this variable indicates that RabbitMQ queues should not be durable. In RabbitMQ, durable queues survive broker restarts and ensure that messages are not lost even if the broker goes down. Setting this variable to "`false`" means that queues will not be durable, and messages may be lost if the broker restarts or fails. However, non-durable queues have better performance compared to durable queues, especially for transient or temporary data.
 
-> **JWT_SECRET**: The secret key for signing and verifying JWT tokens used for user authentication. Simply generate a long string of different characters
+> **JWT_SECRET**: The secret key for signing and verifying JWT tokens used for user authentication. Simply generate a long string of different characters.
 
 > **JWT_EXPIRATION_TIME**: The lifetime of the JWT token, specified in seconds such time format ("`1h`" for one hour, "`7d`" for seven days, etc.).
 
